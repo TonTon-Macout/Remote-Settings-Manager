@@ -41,7 +41,7 @@
 запуск скрипта<br>
 ```python Settings_app_v0.06.py```
 
-сборка exe --- иконка должна лежать в той же папке где и скрипт<br>
+сборка exe --- иконки должна лежать в той же папке где и скрипт<br>
 ```pyinstaller --onefile --windowed --icon=icon.ico Settings_app_v0.06.py```
 
 собирётся экзешник в папке dist, 
