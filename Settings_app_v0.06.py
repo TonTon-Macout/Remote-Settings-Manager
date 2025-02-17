@@ -484,9 +484,9 @@ class WebBrowser(QMainWindow):
 
     def show_about_dialog(self):
         QMessageBox.about(self, "О программе",
-                          "Settings\n"
-                          "Версия 0.05\n"
-                          "Автор: Vania\n"
+                          "Settings APP\n"
+                          "Версия 0.06\n"
+                          "Автор: VaniAI\n"
                           "Описание:\nпрограмма для поиска и отображения истройств в локальной сети\n"
                           "с установленной библиотекой Settinggs AlexGyver \n"
                           "тестированно на версии библиотеки v1.2.5"
