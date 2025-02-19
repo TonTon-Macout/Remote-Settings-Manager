@@ -1,6 +1,6 @@
 
 # APP-for-AlexGyver-Settings
-Виндовс приложение для поиска и отображения вебморды устройств с установленной библиотекой [Settings AlexGyver](https://github.com/GyverLibs/Settings) 
+Виндовс приложение для поиска и отображения вебморды устройств с установленной библиотекой [Settings AlexGyver](https://github.com/GyverLibs/Settings) <br><br>
 [Последняя версия 0.07, ссылка на яндекс диск](https://disk.yandex.ru/d/TRw_d7P8EV3OwA) 
 Возможности приложения:
 + поиск и отображение устройств в локальной сети с  установленной библиотекой  Settings AlexGyver <br>
