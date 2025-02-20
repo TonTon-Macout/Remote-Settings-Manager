@@ -71,6 +71,4 @@
 
 
 
-
-
-![Снимок экрана 2025-02-21 000532](https://github.com/user-attachments/assets/aa418d63-88d2-413a-bb7a-6ec45c1154e8)
+![Снимок экрана 2025-02-21 000532](https://github.com/user-attachments/assets/53d652ac-34c4-459e-b81e-821341b031c6)
