@@ -1,7 +1,7 @@
 
 # APP-for-AlexGyver-Settings
 Виндовс приложение для поиска и отображения вебморды устройств с установленной библиотекой [Settings AlexGyver](https://github.com/GyverLibs/Settings) <br><br>
-Программа написанная на Python, exe можно собрать самому из скрипта, [инструкция ниже ↓](#compiler)<br> 
+Программа написанна на Python, exe можно собрать самому из скрипта, [инструкция ниже ↓](#compiler)<br> 
 Или скачать zip-архив с скомпилированным exe и иконками, [последняя версия  ↓](#relise)<br> 
 <br>
 ![Снимок экрана 2025-02-21 001827](https://github.com/user-attachments/assets/8ed7cbc6-779f-4c44-bbec-a7e77492f784)
