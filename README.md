@@ -4,7 +4,7 @@
 Программа написанная на Python, exe можно собрать самому из скрипта, [инструкция ниже ↓](#compiler)<br> 
 Или скачать zip-архив с скомпилированным exe и иконками, [последняя версия  ↓](#relise)<br> 
 <br>
-
+![Снимок экрана 2025-02-21 001827](https://github.com/user-attachments/assets/8ed7cbc6-779f-4c44-bbec-a7e77492f784)
 
 ## Возможности приложения:
 + поиск и отображение устройств в локальной сети с  установленной библиотекой  Settings AlexGyver <br>
@@ -39,6 +39,7 @@
 ссылка на последнюю версию программы [Settings_app.zip](https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest/download/Settings_app.zip)<br> <br> 
 
 
+
 + v0.08 
   + больше не крашится если ввести неверную маску подсети
   + цвет фона в приложении зависит от цвета фона в веб интерфейсе, теперь будет лучше смотреться в светлой теме и в кастомной 
@@ -66,14 +67,10 @@
 собирётся экзешник в папке dist, 
 рядом с exe в ту же папку нужно положить все файлы иконок <br>
 
-## Внешний вид
-![Снимок экрана 2025-02-16 172425](https://github.com/user-attachments/assets/20cf2ee4-79ae-41fb-9882-3e3b45f95cdd)
-
-![Снимок экрана 2025-02-17 133219](https://github.com/user-attachments/assets/883ddaac-a6ff-4d05-95b0-96d962eecf1e)
-![Снимок экрана 2025-02-17 133134](https://github.com/user-attachments/assets/ac6db62d-6e23-4c82-b540-6b34492f5029)
-
-![Снимок экрана 2025-02-16 172516](https://github.com/user-attachments/assets/fc6bfe1a-0f53-4b14-afa5-2e16a265367c)
-![Снимок экрана 2025-02-16 172501](https://github.com/user-attachments/assets/7ffa2837-f7b2-49a1-9e6a-eac7ec83827a)
-![Снимок экрана 2025-02-16 172442](https://github.com/user-attachments/assets/53e3930d-a9bb-4b06-b86a-c11e99b0361c)
+##  
 
 
+
+
+
+![Снимок экрана 2025-02-21 000532](https://github.com/user-attachments/assets/aa418d63-88d2-413a-bb7a-6ec45c1154e8)
