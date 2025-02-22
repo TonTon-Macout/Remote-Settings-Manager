@@ -95,4 +95,4 @@
 
 
 
-![Снимок экрана 2025-02-21 000532](https://github.com/user-attachments/assets/53d652ac-34c4-459e-b81e-821341b031c6)
+![2Снимок экрана 2025-02-22 144107](https://github.com/user-attachments/assets/d4149c73-87c1-49a2-94df-3c59fe2a19f3)
