@@ -1,10 +1,17 @@
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 NAME = "Settings" # Имя программы, можно переименовать, поменяется имя окна и имя программы в о программе
 #NAME = "GLUONiCA" 
-
-# Если использовано NAME = "GLUONiCA"  то имя приложения будет GLUONiCA 
-# и по умолчанию будет искать только часы GLUONiCA, игнорируя все другие устройства
-# плюс свое окно о программе, в контектстном меню появится пункт Искать все, чтобы нашлись все устройства
+CUSTOM_NAME = "GLUONiCA" 
+NAME_VARIABLES = ["GLUON", "gluon", "Gluon"]
+# Если хотите использовать не просто свое имя, но и чтобы по умолчанию искало только ваши устройства то 
+# NAME должно полностью совпадать с CUSTOM_NAME
+# а в NAME_VARIABLES должны быть варианты с котрых может начинаться имя
+# и по умолчанию будет искать только устройства с вашим именем, игнорируя все другие устройства
+# плюс свое окно о программе, 
+# а также в настройках появится чек бокс Искать только "кустомное имя" 
+# при снятии которого будет искать все устройства с библиотекой Settings в сети 
+# + иконка для приложения должна называться не icon.ico а g_icon.ico
+ 
 
 
 
@@ -296,8 +303,9 @@ class DiscoverWorker(QRunnable):
             if response.status_code == 200:
                 data = response.json()
                 name = data['name']
-                if NAME == "GLUONiCA" and self.gluon_only:
-                    if name.startswith("GLUON") or name.startswith("gluon"):
+                if NAME == CUSTOM_NAME and self.gluon_only:
+                    # Проверяем, начинается ли имя с любого значения из NAME_VARIABLES
+                    if any(name.startswith(prefix) for prefix in NAME_VARIABLES):
                         self.signals.result.emit(f"{name} at http://{self.ip}/")
                 else:
                     self.signals.result.emit(f"{name} at http://{self.ip}/")
@@ -626,7 +634,7 @@ class WebBrowser(QMainWindow):
         self.setGeometry(100, 100, int(self.window_width), int(self.window_height))
 
 
-        if NAME == "GLUONiCA":
+        if NAME == CUSTOM_NAME:
             self.setWindowIcon(QIcon("g_icon.ico"))
         else:
             self.setWindowIcon(QIcon("icon.ico"))
@@ -1505,12 +1513,12 @@ class WebBrowser(QMainWindow):
         return super(WebBrowser, self).event(event)
    
 
-    def toggle_gluon_only(self):
-        """Переключает состояние поиска только GLUON-устройств и сохраняет в settings.json"""
-        self.gluon_only = not self.gluon_only
-        with open("settings.json", 'w') as f:
-            json.dump({"show_names": self.show_names, "gluon_only": self.gluon_only}, f, indent=4)
-        print(f"GLUON_only toggled to: {self.gluon_only}")
+#    def toggle_gluon_only(self):
+#        """Переключает состояние поиска только GLUON-устройств и сохраняет в settings.json"""
+#        self.gluon_only = not self.gluon_only
+#        with open("settings.json", 'w') as f:
+#            json.dump({"show_names": self.show_names, "gluon_only": self.gluon_only}, f, indent=4)
+#        print(f"GLUON_only toggled to: {self.gluon_only}")
 
 
     def show_context_menu(self, position):
@@ -1533,13 +1541,13 @@ class WebBrowser(QMainWindow):
         scan_action = menu.addAction(QIcon("scan.png"), "Поиск устройств")
         scan_action.triggered.connect(self.open_menu)
 
-        if NAME == "GLUONiCA":
-            gluon_only_action = menu.addAction("Искать всё")
-            gluon_only_action.setCheckable(True)
-            # Инвертируем, так как "Искать всё" = !gluon_only
-            # Если gluon_only = False, значит, ищем всё
-            gluon_only_action.setChecked(not self.gluon_only)  
-            gluon_only_action.triggered.connect(self.toggle_gluon_only)
+#        if NAME == CUSTOM_NAME:
+#            gluon_only_action = menu.addAction("Искать всё")
+#            gluon_only_action.setCheckable(True)
+#            # Инвертируем, так как "Искать всё" = !gluon_only
+#            # Если gluon_only = False, значит, ищем всё
+#            gluon_only_action.setChecked(not self.gluon_only)  
+#            gluon_only_action.triggered.connect(self.toggle_gluon_only)
 
 #        # Добавляем пункт "Показывать имена"
 #        show_names_action = menu.addAction("Показывать имена")
@@ -1734,7 +1742,7 @@ class AboutDialog(QDialog):
 
         about_text = QTextBrowser()
         about_text.setOpenExternalLinks(True)  # Позволяет открывать ссылки в браузере
-        if NAME == "GLUONiCA":
+        if NAME == CUSTOM_NAME:
             about_text.setText(
                 f"""
                 <h2>{NAME}</h2>
@@ -1754,7 +1762,7 @@ class AboutDialog(QDialog):
                 <p><b>Описание:</b> программа для поиска и отображения устройств в локальной сети с установленной библиотекой Settinggs AlexGyver
                 <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings">GitHub</a></p>
                 <p>Веб интерфейс работает на библиотеке <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
-                <p> "тестированно на версии библиотеки v1.2.5" </p>
+                <p> тестированно на версии библиотеки v1.2.5 </p>
                 """
             )
                                       
@@ -1784,6 +1792,13 @@ class SettingsDialog(QDialog):
         self.show_names_checkbox.setChecked(self.parent.show_names)
         self.show_names_checkbox.stateChanged.connect(self.update_show_names)
         layout.addWidget(self.show_names_checkbox)
+
+        if NAME == CUSTOM_NAME :
+            # Чекбокс "Искать только GLUON"
+            self.gluon_only_checkbox = QCheckBox(f"Искать только {CUSTOM_NAME}", self)
+            self.gluon_only_checkbox.setChecked(self.parent.gluon_only)
+            self.gluon_only_checkbox.stateChanged.connect(self.update_gluon_only)
+            layout.addWidget(self.gluon_only_checkbox)
 
         # Чекбокс "Поверх окон"
         self.stay_on_top_checkbox = QCheckBox("Поверх окон", self)
@@ -1859,6 +1874,18 @@ class SettingsDialog(QDialog):
             self.parent.setWindowFlags(self.parent.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
         self.parent.show()
 
+    def update_gluon_only(self, state):
+            """Обновляет состояние gluon_only и сохраняет в settings.json"""
+            self.parent.gluon_only = (state == Qt.CheckState.Checked.value)
+            with open("settings.json", 'w') as f:
+                json.dump({
+                    "show_names":    self.parent.show_names,
+                    "gluon_only":    self.parent.gluon_only,
+                    "window_width":  self.parent.window_width,
+                    "window_height": self.parent.window_height,
+                    "zoom_factor":   self.parent.zoom_factor
+                }, f, indent=4)
+            print(f"GLUON_only updated to: {self.parent.gluon_only}")
 
     def update_window_size(self):
             try:
