@@ -72,7 +72,7 @@ DARK_THEME = """
         color: #FFFFFF;  /* Цвет текста */
         border: 1px solid #4A4A4A;  /* Граница кнопки */
         border-radius: 6px;  /* Закругление углов */
-        padding: 8px 16px;  /* Внутренние отступы */
+       /*  padding: 8px 16px;  Внутренние отступы */
     }
     QPushButton:hover {
         background-color: #4A4A4A;  /* Фон кнопки при наведении */
@@ -87,7 +87,7 @@ DARK_THEME = """
         color: #FFFFFF;  /* Цвет текста */
         border: 1px solid #4A4A4A;  /* Граница */
         border-radius: 6px;  /* Закругление углов */
-        padding: 6px;  /* Внутренние отступы */
+        /* padding: 6px;   Внутренние отступы */
     }
     QLineEdit:focus {
         border: 1px solid #29932e;  /* Граница при фокусе (акцентный цвет ) */
@@ -593,17 +593,37 @@ class WebBrowser(QMainWindow):
         screen_width = screen.width()
         screen_height = screen.height()
 
-        # изначально настроено для 2K экрана 
+        # изначально размер настроен для 2K экрана 
         base_width = 525
         base_height = 980
-
-        # Масштабируем размеры окна в зависимости от разрешения 
         scale_factor = min(screen_width / 2560, screen_height / 1440)
-        window_width = int(base_width * scale_factor)
-        window_height = int(base_height * scale_factor)
+        default_width = int(base_width * scale_factor)
+        default_height = int(base_height * scale_factor)
+        default_zoom_factor = scale_factor
 
-        # Устанавливаем размеры окна
-        self.setGeometry(100, 100, window_width, window_height)
+        # Устанавливаем значения по умолчанию
+        self.default_width = default_width
+        self.default_height = default_height
+        self.default_zoom_factor = default_zoom_factor
+
+        # Загружаем настройки из settings.json
+        self.show_names = True
+        self.gluon_only = True
+        self.window_width = default_width
+        self.window_height = default_height
+        self.zoom_factor = default_zoom_factor
+        
+        if os.path.exists("settings.json"):
+            with open("settings.json", 'r') as f:
+                settings = json.load(f)
+                self.show_names = settings.get("show_names", True)
+                self.gluon_only = settings.get("gluon_only", True)
+                self.window_width = settings.get("window_width", default_width)
+                self.window_height = settings.get("window_height", default_height)
+                self.zoom_factor = settings.get("zoom_factor", default_zoom_factor)
+
+        # Устанавливаем начальные размеры окна и масштаб
+        self.setGeometry(100, 100, int(self.window_width), int(self.window_height))
 
 
         if NAME == "GLUONiCA":
@@ -654,13 +674,6 @@ class WebBrowser(QMainWindow):
         self.browser.setPage(QWebEnginePage(self.profile, self.browser))
         self.browser.loadFinished.connect(self.get_colors)
 
-        self.show_names = True  # Значение по умолчанию
-        self.gluon_only = True  # Значение по умолчанию
-        if os.path.exists("settings.json"):
-            with open("settings.json", 'r') as f:
-                settings = json.load(f)
-                self.show_names = settings.get("show_names", True)
-                self.gluon_only = settings.get("gluon_only", True)
 
         self.accent_color = "#37a93c"
         self.initUI()
@@ -668,8 +681,8 @@ class WebBrowser(QMainWindow):
         self.browser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.browser.customContextMenuRequested.connect(self.show_context_menu)
 
-                 # Устанавливаем начальный масштаб браузера
-        self.browser.setZoomFactor(scale_factor)
+        # Устанавливаем начальный масштаб браузера
+        self.browser.setZoomFactor(self.zoom_factor)
         # Переменные для перемещения окна
         self.dragging = False
         self.offset = QPoint()
@@ -894,7 +907,7 @@ class WebBrowser(QMainWindow):
                         color: #FFFFFF;
                         border: none;
                         border-radius: 6px;
-                        padding: 6px;
+                       /* padding: 6px; */
                     }}
                     QLineEdit:focus {{
                         border: 1px solid {accent_color.name()};
@@ -908,7 +921,7 @@ class WebBrowser(QMainWindow):
                         color: #FFFFFF;
                         border: none;
                         border-radius: 6px;
-                        padding: 6px;
+                       /* padding: 6px; */
                     }}
                     QLineEdit:focus {{
                         border: 1px solid {accent_color.name()};
@@ -922,7 +935,7 @@ class WebBrowser(QMainWindow):
                     color: #FFFFFF;
                     border: 1px solid #4A4A4A;
                     border-radius: 6px;
-                    padding: 6px;
+                   /* padding: 6px; */
                 }
                 QLineEdit:focus {
                     border: 1px solid #0078D4;
@@ -1172,7 +1185,7 @@ class WebBrowser(QMainWindow):
                 color: #FFFFFF;
                 border: none;
                 border-radius: 6px;
-                padding: 6px;
+                /* padding: 6px; */
             }}
             QLineEdit:focus {{
                 border: 1px solid {color};
@@ -1261,9 +1274,9 @@ class WebBrowser(QMainWindow):
             if not url.startswith("http://") and not url.startswith("https://"):
                 url = "http://" + url
                 original_url = url
-            
+
             device_ip = url.split('//')[1].split('/')[0]
-            
+
             # Если это ручной ввод IP (не из device_map), отправляем discover
             if device_ip not in self.device_map.values():
                 # Проверяем, является ли device_ip валидным IP-адресом
@@ -1355,7 +1368,7 @@ class WebBrowser(QMainWindow):
                             break
                     self.address_input.setText(original_url)
                 QtCore.QTimer.singleShot(1000, self.get_accent_color)
-            
+
             self.hide()
             self.show()
             self.activateWindow()
@@ -1440,18 +1453,22 @@ class WebBrowser(QMainWindow):
             self.dragging = False
 
     def toggle_on_top(self):
+        """Переключает состояние 'Поверх окон'"""
         if self.checkbox.isChecked():
             self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         else:
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
         self.show()
 
+
+
     def switch_theme(self):
         self.update()  # Перерисовываем виджет
 
     def resizeEvent(self, event):
-        print("resizeEvent")
-        super(WebBrowser, self).resizeEvent(event)
+        super().resizeEvent(event)
+        # Масштаб из настроек
+        self.browser.setZoomFactor(self.zoom_factor)
 
     def focusInEvent(self, event):
         print("focusInEvent")
@@ -1499,7 +1516,7 @@ class WebBrowser(QMainWindow):
     def show_context_menu(self, position):
         menu = QMenu(self)
 
-        # Создаем подменю для устройств
+        # Подменю для устройств
         devices_menu = menu.addMenu("Переключить устройство")
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
@@ -1524,22 +1541,25 @@ class WebBrowser(QMainWindow):
             gluon_only_action.setChecked(not self.gluon_only)  
             gluon_only_action.triggered.connect(self.toggle_gluon_only)
 
-        # Добавляем пункт "Показывать имена"
-        show_names_action = menu.addAction("Показывать имена")
-        show_names_action.setCheckable(True)
-        show_names_action.setChecked(self.show_names)
-        show_names_action.triggered.connect(self.toggle_show_names_and_update)
+#        # Добавляем пункт "Показывать имена"
+#        show_names_action = menu.addAction("Показывать имена")
+#        show_names_action.setCheckable(True)
+#        show_names_action.setChecked(self.show_names)
+#        show_names_action.triggered.connect(self.toggle_show_names_and_update)
 
         # Обновить страницу
         refresh_action = menu.addAction(QIcon("refresh.png"), "Обновить")
         refresh_action.triggered.connect(self.refresh_page)
 
         menu.addSeparator()
+        # Настройки
+        settings_action = menu.addAction("Настройки")
+        settings_action.triggered.connect(self.open_settings_dialog)
 
-        on_top_action = menu.addAction("Поверх окон")
-        on_top_action.setCheckable(True)
-        on_top_action.setChecked(self.checkbox.isChecked())
-        on_top_action.triggered.connect(self.checkbox.click)
+#        on_top_action = menu.addAction("Поверх окон")
+#        on_top_action.setCheckable(True)
+#        on_top_action.setChecked(self.checkbox.isChecked())
+#        on_top_action.triggered.connect(self.checkbox.click)
 
         menu.addSeparator()
 
@@ -1559,13 +1579,37 @@ class WebBrowser(QMainWindow):
 
         menu.exec(self.browser.mapToGlobal(position))
 
+    def open_settings_dialog(self):
+        dialog = SettingsDialog(self)
 
+        # Получаем размеры экрана
+        screen = QApplication.primaryScreen().geometry()
+        # Получаем текущее положение и размеры главного окна
+        main_window_pos = self.geometry()
+        # Вычисляем координаты для окна настроек
+        settings_x = 0
+        # Проверяем, есть ли место слева от главного окна
+        if main_window_pos.left() >= dialog.width() + 10:
+            # Размещаем слева
+            settings_x = main_window_pos.left() - dialog.width() - 10
+        # Проверяем, есть ли место справа от главного окна
+        elif main_window_pos.right() + dialog.width() + 10 <= screen.width():
+            # Размещаем справа
+            settings_x = main_window_pos.right() + 10
+        else:
+            # Если нет места ни слева, ни справа, размещаем по центру главного окна
+            settings_x = main_window_pos.left() + (main_window_pos.width() - dialog.width()) // 2
+
+        # Вычисляем Y координату (выравнивание по вертикали с главным окном)
+        settings_y = main_window_pos.top()
+
+        # Устанавливаем позицию окна настроек
+        dialog.move(settings_x, settings_y)
+        dialog.show()  # открываем
 
     def toggle_show_names_and_update(self):
-        """Переключает состояние показа имён, обновляет address_input и сохраняет в settings.json"""
+        """Переключает состояние показа имён и обновляет address_input"""
         self.show_names = not self.show_names
-        with open("settings.json", 'w') as f:
-            json.dump({"show_names": self.show_names, "gluon_only": self.gluon_only}, f, indent=4)
         print(f"Show names toggled to: {self.show_names}")
 
         # Обновляем список автодополнения
@@ -1681,6 +1725,7 @@ class WebBrowser(QMainWindow):
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+        
         self.setWindowTitle("О программе")
         self.setFixedSize(400, 250)  # Размер окна
 
@@ -1722,6 +1767,160 @@ class AboutDialog(QDialog):
         layout.addWidget(close_button)
 
         self.setLayout(layout)
+
+
+class SettingsDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Настройки")
+        self.setFixedSize(300, 250)  # Увеличиваем размер окна для новых полей
+        self.parent = parent  # Ссылка на WebBrowser
+        
+        # Основной layout
+        layout = QVBoxLayout(self)
+
+        # Чекбокс "Показывать имена устройств"
+        self.show_names_checkbox = QCheckBox("Показывать имена устройств", self)
+        self.show_names_checkbox.setChecked(self.parent.show_names)
+        self.show_names_checkbox.stateChanged.connect(self.update_show_names)
+        layout.addWidget(self.show_names_checkbox)
+
+        # Чекбокс "Поверх окон"
+        self.stay_on_top_checkbox = QCheckBox("Поверх окон", self)
+        self.stay_on_top_checkbox.setChecked(self.parent.checkbox.isChecked())
+        self.stay_on_top_checkbox.stateChanged.connect(self.update_stay_on_top)
+        layout.addWidget(self.stay_on_top_checkbox)
+
+        # Поле для ширины окна
+        self.width_label = QLabel("Ширина окна:", self)
+        layout.addWidget(self.width_label)
+        self.width_input = QLineEdit(self)
+        self.width_input.setText(str(int(self.parent.window_width)))
+        self.width_input.textChanged.connect(self.update_window_size)
+        layout.addWidget(self.width_input)
+
+        # Поле для высоты окна
+        self.height_label = QLabel("Высота окна:", self)
+        layout.addWidget(self.height_label)
+        self.height_input = QLineEdit(self)
+        self.height_input.setText(str(int(self.parent.window_height)))
+        self.height_input.textChanged.connect(self.update_window_size)
+        layout.addWidget(self.height_input)
+
+        # Поле для масштаба
+        self.zoom_label = QLabel("Масштаб браузера (0.1-5.0):", self)
+        layout.addWidget(self.zoom_label)
+        self.zoom_input = QLineEdit(self)
+        self.zoom_input.setText(str(self.parent.zoom_factor))
+        self.zoom_input.textChanged.connect(self.update_zoom_factor)
+        layout.addWidget(self.zoom_input)
+
+        # Кнопка "Сбросить размер"
+        reset_button = QPushButton("Сбросить размер", self)
+        reset_button.clicked.connect(self.reset_size)
+        layout.addWidget(reset_button)
+
+
+
+        self.setLayout(layout)
+
+    def update_show_names(self, state):
+        """Обновляет состояние show_names и сохраняет в settings.json"""
+        self.parent.show_names = (state == Qt.CheckState.Checked.value)
+        with open("settings.json", 'w') as f:
+            json.dump({
+                "show_names": self.parent.show_names,
+                "gluon_only": self.parent.gluon_only,
+                "window_width": self.parent.window_width,
+                "window_height": self.parent.window_height,
+                "zoom_factor": self.parent.zoom_factor
+            }, f, indent=4)
+        
+        
+        # Обновляем address_input
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+                if devices:
+                    if self.parent.show_names:
+                        self.parent.address_input.setText(devices[0]['name'])
+                    else:
+                        self.parent.address_input.setText(f"http://{devices[0]['ip']}/")
+        self.parent.device_list = self.parent.load_devices_for_autocomplete()
+        self.parent.completer.setModel(QStringListModel(self.parent.device_list))
+
+    def update_stay_on_top(self, state):
+        """Обновляет состояние 'Поверх окон'"""
+        stay_on_top = (state == Qt.CheckState.Checked.value)
+        self.parent.checkbox.setChecked(stay_on_top)
+        if stay_on_top:
+            self.parent.setWindowFlags(self.parent.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        else:
+            self.parent.setWindowFlags(self.parent.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
+        self.parent.show()
+
+
+    def update_window_size(self):
+            try:
+                width = float(self.width_input.text())
+                height = float(self.height_input.text())
+                if width > 100 and height > 100:  # Минимальные разумные размеры
+                    self.parent.window_width = width
+                    self.parent.window_height = height
+                    self.parent.resize(int(width), int(height))
+                    with open("settings.json", 'w') as f:
+                        json.dump({
+                            "show_names": self.parent.show_names,
+                            "gluon_only": self.parent.gluon_only,
+                            "window_width": self.parent.window_width,
+                            "window_height": self.parent.window_height,
+                            "zoom_factor": self.parent.zoom_factor
+                        }, f, indent=4)
+                    print(f"Window size updated to: {width}x{height}")
+            except ValueError:
+                pass
+
+    def update_zoom_factor(self):
+            try:
+                zoom = float(self.zoom_input.text())
+                if 0.1 <= zoom <= 5.0:
+                    self.parent.zoom_factor = zoom
+                    self.parent.browser.setZoomFactor(zoom)
+                    with open("settings.json", 'w') as f:
+                        json.dump({
+                            "show_names": self.parent.show_names,
+                            "gluon_only": self.parent.gluon_only,
+                            "window_width": self.parent.window_width,
+                            "window_height": self.parent.window_height,
+                            "zoom_factor": self.parent.zoom_factor
+                        }, f, indent=4)
+                    print(f"Zoom factor updated to: {zoom}")
+            except ValueError:
+                pass
+
+
+    def reset_size(self):
+            """Сбрасывает размер и масштаб до значений по умолчанию"""
+            self.parent.window_width = self.parent.default_width
+            self.parent.window_height = self.parent.default_height
+            self.parent.zoom_factor = self.parent.default_zoom_factor
+
+            self.width_input.setText(str(int(self.parent.window_width)))
+            self.height_input.setText(str(int(self.parent.window_height)))
+            self.zoom_input.setText(str(self.parent.zoom_factor))
+
+            self.parent.resize(int(self.parent.window_width), int(self.parent.window_height))
+            self.parent.browser.setZoomFactor(self.parent.zoom_factor)
+
+            with open("settings.json", 'w') as f:
+                json.dump({
+                    "show_names": self.parent.show_names,
+                    "gluon_only": self.parent.gluon_only,
+                    "window_width": self.parent.window_width,
+                    "window_height": self.parent.window_height,
+                    "zoom_factor": self.parent.zoom_factor
+                }, f, indent=4)
+
 
 class CheckDeviceWorker(QObject):
     finished = pyqtSignal(bool)
