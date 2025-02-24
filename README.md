@@ -81,7 +81,7 @@
   
 
 установить библиотеки<br>
-```pip install PyQt6 requests ipaddress psutil```
+```pip install PyQt6 requests ipaddress psutil PyQt6-WebEngine```
 
 запуск скрипта<br>
 ```python Settings_app.py```
