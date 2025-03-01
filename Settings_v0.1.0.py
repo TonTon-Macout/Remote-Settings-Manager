@@ -1,4 +1,4 @@
-VERSION = "0.2.0"
+VERSION = "0.1.0"
 NAME = "Settings" # Имя программы, можно переименовать, поменяется имя окна и имя программы в о программе
 #NAME = "GLUONiCA" 
 CUSTOM_NAME = "GLUONiCA" 
@@ -7,7 +7,6 @@ NAME_VARIABLES = ["GLUON", "gluon", "Gluon"]
 # NAME должно полностью совпадать с CUSTOM_NAME
 # а в NAME_VARIABLES должны быть варианты с котрых может начинаться имя
 # и по умолчанию будет искать только устройства с вашим именем, игнорируя все другие устройства
-# поиск WLED по умолчанию включен 
 # плюс свое окно о программе, в классе AboutDialog стоит обновить его текст
 # а также в настройках появится чек бокс Искать только {NAME}
 # при снятии которого будет искать все устройства с библиотекой Settings в сети 
@@ -25,7 +24,7 @@ import sys,json, requests, ipaddress, os, socket, ctypes, psutil
 from PyQt6.QtWidgets import ( QDialog, QLabel, QProgressBar, QListWidget, QMessageBox,
                              QListWidgetItem, QApplication, QMainWindow, QVBoxLayout, 
                              QHBoxLayout, QWidget, QLineEdit, QPushButton, QCheckBox, QMenu, 
-                             QTextBrowser, QCompleter, QComboBox, QColorDialog, QFrame
+                             QTextBrowser, QCompleter, QComboBox
                              )
 from PyQt6.QtCore import QThreadPool, QRunnable, pyqtSlot, pyqtSignal, QObject, QUrl, Qt, QPoint, QSize, QStringListModel
 
@@ -79,8 +78,8 @@ DARK_THEME = """
         background-color: #27272f;  /* Фон кнопки */
         color: #FFFFFF;  /* Цвет текста */
         border: 1px solid #4A4A4A;  /* Граница кнопки */
-        border-radius: 4px;  /* Закругление углов */
-         padding: 6px 6px;  Внутренние отступы 
+        border-radius: 6px;  /* Закругление углов */
+       /*  padding: 8px 16px;  Внутренние отступы */
     }
     QPushButton:hover {
         background-color: #4A4A4A;  /* Фон кнопки при наведении */
@@ -236,6 +235,9 @@ def get_subnet(ip, prefix=24):
 
 
 def resizeEvent(self, event):
+    """
+    Обрабатывает изменение размера окна и обновляет масштаб содержимого браузера.
+    """
     super().resizeEvent(event)  # Вызываем родительский метод
 
     # Получаем текущий размер окна
@@ -243,7 +245,7 @@ def resizeEvent(self, event):
     new_width = new_size.width()
     new_height = new_size.height()
 
-    # Базовые размеры окна
+    # Базовые размеры окна (изначальные)
     base_width = 525
     base_height = 980
 
@@ -281,52 +283,34 @@ class WorkerSignals(QObject):
     progress = pyqtSignal(int)
     result = pyqtSignal(str)
     value = 0  # Для флага остановки
-#Сигналы для работы потоков
+
 class DiscoverWorker(QRunnable):
-    def __init__(self, ip, signals, stop_flag, gluon_only=True, wled_search=True):
+    def __init__(self, ip, signals, stop_flag, gluon_only=True):
         super().__init__()
         self.ip = ip
         self.signals = signals
         self.stop_flag = stop_flag
         self.timeout = 0.5
-        self.gluon_only = gluon_only
-        self.wled_search = wled_search
+        self.gluon_only = gluon_only  # Принимаем gluon_only
     
     def run(self):
         try:
             if self.stop_flag.value == 1:
                 return
                 
-            # Проверяем сеть на наличие Settings 
             url = f"http://{self.ip}/settings?action=discover"
-            try:
-                response = requests.get(url, timeout=self.timeout)
-                if response.status_code == 200:
-                    data = response.json()
-                    name = data['name']
-                    if NAME == CUSTOM_NAME and self.gluon_only:
-                        if any(name.startswith(prefix) for prefix in NAME_VARIABLES):
-                            self.signals.result.emit(f"{name} at http://{self.ip}/")
-                    else:
+            response = requests.get(url, timeout=self.timeout)
+            if response.status_code == 200:
+                data = response.json()
+                name = data['name']
+                if NAME == CUSTOM_NAME and self.gluon_only:
+                    # Проверяем, начинается ли имя с любого значения из NAME_VARIABLES
+                    if any(name.startswith(prefix) for prefix in NAME_VARIABLES):
                         self.signals.result.emit(f"{name} at http://{self.ip}/")
-                    return 
-            except requests.RequestException:
-                pass
-
-            # Поиск WLED нсли включен
-            if self.wled_search:
-                url = f"http://{self.ip}/json/info"
-                try:
-                    response = requests.get(url, timeout=self.timeout)
-                    if response.status_code == 200:
-                        data = response.json()
-                        name = data.get('name', f"WLED_{self.ip}")
-                        self.signals.result.emit(f"{name} at http://{self.ip}/")
-                except requests.RequestException:
-                    pass
-                    
-        except Exception as e:
-            print(f"Error in DiscoverWorker: {e}")
+                else:
+                    self.signals.result.emit(f"{name} at http://{self.ip}/")
+        except requests.RequestException:
+            pass
         finally:
             self.signals.progress.emit(1)
 
@@ -335,9 +319,8 @@ class DiscoverWorker(QRunnable):
 class ScanDialog(QDialog):
     def __init__(self, web_browser, parent=None):
         super().__init__(parent)
-        self.wled_search = web_browser.wled_search
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.Dialog)  # Делаем окно диалоговым
-        self.web_browser = web_browser  # Экземпляр WebBrowser
+        self.web_browser = web_browser  # Сохраняем экземпляр WebBrowser
         self.setWindowTitle("Сканировать")
         self.setGeometry(300, 300, 400, 400)
         self.layout = QVBoxLayout(self)
@@ -351,10 +334,10 @@ class ScanDialog(QDialog):
         for subnet in all_subnets:
             SUBNET_HISTORY_MANAGER.add(subnet)
 
-        # QComboBox для ввода подсети
+        # Создаём QComboBox
         self.subnet_input = QComboBox(self)
         self.subnet_input.setEditable(True)  # Разрешаем ручной ввод
-        self.subnet_input.addItems(SUBNET_HISTORY_MANAGER.get_history())  # Добавляем историю
+        self.subnet_input.addItems(SUBNET_HISTORY_MANAGER.get_history())  # Добавляем всю историю
 
         # Устанавливаем первую подсеть как начальное значение
         default_subnet = all_subnets[0] if all_subnets else "127.0.0.1/24"
@@ -381,7 +364,7 @@ class ScanDialog(QDialog):
 
         self.layout.addWidget(self.subnet_input)
 
-        # Поле для таймаута
+        # Добавляем поле для таймаута
         self.timeout_label = QLabel("Таймаут (мс):")
         self.layout.addWidget(self.timeout_label)
 
@@ -446,7 +429,7 @@ class ScanDialog(QDialog):
 
     def start_scan(self):
         self.scanning = True
-        self.scan_button.setText("Стоп")
+        self.scan_button.setText("Stop")
         self.stop_flag.value = 0
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
@@ -478,13 +461,7 @@ class ScanDialog(QDialog):
             signals = WorkerSignals()
             signals.progress.connect(self.update_progress)
             signals.result.connect(self.add_device)
-            worker = DiscoverWorker(
-                ip, 
-                signals, 
-                self.stop_flag, 
-                gluon_only=self.web_browser.gluon_only,
-                wled_search=self.wled_search  # Передаем настройку поиска WLED
-            )
+            worker = DiscoverWorker(ip, signals, self.stop_flag, gluon_only=self.web_browser.gluon_only)
             worker.timeout = timeout
             self.threadpool.start(worker)
 
@@ -503,7 +480,6 @@ class ScanDialog(QDialog):
             with open("discovered_devices.json", 'w') as f:
                 json.dump(self.discovered_devices, f, indent=4)
 
-
     def add_device(self, device_info):
         name, ip = device_info.split(' at http://')
         ip = ip.strip('/')
@@ -511,18 +487,9 @@ class ScanDialog(QDialog):
             if existing_device["ip"] == ip:
                 self.highlight_last_device()
                 return
-
-        # Проверяем, сколько устройств с таким именем уже есть
-        # при совпадении добавляем к имени номер
-        name_count = sum(1 for d in self.discovered_devices if d["name"].startswith(name + "(") or d["name"] == name)
-        if name_count > 0:
-            unique_name = f"{name}({name_count})"
-        else:
-            unique_name = name
-
-        item = QListWidgetItem(f"{unique_name} at http://{ip}/")
+        item = QListWidgetItem(device_info)
         self.device_list.addItem(item)
-        self.discovered_devices.append({"name": unique_name, "ip": ip})
+        self.discovered_devices.append({"name": name, "ip": ip})
         self.highlight_last_device()
         print(f"New device found: {device_info}")
 
@@ -535,39 +502,34 @@ class ScanDialog(QDialog):
                     self.device_list.addItem(device_info)
         self.highlight_last_device()
 
-
     def select_device(self, item):
         # Сброс стиля для всех элементов
         for index in range(self.device_list.count()):
             self.device_list.item(index).setBackground(QColor(Qt.GlobalColor.transparent))
             self.device_list.item(index).setForeground(QColor(Qt.GlobalColor.white))
-
+        
         # Извлечение IP и имени
         device_info = item.text()
-        name_part, ip = device_info.split(' at http://')
+        name, ip = device_info.split(' at http://')
         ip = ip.strip('/')
-
-       
-        base_name = name_part.split('(')[0].strip()
-
+        
         # Перемещаем устройство в начало discovered_devices.json
         devices = []
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
         devices = [d for d in devices if d['ip'] != ip]  # Удаляем дубликат
-        devices.insert(0, {"name": base_name, "ip": ip})  # Добавляем в начало с оригинальным именем
+        devices.insert(0, {"name": name, "ip": ip})  # Добавляем в начало
         with open("discovered_devices.json", 'w') as f:
             json.dump(devices, f, indent=4)
-
+        
+        
         self.discovered_devices = devices
         if self.web_browser.check_device_availability(ip):
             self.web_browser.load_page(f"http://{ip}/")
         else:
             self.web_browser.load_page(f"http://{ip}/")
         self.highlight_last_device()
-
-
 
     def highlight_last_device(self):
         if os.path.exists("discovered_devices.json"):
@@ -633,14 +595,9 @@ class WebBrowser(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(NAME)
+        
         # Получаем размеры 
         screen = QApplication.primaryScreen().geometry()
-        # Ограничения размеров окна
-        self.MIN_WINDOW_WIDTH = 200
-        self.MIN_WINDOW_HEIGHT = 200
-        self.MAX_WINDOW_WIDTH = screen.width()
-        self.MAX_WINDOW_HEIGHT = screen.height() 
-        
         screen_width = screen.width()
         screen_height = screen.height()
 
@@ -663,49 +620,18 @@ class WebBrowser(QMainWindow):
         self.window_width = default_width
         self.window_height = default_height
         self.zoom_factor = default_zoom_factor
-        self.wled_search = True  # По умолчанию включен поиск WLED
-        self.default_border_color = QColor(49, 113, 49, 150)  # Цвет рамки по умолчанию
-        self.default_back_color = QColor(28, 29, 34, 255)
-
-        self.custom_colors_enabled = False
-        self.custom_border_color = self.default_border_color
-        self.custom_back_color = self.default_back_color
         
         if os.path.exists("settings.json"):
             with open("settings.json", 'r') as f:
                 settings = json.load(f)
-                self.show_names = settings.get("show_names", self.show_names)
-                self.gluon_only = settings.get("gluon_only", self.gluon_only)
-                self.wled_search = settings.get("wled_search", self.wled_search)
-                self.window_width = max(self.MIN_WINDOW_WIDTH, min(settings.get("window_width", self.window_width), self.MAX_WINDOW_WIDTH))
-                self.window_height = max(self.MIN_WINDOW_HEIGHT, min(settings.get("window_height", self.window_height), self.MAX_WINDOW_HEIGHT))
-                self.zoom_factor = settings.get("zoom_factor", self.zoom_factor)
-                self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
-                border_color = settings.get("custom_border_color", 
-                                         [self.default_border_color.red(),
-                                          self.default_border_color.green(),
-                                          self.default_border_color.blue(),
-                                          self.default_border_color.alpha()])
-                back_color = settings.get("custom_back_color",
-                                       [self.default_back_color.red(),
-                                        self.default_back_color.green(),
-                                        self.default_back_color.blue(),
-                                        self.default_back_color.alpha()])
-                self.custom_border_color = QColor(*border_color)
-                self.custom_back_color = QColor(*back_color)
-       
-       
-       # Применяем загруженные размеры окна
-        self.resize(int(self.window_width), int(self.window_height))
-        self.browser = QWebEngineView()  
-        self.browser.setZoomFactor(self.zoom_factor)  # Применяем масштаб
-       
-       # Устанавливаем начальные цвета
-        self.border_color = self.default_border_color
-        self.back_color = self.default_back_color
+                self.show_names = settings.get("show_names", True)
+                self.gluon_only = settings.get("gluon_only", True)
+                self.window_width = settings.get("window_width", default_width)
+                self.window_height = settings.get("window_height", default_height)
+                self.zoom_factor = settings.get("zoom_factor", default_zoom_factor)
 
         # Устанавливаем начальные размеры окна и масштаб
-        #self.setGeometry(100, 100, int(self.window_width), int(self.window_height))
+        self.setGeometry(100, 100, int(self.window_width), int(self.window_height))
 
 
         if NAME == CUSTOM_NAME:
@@ -752,7 +678,7 @@ class WebBrowser(QMainWindow):
             self.profile = QWebEngineProfile("myprofile", self)
         
         # Создаем браузер с настроенным профилем
-        #self.browser = QWebEngineView() переехал выше чтобы применить масштаб
+        self.browser = QWebEngineView()
         self.browser.setPage(QWebEnginePage(self.profile, self.browser))
         self.browser.loadFinished.connect(self.get_colors)
 
@@ -778,7 +704,7 @@ class WebBrowser(QMainWindow):
         # Подключаем сигнал изменения URL
         self.browser.urlChanged.connect(self.update_url)
 
-        # 
+        # Отступы для содержимого окна
         container = QWidget()
         container.setStyleSheet("background: transparent;")
 
@@ -796,7 +722,7 @@ class WebBrowser(QMainWindow):
         self.address_input = QLineEdit()
         self.address_input.setPlaceholderText("Enter IP Address")
         self.address_input.returnPressed.connect(self.load_page)
-        self.address_input.setMinimumWidth(170)  # ширина
+        self.address_input.setFixedWidth(170)  # ширина
         self.address_input.setStyleSheet("background-color: rgba(200, 0, 0, 0); border-radius: 9px; ")
         self.address_input.returnPressed.connect(self.load_page)
         # Aвтодополнение с устройствами
@@ -839,7 +765,7 @@ class WebBrowser(QMainWindow):
         self.scan_button.setStyleSheet("background-color: transparent; border: none;")  # Прозрачный фон
         self.scan_button.clicked.connect(self.open_menu)
 
-        # чекбокс поверх окон
+        # чекбокс
         self.checkbox = QCheckBox()
         self.checkbox.stateChanged.connect(self.toggle_on_top)
 
@@ -910,35 +836,9 @@ class WebBrowser(QMainWindow):
                 border-radius: 100px;
             }
         """)
-
-    def save_settings(self):
-        settings = {
-            "show_names": self.show_names,
-            "gluon_only": self.gluon_only,
-            "wled_search": self.wled_search,
-            "window_width": self.window_width,
-            "window_height": self.window_height,
-            "zoom_factor": self.zoom_factor,
-            "custom_colors_enabled": self.custom_colors_enabled,
-            "custom_border_color": [self.custom_border_color.red(), 
-                                  self.custom_border_color.green(), 
-                                  self.custom_border_color.blue(), 
-                                  self.custom_border_color.alpha()],
-            "custom_back_color": [self.custom_back_color.red(), 
-                                self.custom_back_color.green(), 
-                                self.custom_back_color.blue(), 
-                                self.custom_back_color.alpha()]
-        }
-        with open("settings.json", 'w') as f:
-            json.dump(settings, f, indent=4)
-
-
-
-
-
-
+    
     def toggle_show_names(self):
-        #Переключаем показ имён и сохраняем
+        """Переключает состояние показа имён и сохраняет в settings.json"""
         self.show_names = not self.show_names
         with open("settings.json", 'w') as f:
             json.dump({"show_names": self.show_names}, f, indent=4)
@@ -946,32 +846,25 @@ class WebBrowser(QMainWindow):
 
 
     def load_devices_for_autocomplete(self):
-        #Загружаем устройства из discovered_devices.json для автодополнения
+        """Загружает устройства из discovered_devices.json для автодополнения"""
         device_list = []
         self.device_map = {}
-        name_count = {}  # Счётчик одинаковых имён
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
                 for device in devices:
-                    base_name = device['name']
+                    name = device['name']
                     ip = device['ip']
-                    # Подсчитываем, сколько раз встречается базовое имя
-                    if base_name in name_count:
-                        name_count[base_name] += 1
-                        display_name = f"{base_name}({name_count[base_name]})"
-                    else:
-                        name_count[base_name] = 0
-                        display_name = base_name
-                    self.device_map[display_name] = ip
+                    self.device_map[name] = ip
                     if self.show_names:
-                        device_list.append(display_name)
+                        device_list.append(name)
                     else:
                         device_list.append(f"http://{ip}/")
         return device_list
 
 
     def load_selected_device(self, text):
+        """Загружает страницу выбранного устройства из автодополнения и обновляет discovered_devices.json"""
         if text:
             if self.show_names and text in self.device_map:
                 ip = self.device_map[text]
@@ -981,14 +874,13 @@ class WebBrowser(QMainWindow):
                 self.load_page(text)
   
     def show_completer(self, event: QMouseEvent):
+        """Показывает полный список автодополнения при клике"""
         self.completer.setCompletionPrefix("")  # Префикс для показа всех устройств
         self.address_input.completer().complete()  #  Список
         QLineEdit.mousePressEvent(self.address_input, event)  # Сохраняем стандартное поведение
 
     def open_menu(self):
         self.scan_dialog = ScanDialog(self)
-        self.scan_dialog.wled_search = self.wled_search
-
         screen = QApplication.primaryScreen().geometry()
         main_window_pos = self.geometry()
         scan_x = 0
@@ -1000,7 +892,6 @@ class WebBrowser(QMainWindow):
             scan_x = main_window_pos.left() + (main_window_pos.width() - self.scan_dialog.width()) // 2
         scan_y = main_window_pos.top()
         self.scan_dialog.move(scan_x, scan_y)
-        self.scan_dialog.setWindowFlags(self.scan_dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  # флаг "поверх всех"
         self.scan_dialog.show()
         # Обновляем список устройств после закрытия ScanDialog
         self.scan_dialog.exec()
@@ -1060,6 +951,9 @@ class WebBrowser(QMainWindow):
             """)
 
     def update_menu_style(self, color):
+        """
+        Обновляет стили контекстного меню на основе полученного цвета акцента.
+        """
         if color and color.startswith('#'):  # Проверяем, что цвет в формате HEX
             try:
                 # Устанавливаем стили для контекстного меню
@@ -1096,6 +990,9 @@ class WebBrowser(QMainWindow):
 
 
     def update_checkbox_style(self, color):
+        """
+        Обновляет стили QCheckBox на основе полученного цвета акцента.
+        """
         if color and color.startswith('#'):  # Проверяем, что цвет в формате HEX
             try:
                 # Устанавливаем стили для QCheckBox
@@ -1161,18 +1058,11 @@ class WebBrowser(QMainWindow):
 
     def show_about_dialog(self):
         about_dialog = AboutDialog()
-        about_dialog.setWindowFlags(about_dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  # Добавляем флаг "поверх всех"
         about_dialog.exec()
 
     def get_colors(self):
         self.get_accent_color()
         self.get_back_color()
-        if not self.custom_colors_enabled:
-            # Если свои цвета не включены и цвета не найдены, используем по умолчанию
-            if not hasattr(self, 'accent_color') or not self.accent_color:
-                self.handle_accent_color(None)
-            if not hasattr(self, 'back_color') or not self.back_color:
-                self.update_back_color(None)
 
     def get_back_color(self):
         # JavaScript для получения значения --back
@@ -1241,49 +1131,51 @@ class WebBrowser(QMainWindow):
         })();
         """
         # Выполняем JavaScript и получаем результат
+        #self.browser.page().runJavaScript(script, self.update_line_edit_style)
+        #self.browser.page().runJavaScript(script, self.update_border_color)
         self.browser.page().runJavaScript(script, self.handle_accent_color)
   
     def update_border_color(self, color):
-        if self.custom_colors_enabled:
-            self.border_color = self.custom_border_color
-        elif color and color.startswith('#'):
+        # Проверяем, получили ли мы цвет
+        if color and color.startswith('#'):
             try:
+                # Конвертируем HEX в RGB
                 color = color.strip()
                 r = int(color[1:3], 16)
                 g = int(color[3:5], 16)
                 b = int(color[5:7], 16)
-                self.border_color = QColor(r, g, b, self.custom_border_color.alpha())
+                self.border_color = QColor(r, g, b, 150)  # Alpha = 150 для прозрачности
             except ValueError:
-                self.border_color = self.custom_border_color  # Используем цвет из настроек
+                # Если не удалось преобразовать цвет, используем цвет по умолчанию
+                self.border_color = QColor(49, 113, 49, 150)
         else:
-            self.border_color = self.custom_border_color  # Используем цвет из настроек
+            # Если цвет не получен, используем цвет по умолчанию
+            self.border_color = QColor(49, 113, 49, 150)
+
         self.update()  # Перерисовываем окно
 
     def handle_accent_color(self, color):
-        # Обрабатываем полученный цвет
-        if self.custom_colors_enabled:
-            self.accent_color = self.custom_border_color  # Используем цвет как акцент
-            self.border_color = self.custom_border_color
-            self.back_color = self.custom_back_color
+        #Обрабатываем полученный цвет акцента и обновляет стили
+        if color and color.startswith('#'):
+            self.accent_color = color
         else:
-            if color and isinstance(color, str) and color.startswith('#'):
-                self.accent_color = color
-                self.update_border_color(color)  # Обновляем цвет рамки из полученного цвета
-            else:
-                self.accent_color = self.custom_border_color.name(QColor.NameFormat.HexRgb)  # Преобразуем QColor в HEX строку
-                self.border_color = self.custom_border_color  # Устанавливаем цвет рамки
-                self.back_color = self.custom_back_color      # Устанавливаем цвет фона
+            self.accent_color = "#37a93c"  # Цвет по умолчанию
 
         # Обновляем DARK_THEME с новым акцентным цветом
+        # неработает!!
         updated_dark_theme = DARK_THEME.replace(
-            "QListView::item:selected { background-color: #27272f; color: #FFFFFF; }",
+            "QListView::item:selected { background-color: #FFF; color: #FFFFFF; }",
             f"QListView::item:selected {{ background-color: {self.accent_color}; color: #FFFFFF; }}"
         )
         QApplication.instance().setStyleSheet(updated_dark_theme)
 
+        # Получаем стили
+        # 
         combined_style = self.get_combined_styles(self.accent_color)
+        # Применяем стили к главному окну
         self.setStyleSheet(combined_style)
-        self.update()  # Перерисовываем окно
+        # Обновляем цвет рамки окна
+        self.update_border_color(self.accent_color)
 
 
 
@@ -1291,10 +1183,6 @@ class WebBrowser(QMainWindow):
     def get_combined_styles(self, color):
         # объединяем стили для всех элементов котрые меняют цвет динамически 
         # если по отдельности применять стили то они перезаписывают друг друга
-
-        if isinstance(color, QColor):
-            color = color.name(QColor.NameFormat.HexRgb)
-
         if not color or not color.startswith('#'):
             color = "#0078D4"  # Цвет по умолчанию, если цвет не задан
     
@@ -1350,15 +1238,11 @@ class WebBrowser(QMainWindow):
         
 
     def update_back_color(self, back_color):
-        if self.custom_colors_enabled:
-            self.back_color = self.custom_back_color
-        elif back_color:
+        if back_color:
             self.back_color = QColor(back_color)
         else:
-            self.back_color = self.custom_back_color  # Используем цвет из настроек
-        self.update()  # Перерисовываем окно
-
-
+            self.back_color = QColor(28, 29, 34, 255)  # Цвет по умолчанию
+        self.update()  # Перерисовать окно
     def paintEvent(self, event):
         # окно 
         painter = QPainter(self)
@@ -1366,6 +1250,7 @@ class WebBrowser(QMainWindow):
     
         # Получаем цвет рамки и фона
         border_color      = getattr(self, 'border_color', QColor(49, 113, 49, 150))
+       
         back_color        = getattr(self, 'back_color', QColor(28, 29, 34, 255))  # Цвет по умолчанию
         back_color_top = getattr(self, 'back_color', QColor(28, 29, 34, 255))  # Цвет по умолчанию
         # Рисуем фон с скруглёнными углами -- меню и заголовок
@@ -1390,6 +1275,7 @@ class WebBrowser(QMainWindow):
 
 
     def load_page(self, ip=None):
+        """Загружает страницу и обновляет discovered_devices.json"""
         url = ip if ip else self.address_input.text().strip()
         if url:
             original_url = url
@@ -1499,29 +1385,22 @@ class WebBrowser(QMainWindow):
 
 
     def update_discovered_devices(self, name, ip):
-        # Загружаем список устройств
+        """Обновляет discovered_devices.json, перемещая или добавляя устройство в начало"""
         devices = []
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
-    
-        # Удаляем устройство с таким IP, если оно уже есть
+
+        # Удаляем устройство, если оно уже есть, чтобы избежать дубликатов
         devices = [d for d in devices if d['ip'] != ip]
-    
-        # Проверяем, сколько устройств с таким именем
-        name_count = sum(1 for d in devices if d["name"].startswith(name + "(") or d["name"] == name)
-        if name_count > 0:
-            unique_name = f"{name}({name_count})"
-        else:
-            unique_name = name
-    
-        # Добавляем устройство в начало списка с уникальным именем
-        devices.insert(0, {"name": unique_name, "ip": ip})
-    
+
+        # Добавляем устройство в начало списка
+        devices.insert(0, {"name": name, "ip": ip})
+
         # Сохраняем обновлённый список
         with open("discovered_devices.json", 'w') as f:
             json.dump(devices, f, indent=4)
-    
+
         # Обновляем device_map и автодополнение
         self.device_list = self.load_devices_for_autocomplete()
         self.completer.setModel(QStringListModel(self.device_list))
@@ -1548,12 +1427,12 @@ class WebBrowser(QMainWindow):
 
 
     def update_url(self, url):
-        # Обновляем URL в поле ввода
+        """Обновляет строку ввода при изменении URL"""
         self.address_input.setText(url.toString())
 
 
     def load_last_url(self):
-        # Загружаем последний URL из файла
+        """Загружает последнее устройство из discovered_devices.json"""
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
@@ -1582,6 +1461,7 @@ class WebBrowser(QMainWindow):
             self.dragging = False
 
     def toggle_on_top(self):
+        """Переключает состояние 'Поверх окон'"""
         if self.checkbox.isChecked():
             self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         else:
@@ -1633,9 +1513,15 @@ class WebBrowser(QMainWindow):
         return super(WebBrowser, self).event(event)
    
 
+#    def toggle_gluon_only(self):
+#        """Переключает состояние поиска только GLUON-устройств и сохраняет в settings.json"""
+#        self.gluon_only = not self.gluon_only
+#        with open("settings.json", 'w') as f:
+#            json.dump({"show_names": self.show_names, "gluon_only": self.gluon_only}, f, indent=4)
+#        print(f"GLUON_only toggled to: {self.gluon_only}")
+
 
     def show_context_menu(self, position):
-       
         menu = QMenu(self)
 
         # Подменю для устройств
@@ -1727,11 +1613,10 @@ class WebBrowser(QMainWindow):
 
         # Устанавливаем позицию окна настроек
         dialog.move(settings_x, settings_y)
-        dialog.setWindowFlags(dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  # флаг "поверх всех"
         dialog.show()  # открываем
 
     def toggle_show_names_and_update(self):
-        # Переключаем значение show_names
+        """Переключает состояние показа имён и обновляет address_input"""
         self.show_names = not self.show_names
         print(f"Show names toggled to: {self.show_names}")
 
@@ -1759,6 +1644,7 @@ class WebBrowser(QMainWindow):
         self.profile.clearHttpCache()
 
     def check_device_availability(self, ip):
+        """Синхронная проверка доступности для initial check"""
         try:
             response = requests.get(
                 f"http://{ip}/settings?action=discover",
@@ -1834,7 +1720,7 @@ class WebBrowser(QMainWindow):
         self.check_worker.run()
 
     def check_initial_device(self):
-        #Проверка доступности устройства при запуске
+        """Проверка доступности устройства при запуске"""
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
@@ -1862,7 +1748,7 @@ class AboutDialog(QDialog):
                 <h2>{NAME}</h2>
                 <p><b>Версия:</b> {VERSION}</p>
                 <p><b>Автор:</b> Vanila</p>
-                <p><b>Описание:</b> Программа для отображения и поиска устройств {NAME} в локальной сети 
+                <p><b>Описание:</b> Программа для отображения и поиска часов {NAME} в локальной сети 
                 <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/web-server-for-Libre-Hardware-Monitor">GitHub</a></p>
                 <p>Веб интерфейс работает на библиотеке <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
                 """
@@ -1873,10 +1759,10 @@ class AboutDialog(QDialog):
                 <h2>{NAME}</h2>
                 <p><b>Версия:</b> {VERSION}</p>
                 <p><b>Автор:</b> Vanila</p>
-                <p><b>Описание:</b> программа для поиска и отображения устройств в локальной сети с установленной библиотекой <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
-                <p>так же может искать устройства с <a href="https://github.com/wled/WLED">WLED</a></p>
+                <p><b>Описание:</b> программа для поиска и отображения устройств в локальной сети с установленной библиотекой Settinggs AlexGyver
                 <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings">GitHub</a></p>
-                
+                <p>Веб интерфейс работает на библиотеке <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
+                <p> тестированно на версии библиотеки v1.2.5 </p>
                 """
             )
                                       
@@ -1895,7 +1781,7 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Настройки")
-        self.setMinimumSize(300, 250)  
+        self.setFixedSize(300, 250)  # Увеличиваем размер окна для новых полей
         self.parent = parent  # Ссылка на WebBrowser
         
         # Основной layout
@@ -1907,12 +1793,6 @@ class SettingsDialog(QDialog):
         self.show_names_checkbox.stateChanged.connect(self.update_show_names)
         layout.addWidget(self.show_names_checkbox)
 
-        # Чекбокс "Искать устройства WLED"
-        self.wled_search_checkbox = QCheckBox("Искать устройства WLED", self)
-        self.wled_search_checkbox.setChecked(self.parent.wled_search)
-        self.wled_search_checkbox.stateChanged.connect(self.update_wled_search)
-        layout.addWidget(self.wled_search_checkbox)
-
         if NAME == CUSTOM_NAME :
             # Чекбокс "Искать только GLUON"
             self.gluon_only_checkbox = QCheckBox(f"Искать только {CUSTOM_NAME}", self)
@@ -1920,48 +1800,18 @@ class SettingsDialog(QDialog):
             self.gluon_only_checkbox.stateChanged.connect(self.update_gluon_only)
             layout.addWidget(self.gluon_only_checkbox)
 
-
-        separator = QFrame()
-        separator.setFrameShape(QFrame.Shape.HLine)  # Горизонтальная линия
-        separator.setFrameShadow(QFrame.Shadow.Sunken) 
-        layout.addWidget(separator)
-
         # Чекбокс "Поверх окон"
-        #self.stay_on_top_checkbox = QCheckBox("Поверх окон", self)
-        #self.stay_on_top_checkbox.setChecked(self.parent.checkbox.isChecked())
-        #self.stay_on_top_checkbox.stateChanged.connect(self.update_stay_on_top)
-        #layout.addWidget(self.stay_on_top_checkbox)
+        self.stay_on_top_checkbox = QCheckBox("Поверх окон", self)
+        self.stay_on_top_checkbox.setChecked(self.parent.checkbox.isChecked())
+        self.stay_on_top_checkbox.stateChanged.connect(self.update_stay_on_top)
+        layout.addWidget(self.stay_on_top_checkbox)
 
-
-
-        # Чекбокс "Свои цвета"
-        self.custom_colors_checkbox = QCheckBox("Свои цвета всегда", self)
-        self.custom_colors_checkbox.setChecked(self.parent.custom_colors_enabled)
-        self.custom_colors_checkbox.stateChanged.connect(self.update_custom_colors)
-        layout.addWidget(self.custom_colors_checkbox)
-
-        # Кнопка выбора цвета рамки
-        self.border_color_button = QPushButton("Цвет рамки по умолчанию", self)
-        self.border_color_button.clicked.connect(self.choose_border_color)
-        layout.addWidget(self.border_color_button)
-
-        # Кнопка выбора цвета фона
-        self.back_color_button = QPushButton("Цвет фона по умолчанию", self)
-        self.back_color_button.clicked.connect(self.choose_back_color)
-        layout.addWidget(self.back_color_button)
-
-
-        separator2 = QFrame()
-        separator2.setFrameShape(QFrame.Shape.HLine)  # Горизонтальная линия
-        separator2.setFrameShadow(QFrame.Shadow.Sunken)  
-        layout.addWidget(separator2)
-      
         # Поле для ширины окна
         self.width_label = QLabel("Ширина окна:", self)
         layout.addWidget(self.width_label)
         self.width_input = QLineEdit(self)
         self.width_input.setText(str(int(self.parent.window_width)))
-        #self.width_input.textChanged.connect(self.update_window_size)
+        self.width_input.textChanged.connect(self.update_window_size)
         layout.addWidget(self.width_input)
 
         # Поле для высоты окна
@@ -1969,7 +1819,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.height_label)
         self.height_input = QLineEdit(self)
         self.height_input.setText(str(int(self.parent.window_height)))
-        #self.height_input.textChanged.connect(self.update_window_size)
+        self.height_input.textChanged.connect(self.update_window_size)
         layout.addWidget(self.height_input)
 
         # Поле для масштаба
@@ -1977,13 +1827,8 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.zoom_label)
         self.zoom_input = QLineEdit(self)
         self.zoom_input.setText(str(self.parent.zoom_factor))
-        #self.zoom_input.textChanged.connect(self.update_zoom_factor)
+        self.zoom_input.textChanged.connect(self.update_zoom_factor)
         layout.addWidget(self.zoom_input)
-        
-        # Кнопка "Применить"
-        self.apply_button = QPushButton("Применить размер", self)
-        self.apply_button.clicked.connect(self.apply_settings)
-        layout.addWidget(self.apply_button)
 
         # Кнопка "Сбросить размер"
         reset_button = QPushButton("Сбросить размер", self)
@@ -1994,89 +1839,19 @@ class SettingsDialog(QDialog):
 
         self.setLayout(layout)
 
-
-    def apply_settings(self):
-        try:
-            width = float(self.width_input.text())
-            height = float(self.height_input.text())
-            zoom = float(self.zoom_input.text())
-
-            # Проверка и ограничение размеров
-            width = max(self.parent.MIN_WINDOW_WIDTH, min(width, self.parent.MAX_WINDOW_WIDTH))
-            height = max(self.parent.MIN_WINDOW_HEIGHT, min(height, self.parent.MAX_WINDOW_HEIGHT))
-            if not (0.1 <= zoom <= 5.0):
-                raise ValueError("Масштаб должен быть в диапазоне от 0.1 до 5.0")
-
-            # Применяем значения
-            self.parent.window_width = width
-            self.parent.window_height = height
-            self.parent.zoom_factor = zoom
-            self.parent.resize(int(width), int(height))
-            self.parent.browser.setZoomFactor(zoom)
-
-            # Обновляем поля ввода с актуальными значениями
-            self.width_input.setText(str(int(width)))
-            self.height_input.setText(str(int(height)))
-            self.zoom_input.setText(str(zoom))
-
-            # Сохраняем настройки
-            self.parent.save_settings()
-
-        except ValueError as e:
-            QMessageBox.warning(
-                self, "Ошибка", 
-                f"Введите корректные числовые значения.\nШирина: {self.parent.MIN_WINDOW_WIDTH}-{self.parent.MAX_WINDOW_WIDTH}\nВысота: {self.parent.MIN_WINDOW_HEIGHT}-{self.parent.MAX_WINDOW_HEIGHT}\nМасштаб: 0.1-5.0\nОшибка: {str(e)}"
-            )
-            # Восстанавливаем предыдущие значения в поля ввода
-            self.width_input.setText(str(int(self.parent.window_width)))
-            self.height_input.setText(str(int(self.parent.window_height)))
-            self.zoom_input.setText(str(self.parent.zoom_factor))
-
-    def update_colors(self):
-        if self.parent.custom_colors_enabled:
-            self.parent.border_color = self.parent.custom_border_color
-            self.parent.back_color = self.parent.custom_back_color
-        else:
-            # Если "Свои цвета" выключены, вызываем получение цветов
-            self.parent.get_colors()
-        self.parent.update()  # Перерисовываем главное окно
-
-    def choose_border_color(self):
-        # Диалог выбора цвета рамки
-        color = QColorDialog.getColor(
-            self.parent.custom_border_color,
-            self,
-            "Выберите цвет рамки",
-            QColorDialog.ColorDialogOption.ShowAlphaChannel
-        )
-        if color.isValid():
-            self.parent.custom_border_color = color
-            self.parent.save_settings()
-            self.update_colors()  # Обновляем цвета сразу после выбора
-
-    def choose_back_color(self):
-       #Диалог выбора цвета фона
-        color = QColorDialog.getColor(
-            self.parent.custom_back_color,
-            self,
-            "Выберите цвет фона",
-            QColorDialog.ColorDialogOption.ShowAlphaChannel
-        )
-        if color.isValid():
-            self.parent.custom_back_color = color
-            self.parent.save_settings()
-            self.update_colors()  # Обновляем цвета сразу после выбора
-
-    def update_custom_colors(self, state):
-        self.parent.custom_colors_enabled = (state == Qt.CheckState.Checked.value)
-        self.parent.save_settings()
-        self.update_colors()  # Обновляем цвета после изменения состояния
-
-
-
     def update_show_names(self, state):
+        """Обновляет состояние show_names и сохраняет в settings.json"""
         self.parent.show_names = (state == Qt.CheckState.Checked.value)
-        self.parent.save_settings()
+        with open("settings.json", 'w') as f:
+            json.dump({
+                "show_names": self.parent.show_names,
+                "gluon_only": self.parent.gluon_only,
+                "window_width": self.parent.window_width,
+                "window_height": self.parent.window_height,
+                "zoom_factor": self.parent.zoom_factor
+            }, f, indent=4)
+        
+        
         # Обновляем address_input
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
@@ -2090,6 +1865,7 @@ class SettingsDialog(QDialog):
         self.parent.completer.setModel(QStringListModel(self.parent.device_list))
 
     def update_stay_on_top(self, state):
+        """Обновляет состояние 'Поверх окон'"""
         stay_on_top = (state == Qt.CheckState.Checked.value)
         self.parent.checkbox.setChecked(stay_on_top)
         if stay_on_top:
@@ -2099,31 +1875,78 @@ class SettingsDialog(QDialog):
         self.parent.show()
 
     def update_gluon_only(self, state):
-            # Cостояние gluon_only, нужно для поиска только своих устройств если используется свое имя 
+            """Обновляет состояние gluon_only и сохраняет в settings.json"""
             self.parent.gluon_only = (state == Qt.CheckState.Checked.value)
-            self.parent.save_settings()
-
+            with open("settings.json", 'w') as f:
+                json.dump({
+                    "show_names":    self.parent.show_names,
+                    "gluon_only":    self.parent.gluon_only,
+                    "window_width":  self.parent.window_width,
+                    "window_height": self.parent.window_height,
+                    "zoom_factor":   self.parent.zoom_factor
+                }, f, indent=4)
             print(f"GLUON_only updated to: {self.parent.gluon_only}")
 
+    def update_window_size(self):
+            try:
+                width = float(self.width_input.text())
+                height = float(self.height_input.text())
+                if width > 100 and height > 100:  # Минимальные разумные размеры
+                    self.parent.window_width = width
+                    self.parent.window_height = height
+                    self.parent.resize(int(width), int(height))
+                    with open("settings.json", 'w') as f:
+                        json.dump({
+                            "show_names": self.parent.show_names,
+                            "gluon_only": self.parent.gluon_only,
+                            "window_width": self.parent.window_width,
+                            "window_height": self.parent.window_height,
+                            "zoom_factor": self.parent.zoom_factor
+                        }, f, indent=4)
+                    print(f"Window size updated to: {width}x{height}")
+            except ValueError:
+                pass
+
+    def update_zoom_factor(self):
+            try:
+                zoom = float(self.zoom_input.text())
+                if 0.1 <= zoom <= 5.0:
+                    self.parent.zoom_factor = zoom
+                    self.parent.browser.setZoomFactor(zoom)
+                    with open("settings.json", 'w') as f:
+                        json.dump({
+                            "show_names": self.parent.show_names,
+                            "gluon_only": self.parent.gluon_only,
+                            "window_width": self.parent.window_width,
+                            "window_height": self.parent.window_height,
+                            "zoom_factor": self.parent.zoom_factor
+                        }, f, indent=4)
+                    print(f"Zoom factor updated to: {zoom}")
+            except ValueError:
+                pass
 
 
-
-    def update_wled_search(self, state):
-        self.parent.wled_search = (state == Qt.CheckState.Checked.value)
-        self.parent.save_settings()
-
-        print(f"WLED_search updated to: {self.parent.wled_search}")
-    
     def reset_size(self):
-        self.parent.window_width = self.parent.default_width
-        self.parent.window_height = self.parent.default_height
-        self.parent.zoom_factor = self.parent.default_zoom_factor
-        self.parent.resize(int(self.parent.window_width), int(self.parent.window_height))
-        self.parent.browser.setZoomFactor(self.parent.zoom_factor)
-        self.width_input.setText(str(int(self.parent.window_width)))
-        self.height_input.setText(str(int(self.parent.window_height)))
-        self.zoom_input.setText(str(self.parent.zoom_factor))
-        self.parent.save_settings()
+            """Сбрасывает размер и масштаб до значений по умолчанию"""
+            self.parent.window_width = self.parent.default_width
+            self.parent.window_height = self.parent.default_height
+            self.parent.zoom_factor = self.parent.default_zoom_factor
+
+            self.width_input.setText(str(int(self.parent.window_width)))
+            self.height_input.setText(str(int(self.parent.window_height)))
+            self.zoom_input.setText(str(self.parent.zoom_factor))
+
+            self.parent.resize(int(self.parent.window_width), int(self.parent.window_height))
+            self.parent.browser.setZoomFactor(self.parent.zoom_factor)
+
+            with open("settings.json", 'w') as f:
+                json.dump({
+                    "show_names": self.parent.show_names,
+                    "gluon_only": self.parent.gluon_only,
+                    "window_width": self.parent.window_width,
+                    "window_height": self.parent.window_height,
+                    "zoom_factor": self.parent.zoom_factor
+                }, f, indent=4)
 
 
 class CheckDeviceWorker(QObject):
