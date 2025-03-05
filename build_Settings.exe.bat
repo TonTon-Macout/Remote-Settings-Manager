@@ -2,9 +2,9 @@
 chcp 65001
 cd /d "%~dp0"
 echo.
-echo ================ Запуск скрипта сборки ===================
-echo ------ Должен быть установлен python версии 3 и выше -----
-echo --- а так же библиотеки PyQt6 PyQt6-WebEngine requests ---
+echo ==================== Запуск скрипта сборки ======================
+echo ---------- Должен быть установлен python версии 3 и выше --------
+echo --- а так же библиотеки PyQt6 PyQt6-WebEngine psutil requests ---
 echo.
 REM Извлекаем имя, номер версии и пользовательское имя из скрипта
 echo Извлекаем имя, версию и пользовательское имя из Settings...
@@ -118,6 +118,11 @@ copy "refresh.png" "%dir_name%"
 copy "scan.png" "%dir_name%"
 copy "close.png" "%dir_name%"
 
+copy "copy.png" "%dir_name%"
+copy "open.png" "%dir_name%"
+copy "info.png" "%dir_name%"
+copy "settings.png" "%dir_name%"
+copy "swap.png" "%dir_name%"
 REM Удаляем временную папку dist
 rmdir /s /q dist
 REM Удаляем папку __pycache__
