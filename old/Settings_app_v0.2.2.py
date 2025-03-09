@@ -1,4 +1,4 @@
-VERSION = "0.2.6"
+VERSION = "0.2.2"
 NAME = "Settings" # Имя программы, можно переименовать, поменяется имя окна и имя программы в о программе
 #NAME = "GLUONiCA" 
 CUSTOM_NAME = "GLUONiCA" 
@@ -16,13 +16,14 @@ NAME_VARIABLES = ["GLUON", "gluon", "Gluon"]
 
 
 
-import sys,json, requests, ipaddress, os, socket, ctypes, psutil, re,base64
+
+import sys,json, requests, ipaddress, os, socket, ctypes, psutil
 
 
 from PyQt6.QtWidgets import ( QDialog, QLabel, QProgressBar, QListWidget, QMessageBox,
                              QListWidgetItem, QApplication, QMainWindow, QVBoxLayout, 
                              QHBoxLayout, QWidget, QLineEdit, QPushButton, QCheckBox, QMenu, 
-                             QTextBrowser, QCompleter, QComboBox, QColorDialog, QFrame, QFormLayout
+                             QTextBrowser, QCompleter, QComboBox, QColorDialog, QFrame
                              )
 from PyQt6.QtCore import QThreadPool, QRunnable, pyqtSlot, pyqtSignal, QObject, QUrl, Qt, QPoint, QSize, QStringListModel, QRect, QTimer
 
@@ -35,8 +36,8 @@ from PyQt6 import QtCore
 from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
 
 
-from PyQt6.QtWebChannel import QWebChannel
 
+from PyQt6.QtWidgets import QApplication
 
 
 DARK_THEME = """
@@ -48,10 +49,7 @@ DARK_THEME = """
         font-size: 14px;  /* Размер шрифта */
     }
 
-    QAbstractItemView {
-                border-radius: 10px;  
-                background-color: transparent;
-            } 
+
     QListView {
         background-color: #1c1d22;
         color: #FFFFFF;
@@ -211,7 +209,7 @@ def is_windows_dark_theme():
         return False
 
 
-
+# Функции для работы с IP и подсетью
 def get_all_local_subnets(prefix=24):
     local_subnets = []
     try:
@@ -232,6 +230,8 @@ def get_all_local_subnets(prefix=24):
 
 def get_subnet(ip, prefix=24):
     return ipaddress.ip_network(f"{ip}/{prefix}", strict=False)
+
+
 
 def resizeEvent(self, event):
     super().resizeEvent(event)  # Вызываем родительский метод
@@ -277,7 +277,7 @@ class CheckWorker(QObject):
 class WorkerSignals(QObject):
     """Определяет сигналы, доступные для воркера"""
     progress = pyqtSignal(int)
-    result = pyqtSignal(object)
+    result = pyqtSignal(str)
     value = 0  # Для флага остановки
 #Сигналы для работы потоков
 class DiscoverWorker(QRunnable):
@@ -295,6 +295,7 @@ class DiscoverWorker(QRunnable):
             if self.stop_flag.value == 1:
                 return
                 
+            # Проверяем сеть на наличие Settings 
             url = f"http://{self.ip}/settings?action=discover"
             try:
                 response = requests.get(url, timeout=self.timeout)
@@ -310,6 +311,7 @@ class DiscoverWorker(QRunnable):
             except requests.RequestException:
                 pass
 
+            # Поиск WLED нсли включен
             if self.wled_search:
                 url = f"http://{self.ip}/json/info"
                 try:
@@ -327,23 +329,274 @@ class DiscoverWorker(QRunnable):
             self.signals.progress.emit(1)
 
 
+""" 
+class ScanDialog(QDialog):
+    def __init__(self, web_browser, parent=None):
+        super().__init__(parent)
+        self.wled_search = web_browser.wled_search
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.Dialog)  # Делаем окно диалоговым
+        self.web_browser = web_browser  # Экземпляр WebBrowser
+        self.setWindowTitle("Сканировать")
+        self.setGeometry(300, 300, 400, 400)
+        self.layout = QVBoxLayout(self)
 
-class CheckAvailabilityWorker(QRunnable):
-    def __init__(self, url, signals, timeout):
-        super().__init__()
-        self.url = url
-        self.signals = signals
-        self.timeout = timeout
+        self.subnet_label = QLabel("Маска:")
+        self.layout.addWidget(self.subnet_label)
 
-    def run(self):
+        # Получаем все подсети
+        all_subnets = get_all_local_subnets()
+        #  все подсети в историю
+        for subnet in all_subnets:
+            SUBNET_HISTORY_MANAGER.add(subnet)
+
+        # QComboBox для ввода подсети
+        self.subnet_input = QComboBox(self)
+        self.subnet_input.setEditable(True)  # Разрешаем ручной ввод
+        self.subnet_input.addItems(SUBNET_HISTORY_MANAGER.get_history())  #  историю
+
+        # Устанавливаем первую подсеть как начальное значение
+        default_subnet = all_subnets[0] if all_subnets else "127.0.0.1/24"
+        self.subnet_input.setCurrentText(default_subnet)
+
+        # Инициализируем историю начальными значениями, если она пуста
+        if not SUBNET_HISTORY_MANAGER.get_history():
+            SUBNET_HISTORY_MANAGER.add(default_subnet)
+            SUBNET_HISTORY_MANAGER.add("192.168.1.1/24")
+            SUBNET_HISTORY_MANAGER.add("10.0.0.1/24")
+
+        # Настраиваем автодополнение для ручного ввода
+        self.completer = QCompleter(SUBNET_HISTORY_MANAGER.get_history(), self)
+        self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        self.completer.setFilterMode(Qt.MatchFlag.MatchContains)
+        self.subnet_input.lineEdit().setCompleter(self.completer)
+
+        # Подключаем сигнал для добавления новых значений
+        self.subnet_input.lineEdit().returnPressed.connect(self.add_new_input)
+
+        # Переопределяем mousePressEvent для внутреннего QLineEdit
+        self.subnet_input.lineEdit().mousePressEvent = self.show_completer
+
+        self.layout.addWidget(self.subnet_input)
+
+        # Поле для таймаута
+        self.timeout_label = QLabel("Таймаут (мс):")
+        self.layout.addWidget(self.timeout_label)
+
+        self.timeout_input = QLineEdit(self)
+        self.timeout_input.setText("500")  # По умолчанию 500 мс
+        self.layout.addWidget(self.timeout_input)
+
+        self.button_layout = QHBoxLayout()
+
+        self.scan_button = QPushButton("Сканировать")
+        self.scan_button.clicked.connect(self.toggle_scan)
+        self.button_layout.addWidget(self.scan_button)
+
+        self.clear_button = QPushButton("Очистить")
+        self.clear_button.clicked.connect(self.clear_devices)
+        self.button_layout.addWidget(self.clear_button)
+
+        self.delete_button = QPushButton("Удалить")
+        self.delete_button.clicked.connect(self.delete_device)
+        self.button_layout.addWidget(self.delete_button)
+
+        self.layout.addLayout(self.button_layout)
+
+        self.progress_bar = QProgressBar(self)
+        self.layout.addWidget(self.progress_bar)
+
+        self.device_list = QListWidget(self)
+        self.device_list.itemClicked.connect(self.select_device)
+        self.layout.addWidget(self.device_list)
+
+        self.scanning = False
+        self.threadpool = QThreadPool()
+        self.stop_flag = WorkerSignals()
+        self.stop_flag.value = 0
+        self.total_ips = 0
+        self.discovered_devices = []
+
+        self.load_devices()
+        self.highlight_last_device()
+
+    def add_new_input(self):
+        new_value = self.subnet_input.currentText().strip()
+        SUBNET_HISTORY_MANAGER.add(new_value)
+        # Обновить список в QComboBox
+        if new_value not in [self.subnet_input.itemText(i) for i in range(self.subnet_input.count())]:
+            self.subnet_input.insertItem(0, new_value)
+        self.subnet_input.setCurrentText(new_value)
+
+        model = self.completer.model()
+        model.setStringList(SUBNET_HISTORY_MANAGER.get_history())
+
+    def show_completer(self, event: QMouseEvent):
+        self.completer.setCompletionPrefix("")  # Сбрасываем префикс для показа полного списка
+        self.subnet_input.lineEdit().completer().complete()  # Показываем список
+        QComboBox.mousePressEvent(self.subnet_input, event)  
+
+    def toggle_scan(self):
+        if self.scanning:
+            self.stop_scan()
+        else:
+            self.start_scan()
+
+    def start_scan(self):
+        self.scanning = True
+        self.scan_button.setText("Стоп")
+        self.stop_flag.value = 0
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                self.discovered_devices = json.load(f)
+        self.scan_network()
+
+    def scan_network(self):
+        subnet_mask = self.subnet_input.currentText()
         try:
-            response = requests.get(self.url, timeout=self.timeout, verify=False)
-            is_available = response.status_code == 200
-            print(f"Проверка {self.url}: статус {response.status_code}, доступно: {is_available}")
-            self.signals.result.emit(is_available)
-        except requests.RequestException as e:
-            print(f"Устройство недоступно {self.url}: {e}")
-            self.signals.result.emit(False)
+            timeout = float(self.timeout_input.text()) / 1000
+        except ValueError:
+            timeout = 0.5
+        try:
+            network = ipaddress.ip_network(subnet_mask)
+        except ValueError as e:
+            QMessageBox.warning(self, "Warning", f"Неверная маска подсети: {e}")
+            print(f"Неверная маска подсети: {e}")
+            return
+
+        self.total_ips = network.num_addresses
+        self.progress_bar.setMaximum(self.total_ips)
+        self.device_list.clear()
+        self.load_devices()
+        self.completed_ips = 0
+
+        for ip in network:
+            if self.stop_flag.value == 1:
+                break
+            signals = WorkerSignals()
+            signals.progress.connect(self.update_progress)
+            signals.result.connect(self.add_device)
+            worker = DiscoverWorker(
+                ip, 
+                signals, 
+                self.stop_flag, 
+                gluon_only=self.web_browser.gluon_only,
+                wled_search=self.wled_search  # Передаем настройку поиска WLED
+            )
+            worker.timeout = timeout
+            self.threadpool.start(worker)
+
+    def stop_scan(self):
+        self.scanning = False
+        self.scan_button.setText("Сканировать")
+        self.stop_flag.value = 1
+
+
+    def update_progress(self, value):
+        self.completed_ips += value
+        self.progress_bar.setValue(self.completed_ips)
+        if self.completed_ips >= self.total_ips or self.stop_flag.value == 1:
+            self.scan_button.setText("Сканировать")
+            self.scanning = False
+            with open("discovered_devices.json", 'w') as f:
+                json.dump(self.discovered_devices, f, indent=4)
+
+
+    def add_device(self, device_info):
+        name, ip = device_info.split(' at http://')
+        ip = ip.strip('/')
+        for existing_device in self.discovered_devices:
+            if existing_device["ip"] == ip:
+                self.highlight_last_device()
+                return
+
+        # Проверяем, сколько устройств с таким именем уже есть
+        # при совпадении  к имени номер
+        name_count = sum(1 for d in self.discovered_devices if d["name"].startswith(name + "(") or d["name"] == name)
+        if name_count > 0:
+            unique_name = f"{name}({name_count})"
+        else:
+            unique_name = name
+
+        item = QListWidgetItem(f"{unique_name} at http://{ip}/")
+        self.device_list.addItem(item)
+        self.discovered_devices.append({"name": unique_name, "ip": ip})
+        self.highlight_last_device()
+        print(f"New device found: {device_info}")
+
+    def load_devices(self):
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+                for device in devices:
+                    device_info = f"{device['name']} at http://{device['ip']}/"
+                    self.device_list.addItem(device_info)
+        self.highlight_last_device()
+
+
+    def select_device(self, item):
+        # Сброс стиля для всех элементов
+        for index in range(self.device_list.count()):
+            self.device_list.item(index).setBackground(QColor(Qt.GlobalColor.transparent))
+            self.device_list.item(index).setForeground(QColor(Qt.GlobalColor.white))
+
+        # Извлечение IP и имени
+        device_info = item.text()
+        name_part, ip = device_info.split(' at http://')
+        ip = ip.strip('/')
+
+       
+        base_name = name_part.split('(')[0].strip()
+
+        # Перемещаем устройство в начало discovered_devices.json
+        devices = []
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+        devices = [d for d in devices if d['ip'] != ip]  # Удаляем дубликат
+        devices.insert(0, {"name": base_name, "ip": ip})  #  в начало с оригинальным именем
+        with open("discovered_devices.json", 'w') as f:
+            json.dump(devices, f, indent=4)
+
+        self.discovered_devices = devices
+        if self.web_browser.check_device_availability(ip):
+            self.web_browser.load_page(f"http://{ip}/")
+        else:
+            self.web_browser.load_page(f"http://{ip}/")
+        self.highlight_last_device()
+
+
+
+    def highlight_last_device(self):
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+                if devices:
+                    last_ip = devices[0]['ip']
+                    for index in range(self.device_list.count()):
+                        item = self.device_list.item(index)
+                        if last_ip in item.text():
+                            item.setBackground(QColor(0, 100, 0))  # темно-зеленый фон
+                            item.setForeground(QColor(Qt.GlobalColor.white))  # белый текст
+
+    def clear_devices(self):
+        self.device_list.clear()
+        self.discovered_devices = []
+        if os.path.exists("discovered_devices.json"):
+            os.remove("discovered_devices.json")
+
+    def delete_device(self):
+        current_item = self.device_list.currentItem()
+        if current_item:
+            device_info = current_item.text()
+            self.device_list.takeItem(self.device_list.row(current_item))
+            name, ip = device_info.split(' at http://')
+            ip = ip.strip('/')
+            self.discovered_devices = [device for device in self.discovered_devices if device['ip'] != ip]
+            with open("discovered_devices.json", 'w') as f:
+                json.dump(self.discovered_devices, f, indent=4)
+            self.highlight_last_device()
+ """
 
 class ScanDialog(QDialog):
     def __init__(self, web_browser, parent=None):
@@ -351,7 +604,7 @@ class ScanDialog(QDialog):
         self.wled_search = web_browser.wled_search
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.Dialog)
         self.web_browser = web_browser
-        self.setWindowTitle("Поиск и редактирование")
+        self.setWindowTitle("Сканировать")
         self.setGeometry(300, 300, 400, 500)
         
         accent_color = self.web_browser.accent_color if hasattr(self.web_browser, 'accent_color') else "#37a93c"
@@ -363,7 +616,7 @@ class ScanDialog(QDialog):
 
         self.layout = QVBoxLayout(self)
 
-        self.subnet_label = QLabel("  Маска:")
+        self.subnet_label = QLabel("Маска:")
         self.layout.addWidget(self.subnet_label)
 
         all_subnets = get_all_local_subnets()
@@ -391,19 +644,16 @@ class ScanDialog(QDialog):
         self.subnet_input.lineEdit().mousePressEvent = self.show_completer
         self.layout.addWidget(self.subnet_input)
 
-        self.timeout_label = QLabel("  Таймаут (мс):")
+        self.timeout_label = QLabel("Таймаут (мс):")
         self.layout.addWidget(self.timeout_label)
 
-        
-
         self.timeout_input = QLineEdit(self)
-        self.timeout_input.setText(str(int(self.web_browser.check_timeout * 1000)))
+        self.timeout_input.setText("500")
         self.timeout_input.setStyleSheet(f"""
                                             QLineEdit:focus {{
                                                 border: 1px solid {accent_color};  
                                             }}
                                         """)
-        self.timeout_input.textChanged.connect(self.update_timeout)
         self.layout.addWidget(self.timeout_input)
 
         self.button_layout = QHBoxLayout()
@@ -445,14 +695,9 @@ class ScanDialog(QDialog):
         self.device_list.itemClicked.connect(self.select_device)
         self.layout.addWidget(self.device_list)
 
-
-        self.label_edit_layout = QHBoxLayout()
-        self.edit_lable = QLabel("  Редактирование:")
-        self.label_edit_layout.addWidget(self.edit_lable)
-        self.layout.addLayout(self.label_edit_layout)
-
-
         self.edit_layout = QHBoxLayout()
+        
+
         self.name_input = QLineEdit(self)
         self.name_input.setPlaceholderText(" Имя устройства")
         self.name_input.setStyleSheet(f"""
@@ -463,7 +708,7 @@ class ScanDialog(QDialog):
         self.edit_layout.addWidget(self.name_input)
         
         self.ip_input = QLineEdit(self)
-        self.ip_input.setPlaceholderText("  IP-адрес или URL")
+        self.ip_input.setPlaceholderText("  IP-адрес")
         self.ip_input.setStyleSheet(f"""
                                             QLineEdit:focus {{
                                                 border: 1px solid {accent_color};  
@@ -526,42 +771,39 @@ class ScanDialog(QDialog):
         self.highlight_last_device()
         self.original_devices = self.discovered_devices.copy()
 
-        self.name_input.textChanged.connect(self.update_buttons_state)
-        self.ip_input.textChanged.connect(self.update_buttons_state)
-
-
+        self.name_input.textChanged.connect(self.update_apply_button)
+        self.ip_input.textChanged.connect(self.update_apply_button)
 
 
     def add_new_device(self):
         new_name = self.name_input.text().strip()
-        new_url = self.ip_input.text().strip()
-        if new_name and new_url:
-            if not (new_url.startswith("http://") or new_url.startswith("https://")):
-                new_url = "http://" + new_url
+        new_ip = self.ip_input.text().strip()
+        if new_name and new_ip:
+            # Проверка на совпадение IP
             for dev in self.discovered_devices:
-                if dev["url"] == new_url:
-                    QMessageBox.warning(self, "Ошибка", "Устройство с таким URL уже существует!")
+                if dev["ip"] == new_ip:
+                    QMessageBox.warning(self, "Ошибка", "Устройство с таким IP уже существует!")
                     return
+            # Проверка на совпадение имени
             for dev in self.discovered_devices:
                 if dev["name"] == new_name:
                     QMessageBox.warning(self, "Ошибка", "Устройство с таким именем уже существует!")
                     return
-            self.discovered_devices.append({"name": new_name, "url": new_url})
-            self.device_list.addItem(f"{new_name} at {new_url}")
+            #  новое устройство
+            self.discovered_devices.append({"name": new_name, "ip": new_ip})
+            self.device_list.addItem(f"{new_name} at http://{new_ip}/")
+            # Сохранить изменения в файл
             with open("discovered_devices.json", 'w') as f:
                 json.dump(self.discovered_devices, f, indent=4)
             self.original_devices = self.discovered_devices.copy()
             self.name_input.clear()
             self.ip_input.clear()
-            self.update_buttons_state()
+            self.update_apply_button()
         else:
-            QMessageBox.warning(self, "Ошибка", "Введите имя и URL!")
-
+            QMessageBox.warning(self, "Ошибка", "Введите имя и IP-адрес!")
 
     def update_list_style(self):
         accent_color = self.web_browser.accent_color if hasattr(self.web_browser, 'accent_color') else "#37a93c"
-        brightness = self.web_browser.calculate_brightness(accent_color)
-        text_color = "#FFFFFF" if brightness < 128 else "#000000"
         self.device_list.setStyleSheet(f"""
             QListWidget {{
                 background-color: #27272f;
@@ -576,7 +818,7 @@ class ScanDialog(QDialog):
             }}
             QListWidget::item:selected {{
                 background-color: {accent_color};
-                color: {text_color};
+                color: #000000;
                 
             }}
         """)
@@ -618,18 +860,6 @@ class ScanDialog(QDialog):
         else:
             self.start_scan()
 
-    def update_timeout(self):
-        """Обновляет значение таймаута в настройках при изменении поля."""
-        try:
-            timeout_ms = float(self.timeout_input.text())
-            if timeout_ms < 50:  # Минимальный таймаут
-                timeout_ms = 50
-                self.timeout_input.setText("50")
-            self.web_browser.check_timeout = timeout_ms / 1000  # Переводим в секунды
-            self.web_browser.save_settings()  # Сохраняем настройки
-        except ValueError:
-            # Если введено некорректное значение, оставляем текущее
-            self.timeout_input.setText(str(int(self.web_browser.check_timeout * 1000)))
     def start_scan(self):
         self.scanning = True
         self.scan_button.setText("Стоп")
@@ -685,120 +915,128 @@ class ScanDialog(QDialog):
         if self.completed_ips >= self.total_ips or self.stop_flag.value == 1:
             self.scan_button.setText("Сканировать")
             self.scanning = False
-
-
+            with open("discovered_devices.json", 'w') as f:
+                json.dump(self.discovered_devices, f, indent=4)
 
     def add_device(self, device_info):
-        name, url = device_info.split(' at ')
+        name, ip = device_info.split(' at http://')
+        ip = ip.strip('/')
         for existing_device in self.discovered_devices:
-            if existing_device["url"] == url:
+            if existing_device["ip"] == ip:
                 self.highlight_last_device()
                 return
 
         name_count = sum(1 for d in self.discovered_devices if d["name"].startswith(name + "(") or d["name"] == name)
-        unique_name = f"{name}({name_count})" if name_count > 0 else name
+        if name_count > 0:
+            unique_name = f"{name}({name_count})"
+        else:
+            unique_name = name
 
-        item = QListWidgetItem(f"{unique_name} at {url}")
+        item = QListWidgetItem(f"{unique_name} at http://{ip}/")
         self.device_list.addItem(item)
-        self.discovered_devices.append({"name": unique_name, "url": url})
+        self.discovered_devices.append({"name": unique_name, "ip": ip})
         self.highlight_last_device()
-        print(f"Нашли новое устройство: {device_info}")
-
-        self.web_browser.device_list = self.web_browser.load_devices_for_autocomplete()
-        self.web_browser.completer.setModel(QStringListModel(self.web_browser.device_list))
-
-        with open("discovered_devices.json", 'w') as f:
-            json.dump(self.discovered_devices, f, indent=4)
-
-    def load_devices_from_file(self):
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                return json.load(f)
-        return []
+        print(f"New device found: {device_info}")
 
     def load_devices(self):
-        self.discovered_devices = self.load_devices_from_file()
-        for device in self.discovered_devices:
-            self.device_list.addItem(f"{device['name']} at {device['url']}")
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                self.discovered_devices = json.load(f)
+                for device in self.discovered_devices:
+                    self.device_list.addItem(f"{device['name']} at http://{device['ip']}/")
         self.highlight_last_device()
 
-
     def select_device(self, item):
+        
+
         device_info = item.text()
-        name_part, url = device_info.split(' at ')
+        name_part, ip = device_info.split(' at http://')
+        ip = ip.strip('/')
         base_name = name_part.split('(')[0].strip()
 
-        devices = self.load_devices_from_file()
-        devices = [d for d in devices if d['url'] != url]
-        devices.insert(0, {"name": base_name, "url": url})
+        # Перемещаем устройство в начало списка
+        devices = []
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+        devices = [d for d in devices if d['ip'] != ip]
+        devices.insert(0, {"name": base_name, "ip": ip})
         with open("discovered_devices.json", 'w') as f:
             json.dump(devices, f, indent=4)
 
         self.discovered_devices = devices
-
-        def handle_availability(is_available):
-            if is_available:
-                self.web_browser.load_page(url)
-            else:
-                self.web_browser.load_page(url)
-            self.highlight_last_device()
-
-        device_ip = url.split('//')[1].split('/')[0]
-        self.web_browser.check_device_availability(device_ip, handle_availability)
+        if self.web_browser.check_device_availability(ip):
+            self.web_browser.load_page(f"http://{ip}/")
+        else:
+            self.web_browser.load_page(f"http://{ip}/")
+        self.highlight_last_device()
 
         self.name_input.setText(name_part)
-        self.ip_input.setText(url)
+        self.ip_input.setText(ip)
+
         font = QFont()
-        font.setWeight(QFont.Weight.Bold)
+        font.setWeight(QFont.Weight.Bold)  # Полужирный шрифт (600)
         item.setFont(font)
+
+        # Отложить обновление стиля, иначе не успевает
         QTimer.singleShot(400, self.update_list_style)
-        self.update_buttons_state()
+        self.update_apply_button()
+
 
     def apply_changes(self):
         current_item = self.device_list.currentItem()
         if current_item:
             new_name = self.name_input.text().strip()
-            new_url = self.ip_input.text().strip()
-            if not (new_url.startswith("http://") or new_url.startswith("https://")):
-                new_url = "http://" + new_url
-            if new_name and new_url:
+            new_ip = self.ip_input.text().strip()
+            if new_name and new_ip:
+                # Получаем данные текущего устройства из текста
                 device_info = current_item.text()
-                orig_name, orig_url = device_info.split(' at ', 1)
-                orig_url = orig_url.strip()
+                orig_name, orig_ip = device_info.split(' at http://')
+                orig_ip = orig_ip.strip('/')
 
-                current_device = next((dev for dev in self.discovered_devices if dev["url"] == orig_url), None)
+                # Находим текущее устройство в списке по IP
+                current_device = next((dev for dev in self.discovered_devices if dev["ip"] == orig_ip), None)
                 if not current_device:
                     QMessageBox.warning(self, "Ошибка", "Не удалось найти устройство в списке!")
                     return
+
+                # Проверка на совпадение IP, исключая текущее устройство
                 for dev in self.discovered_devices:
-                    if dev["url"] == new_url and dev != current_device:
-                        QMessageBox.warning(self, "Ошибка", "Устройство с таким URL уже существует!")
+                    if dev["ip"] == new_ip and dev != current_device:
+                        QMessageBox.warning(self, "Ошибка", "Устройство с таким IP уже существует!")
                         return
+                # Проверка на совпадение имени, исключая текущее устройство
                 for dev in self.discovered_devices:
                     if dev["name"] == new_name and dev != current_device:
                         QMessageBox.warning(self, "Ошибка", "Устройство с таким именем уже существует!")
                         return
+
+                # Обновить данные текущего устройства
                 current_device["name"] = new_name
-                current_device["url"] = new_url
-                current_item.setText(f"{new_name} at {new_url}")
+                current_device["ip"] = new_ip
+                current_item.setText(f"{new_name} at http://{new_ip}/")
+
+                # Сохранить изменения в файл
                 with open("discovered_devices.json", 'w') as f:
                     json.dump(self.discovered_devices, f, indent=4)
                 self.original_devices = self.discovered_devices.copy()
+
+                # Обновить окно сканирования
                 self.device_list.clear()
                 self.load_devices()
-                self.update_list_style()
+                self.update_list_style()  # Обновить стиль списка с новым акцентным цветом
+
+                # Обновить основное окно и открываем устройство заново
                 self.web_browser.device_list = self.web_browser.load_devices_for_autocomplete()
                 self.web_browser.completer.setModel(QStringListModel(self.web_browser.device_list))
-                self.web_browser.load_page(new_url)
-                self.update_buttons_state()
+                self.web_browser.load_page(f"http://{new_ip}/")
+
+                self.update_apply_button()
             else:
-                QMessageBox.warning(self, "Ошибка", "Введите имя и URL!")
+                QMessageBox.warning(self, "Ошибка", "Введите имя и IP-адрес!")
         else:
             QMessageBox.warning(self, "Ошибка", "Выберите устройство для редактирования!")
-
-
-
-
+   
     def get_darker_color(self, color, factor):
         """Возвращает более тёмный оттенок цвета"""
         if isinstance(color, str) and color.startswith('#'):
@@ -816,117 +1054,71 @@ class ScanDialog(QDialog):
         self.discovered_devices = []
         if os.path.exists("discovered_devices.json"):
             os.remove("discovered_devices.json")
-        self.update_buttons_state()
-
-        # Показываем заглушку в главном окне, если устройств больше нет
-        self.web_browser.show_no_devices_placeholder()
+        self.update_apply_button()
 
     def delete_device(self):
         current_item = self.device_list.currentItem()
         if current_item:
             device_info = current_item.text()
             self.device_list.takeItem(self.device_list.row(current_item))
-            name, url = device_info.split(' at ')
-            self.discovered_devices = [device for device in self.discovered_devices if device['url'] != url]
+            name, ip = device_info.split(' at http://')
+            ip = ip.strip('/')
+            self.discovered_devices = [device for device in self.discovered_devices if device['ip'] != ip]
             with open("discovered_devices.json", 'w') as f:
                 json.dump(self.discovered_devices, f, indent=4)
             self.highlight_last_device()
-            self.name_input.clear()
-            self.ip_input.clear()
-            self.web_browser.load_last_url()
-            self.update_buttons_state()
+            self.update_apply_button()
 
-
-    def update_buttons_state(self):
+    def update_apply_button(self):
+        """Обновить стиль кнопки Применить"""
         accent_color = self.web_browser.accent_color if hasattr(self.web_browser, 'accent_color') else "#37a93c"
         current_item = self.device_list.currentItem()
-        name = self.name_input.text().strip()
-        url = self.ip_input.text().strip()
+        if current_item:
+            name = self.name_input.text().strip()
+            ip = self.ip_input.text().strip()
+            if name and ip:
+                # Извлекаем данные из текста элемента списка
+                device_info = current_item.text()
+                orig_name, orig_ip = device_info.split(' at http://')
+                orig_ip = orig_ip.strip('/')
+                # Проверяем изменения только в данных устройства
+                if orig_name != name or orig_ip != ip:
+                    self.apply_button.setEnabled(True)
+                    self.apply_button.setStyleSheet(f"""
+                        QPushButton {{
+                            background-color: {accent_color};
+                            color: #FFFFFF;
+                            border: 1px solid #4A4A4A;
+                            border-radius: 4px;
+                            padding: 6px;
+                        }}
+                        QPushButton:hover {{
+                            background-color: {self.get_darker_color(accent_color, 120)};
+                        }}
+                    """)
+                    return
+        self.apply_button.setEnabled(False)
+        self.apply_button.setStyleSheet("""
+            QPushButton {
+                background-color: #27272f;
+                color: #FFFFFF;
+                border: 1px solid #4A4A4A;
+                border-radius: 4px;
+                padding: 6px;
+            }
+            QPushButton:hover {
+                background-color: #4A4A4A;
+            }
+            QPushButton:disabled {
+                background-color: #1c1d22;
+                color: #888888;
+            }
+        """)
+        self.update_list_style()  
+            
 
-        if url and not (url.startswith("http://") or url.startswith("https://")):
-            url = "http://" + url
 
-        # Состояние кнопки "Добавить"
-        add_enabled = False
-        if name and url:
-            url_exists = any(dev["url"] == url for dev in self.discovered_devices)
-            add_enabled = not url_exists
-
-        self.add_button.setEnabled(add_enabled)
-        if add_enabled:
-            self.add_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {accent_color};
-                    color: #FFFFFF;
-                    border: 1px solid #4A4A4A;
-                    border-radius: 4px;
-                    padding: 6px;
-                }}
-                QPushButton:hover {{
-                    background-color: {self.get_darker_color(accent_color, 120)};
-                }}
-            """)
-        else:
-            self.add_button.setStyleSheet("""
-                QPushButton {
-                    background-color: #27272f;
-                    color: #FFFFFF;
-                    border: 1px solid #4A4A4A;
-                    border-radius: 4px;
-                    padding: 6px;
-                }
-                QPushButton:hover {
-                    background-color: #4A4A4A;
-                }
-                QPushButton:disabled {
-                    background-color: #1c1d22;
-                    color: #888888;
-                }
-            """)
-
-        # кнопка применить
-        apply_enabled = False
-        if current_item and name and url:
-            device_info = current_item.text()
-            orig_name, orig_url = device_info.split(' at ', 1)
-            orig_url = orig_url.strip()
-            apply_enabled = (orig_name != name or orig_url != url)  
-
-        self.apply_button.setEnabled(apply_enabled)
-        if apply_enabled:
-            self.apply_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {accent_color};
-                    color: #FFFFFF;
-                    border: 1px solid #4A4A4A;
-                    border-radius: 4px;
-                    padding: 6px;
-                }}
-                QPushButton:hover {{
-                    background-color: {self.get_darker_color(accent_color, 120)};
-                }}
-            """)
-        else:
-            self.apply_button.setStyleSheet("""
-                QPushButton {
-                    background-color: #27272f;
-                    color: #FFFFFF;
-                    border: 1px solid #4A4A4A;
-                    border-radius: 4px;
-                    padding: 6px;
-                }
-                QPushButton:hover {
-                    background-color: #4A4A4A;
-                }
-                QPushButton:disabled {
-                    background-color: #1c1d22;
-                    color: #888888;
-                }
-            """)
-
-        self.update_list_style()
-
-# Класс для управления историей масок сетей
+# Класс для управления историей
 class SubnetHistoryManager:
     def __init__(self):
         self.history = []
@@ -954,59 +1146,15 @@ class SubnetHistoryManager:
 
 SUBNET_HISTORY_MANAGER = SubnetHistoryManager()
 
-
-class AuthDialog(QDialog):
-    def __init__(self, url, realm, saved_login="", saved_password="", parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Требуется авторизация")
-        self.setModal(False)
-        
-        layout = QFormLayout()
-        
-        self.url_label = QLabel(f"{url}")
-        layout.addRow(self.url_label)
-        
-        self.realm_label = QLabel(f"{realm}")
-        layout.addRow(self.realm_label)
-        
-        self.login_input = QLineEdit()
-        self.login_input.setPlaceholderText("Логин")
-        self.login_input.setText(saved_login)  # Предзаполняем логин
-        layout.addRow("Логин:", self.login_input)
-        
-        self.password_input = QLineEdit()
-        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password_input.setPlaceholderText("Пароль")
-        self.password_input.setText(saved_password)  # Предзаполняем пароль
-        layout.addRow("Пароль:", self.password_input)
-        
-        self.remember_checkbox = QCheckBox("Запомнить меня")
-        self.remember_checkbox.setChecked(bool(saved_login and saved_password))  # Включаем, если данные есть
-        layout.addRow(self.remember_checkbox)
-        
-        self.ok_button = QPushButton("ОК")
-        self.ok_button.clicked.connect(self.accept)
-        layout.addRow(self.ok_button)
-        
-        self.cancel_button = QPushButton("Отмена")
-        self.cancel_button.clicked.connect(self.reject)
-        layout.addRow(self.cancel_button)
-        
-        self.setLayout(layout)
-        
-    def get_credentials(self):
-        return self.login_input.text(), self.password_input.text(), self.remember_checkbox.isChecked()
-
-
 class WebBrowser(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(NAME)
 
-        self.check_timeout = 0.3
+
         self.update_available = False
         self.latest_version = None
-        self.github_repo = "TonTon-Macout/APP-for-AlexGyver-Settings"  # Репо
+        self.github_repo = "TonTon-Macout/APP-for-AlexGyver-Settings"  # репо
 
         # Версия
         self.check_latest_version()
@@ -1041,20 +1189,20 @@ class WebBrowser(QMainWindow):
         self.resize_offset = QPoint()
         self.resize_area_size = 20
 
-       
+        # Загружаем настройки из settings.json
         self.show_names = True
         self.gluon_only = True
         self.window_width = default_width
         self.window_height = default_height
         self.zoom_factor = default_zoom_factor
         self.wled_search = True  # По умолчанию включен поиск WLED
-        self.default_border_color = QColor(49, 113, 49, 150)  # Цвет рамки
+        self.default_border_color = QColor(49, 113, 49, 150)  # Цвет рамки по умолчанию
         self.default_back_color = QColor(28, 29, 34, 255)
 
         self.custom_colors_enabled = False
         self.custom_border_color = self.default_border_color
         self.custom_back_color = self.default_back_color
-         # Загружаем настройки из settings.json
+        
         if os.path.exists("settings.json"):
             with open("settings.json", 'r') as f:
                 settings = json.load(f)
@@ -1065,8 +1213,6 @@ class WebBrowser(QMainWindow):
                 self.window_height = max(self.MIN_WINDOW_HEIGHT, min(settings.get("window_height", self.window_height), self.MAX_WINDOW_HEIGHT))
                 self.zoom_factor = settings.get("zoom_factor", self.zoom_factor)
                 self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
-                self.check_timeout = settings.get("check_timeout", 0.3)
-
                 border_color = settings.get("custom_border_color", 
                                          [self.default_border_color.red(),
                                           self.default_border_color.green(),
@@ -1080,7 +1226,7 @@ class WebBrowser(QMainWindow):
                 self.custom_border_color = QColor(*border_color)
                 self.custom_back_color = QColor(*back_color)
        
-        self.credentials = {} # учетные данные для веб 
+       
        # Применяем загруженные размеры окна
         self.resize(int(self.window_width), int(self.window_height))
         self.browser = QWebEngineView()  
@@ -1090,12 +1236,8 @@ class WebBrowser(QMainWindow):
         self.border_color = self.default_border_color
         self.back_color = self.default_back_color
 
-       
-        self.load_settings()
-        self.migrate_discovered_devices() # Преобразуем в новый формат хранения
-
         # Устанавливаем начальные размеры окна и масштаб
-
+        #self.setGeometry(100, 100, int(self.window_width), int(self.window_height))
 
 
         if NAME == CUSTOM_NAME:
@@ -1112,9 +1254,9 @@ class WebBrowser(QMainWindow):
         
         try:
             storage_path = os.path.abspath("./browser_data")
-            cache_path   = os.path.abspath("./browser_cache")
+            cache_path = os.path.abspath("./browser_cache")
             
-            # Проверяем и создаем
+            # Проверяем и создаем директории
             for path in [storage_path, cache_path]:
                 if not os.path.exists(path):
                     os.makedirs(path, mode=0o777, exist_ok=True)
@@ -1145,15 +1287,10 @@ class WebBrowser(QMainWindow):
         #self.browser = QWebEngineView() переехал выше чтобы применить масштаб
         self.browser.setPage(QWebEnginePage(self.profile, self.browser))
         self.browser.loadFinished.connect(self.get_colors)
-        # Сигнал авторизации
-        self.browser.page().authenticationRequired.connect(self.handle_authentication)
+
 
         self.accent_color = "#37a93c"
         self.initUI()
-        
-
-        
-
 
         self.browser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.browser.customContextMenuRequested.connect(self.show_context_menu)
@@ -1167,344 +1304,33 @@ class WebBrowser(QMainWindow):
         # Флаг для отслеживания скрытия окна
         self.hidden_flag = False
 
-
+        # Загружаем последний сохранённый URL
         self.load_last_url()
-        # сигнал изменения URL
+
+        # Подключаем сигнал изменения URL
         self.browser.urlChanged.connect(self.update_url)
 
         # 
         container = QWidget()
         container.setStyleSheet("background: transparent;")
 
-        # Настройка QWebChannel
-        self.channel = QWebChannel(self)
-        self.channel.registerObject("pybridge", self)  # Регистрируем сам объект WebBrowser
-        self.browser.page().setWebChannel(self.channel)
-
         # Таймер для проверки доступности
         self.check_timer = QtCore.QTimer(self)
         self.check_timer.timeout.connect(self.check_current_device)
         self.current_checking_device = None
-        
 
         # Проверяем доступность
         QtCore.QTimer.singleShot(0, self.check_initial_device)
 
 
-
-
-    def check_initial_device(self):
-        # Проверка доступности устройства при запуске
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                devices = json.load(f)
-                if devices:
-                    url = devices[0]['url']
-                    self.load_page(url)
-                else:
-                    self.show_no_devices_placeholder()
-        else:
-            self.show_no_devices_placeholder()
-
-    def migrate_discovered_devices(self):
-        #Преобразование старого формата в новый
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                try:
-                    devices = json.load(f)
-                except json.JSONDecodeError:
-                    devices = []  # Если файл повреждён, начнём с пустого списка
-
-            # Проверяем, есть ли старый формат
-            updated = False
-            for device in devices:
-                if "ip" in device and "url" not in device:
-                    # Преобразуем старый формат в новый
-                    device["url"] = f"http://{device['ip']}/"
-                    del device["ip"]  # Удаляем старый ключ
-                    updated = True
-                elif "url" not in device and "name" in device:
-                    # Если нет ни ip, ни url, но есть name, пропускаем 
-                    continue
-
-            # Сохраняем обновлённый файл, если были изменения
-            if updated:
-                with open("discovered_devices.json", 'w') as f:
-                    json.dump(devices, f, indent=4)
-                print("Поменян формат файла discovered_devices на новую версию")
-
-    def load_settings(self):
-        if os.path.exists("settings.json"):
-            with open("settings.json", 'r') as f:
-                settings = json.load(f)
-                self.show_names = settings.get("show_names", True)
-                self.gluon_only = settings.get("gluon_only", False)
-                self.wled_search = settings.get("wled_search", True)
-                self.window_width = settings.get("window_width", 800)
-                self.window_height = settings.get("window_height", 600)
-                self.zoom_factor = settings.get("zoom_factor", 1.0)
-                self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
-                self.custom_border_color = QColor(*settings.get("custom_border_color", [255, 255, 255, 255]))
-                self.custom_back_color = QColor(*settings.get("custom_back_color", [0, 0, 0, 255]))
-                self.check_timeout = settings.get("check_timeout", 0.3)
-                # Учетные данные
-                if "credentials" in settings:
-                    for url, cred in settings["credentials"].items():
-                        try:
-                            login = base64.b64decode(cred["login"]).decode('utf-8')
-                            password = base64.b64decode(cred["password"]).decode('utf-8')
-                            self.credentials[url] = {"login": login, "password": password}
-                        except Exception as e:
-                            print(f"Ошибка расшифровки учетных данных для {url}: {e}")
-        else:
-            self.credentials = {}
-
-    def save_settings(self):
-        settings = {
-            "show_names": self.show_names,
-            "gluon_only": self.gluon_only,
-            "wled_search": self.wled_search,
-            "window_width": self.window_width,
-            "window_height": self.window_height,
-            "zoom_factor": self.zoom_factor,
-            "custom_colors_enabled": self.custom_colors_enabled,
-            "check_timeout": self.check_timeout,
-            "custom_border_color": [self.custom_border_color.red(), 
-                                   self.custom_border_color.green(), 
-                                   self.custom_border_color.blue(), 
-                                   self.custom_border_color.alpha()],
-            "custom_back_color": [self.custom_back_color.red(), 
-                                 self.custom_back_color.green(), 
-                                 self.custom_back_color.blue(), 
-                                 self.custom_back_color.alpha()],
-            "credentials": {}
-        }
-        for url, cred in self.credentials.items():
-            try:
-                settings["credentials"][url] = {
-                    "login": base64.b64encode(cred["login"].encode('utf-8')).decode('utf-8'),
-                    "password": base64.b64encode(cred["password"].encode('utf-8')).decode('utf-8')
-                }
-            except Exception as e:
-                print(f"Ошибка кодирования учетныйх данных для {url}: {e}")
-        try:
-            with open("settings.json", 'w') as f:
-                json.dump(settings, f, indent=4)
-            print("Настройки сохранены")
-        except Exception as e:
-            print(f"Ошибка при сохранении настроек: {e}")
-
-
-
-    def handle_authentication(self, url, authenticator):
-        url_str = url.toString()
-        saved_login = self.credentials.get(url_str, {}).get("login", "")
-        saved_password = self.credentials.get(url_str, {}).get("password", "")
-        
-        print(f"Запрос авторизации: {url_str}")
-        dialog = AuthDialog(url_str, authenticator.realm(), saved_login, saved_password, self)
-        
-      
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            login, password, remember = dialog.get_credentials()
-            #print(f"Введено: login={login}, password={password}, remember={remember}")
-            
-            if login and password:  # Проверяем что введено
-                authenticator.setUser(login)
-                authenticator.setPassword(password)
-           
-            
-                if remember and login and password:
-                    print(f"Сохранили учетные данные {url_str}")
-                    self.credentials[url_str] = {"login": login, "password": password}
-                    self.save_settings()  # Сохраняем все настройки
-            else:
-             # Если пользователь нажал ок но не ввел данные
-                self.show_device_unavailable_placeholder(url_str)
-                authenticator.setUser("")  # Отменяем
-      
-        else:
-            authenticator.setUser("")
-            print("Авторизация отменена")
-            self.show_device_unavailable_placeholder(url_str)
-            authenticator.setUser("")  
-
-
-
-
-
-    def show_device_unavailable_placeholder(self, url):
-       
-        error_html = f"""
-        <!DOCTYPE html>
-        <html lang="en" style="--accent: #150000;">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>No Devices Found</title>
-            <style>
-                body {{
-                    background-color: #1c1d22;
-                    color: #ffffff;
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100vh;
-                    margin: 0;
-                    transition: background-color 2s ease;
-                }}
-                .snowman-container {{
-                    font-size: 64px;
-                    margin-bottom: 20px;
-                    color: #140000;
-                    width: 10px;
-                    height: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                    transition: color 1s ease;
-                }}
-                .snowman-container .eyes {{
-                    display: none;
-                    position: absolute;
-                    top: -7px;
-                    width: 15px;
-                    height: 10px;
-                    background-color: #ff0000;
-                    border-radius: 50%;
-                    animation: look 5s infinite;
-                    z-index: -1;
-                }}
-                .snowman-container .moon {{
-                    display: none;
-                    position: absolute;
-                    top: -30px;
-                    left: 20px;
-                    width: 20px;
-                    height: 20px;
-                    background-color: #ffcc008f;
-                    box-shadow: 0px 0px 7px 0px #ff0000de;
-                    border-radius: 50%;
-                    z-index: -2;
-                    filter: blur(1px);
-                }}
-                @keyframes look {{
-                    0% {{ opacity: 1; filter: brightness(70%); }}
-                    20% {{ opacity: 0.3; filter: brightness(10%); }}
-                    30% {{ opacity: 0.3; filter: brightness(10%); }}
-                    40% {{ opacity: 1; filter: brightness(60%); }}
-                    45% {{ opacity: 0.8; filter: brightness(50%); }}
-                    60% {{ opacity: 0.2; filter: brightness(20%); }}
-                    80% {{ opacity: 1; filter: brightness(70%); }}
-                    85% {{ opacity: 0.4; filter: brightness(30%); }}
-                    100% {{ opacity: 1; filter: brightness(70%); }}
-                }}
-                .message {{
-                    margin-top: 20px;
-                    margin-bottom: 20px;
-                    font-size: 24px;
-                    text-align: center;
-                    color: #5e5e5e;
-                }}
-                .error-icon {{
-                    font-size: 48px;
-                    
-                    cursor: pointer;
-                    transition: opacity 0.5s ease;
-                }}
-                .snowman {{
-                    display: none;
-                    opacity: 0;
-                    transition: opacity 0.5s ease;
-                }}
-                .device-info {{
-                                margin-bottom: 7px;
-                                color: #888;
-                            }}
-                .device-info2 {{
-                    margin-bottom: 7px;
-                    color: #888;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="snowman-container">
-                <div class="moon"></div>
-                <div class="eyes"></div>
-                <span class="snowman">⛇</span>
-            </div>
-            <div class="error-icon">🔒</div>
-            <div class="message">Устройство недоступно</div>
-            <div class="device-info">это устройство требует авторизации</div>
-            <div class="device-info2">обновите страницу и попробуйте снова</div>
-
-            <script>
-                const errorIcon = document.querySelector('.error-icon');
-                let clickCount = 0;
-
-                errorIcon.addEventListener('click', () => {{
-                    clickCount++;
-                    if (clickCount === 2){{
-                                   const message = document.querySelector('.message')
-                                   message.style.display = 'none';
-
-                                   const device_info = document.querySelector('.device-info')
-                                   device_info.style.display = 'none';
-
-                                   const device_info2 = document.querySelector('.device-info2')
-                                   device_info2.style.display = 'none';
-                                }}
-                    if (clickCount === 10) {{
-                        errorIcon.style.opacity = '0';
-                        document.body.style.backgroundColor = '#000000';
-
-                         setTimeout(() => {{
-                              const eyes = document.querySelector('.eyes');
-                              eyes.style.display = 'block';
-                         
-                         }}, 3000);
-
-                        setTimeout(() => {{
-                            const snowman = document.querySelector('.snowman');
-                            snowman.style.display = 'inline';
-                            setTimeout(() => {{
-                                snowman.style.opacity = '1';
-                            }}, 10);
-
-                            setTimeout(() => {{
-                                const snowmanContainer = document.querySelector('.snowman-container');
-                                snowmanContainer.style.color = '#200000';
-
-
-                            }}, 5000);
-                        }}, 2000);
-                    }}
-                }});
-            </script>
-        </body>
-        </html>
-        """
-
-        self.browser.setHtml(error_html, QUrl(url))
-        self.address_input.setText(url if not self.show_names else self.get_name_by_url(url))
-
-
-
-
-
     def initUI(self):
         # строка ввода  
         self.address_input = QLineEdit()
-        self.address_input.setPlaceholderText("Введите URL или IP")
+        self.address_input.setPlaceholderText("Enter IP Address")
         self.address_input.returnPressed.connect(self.load_page)
-        #self.address_input.setMinimumWidth(170)  # ширина
+        self.address_input.setMinimumWidth(170)  # ширина
         self.address_input.setStyleSheet("background-color: rgba(200, 0, 0, 0); border-radius: 9px; ")
         self.address_input.returnPressed.connect(self.load_page)
-        self.address_input.textChanged.connect(self.adjust_address_input_width)  # сигнал
-        self.adjust_address_input_width()  # начальная ширина
         # Aвтодополнение с устройствами
         self.device_list = self.load_devices_for_autocomplete()
         self.completer = QCompleter(self.device_list, self)
@@ -1512,8 +1338,6 @@ class WebBrowser(QMainWindow):
         self.completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
         self.completer.setFilterMode(Qt.MatchFlag.MatchContains)
         self.address_input.setCompleter(self.completer)
-
-
 
 
         # Cигнал для загрузки выбранного устройства из автодополнения
@@ -1529,7 +1353,7 @@ class WebBrowser(QMainWindow):
                         if self.show_names:
                             self.address_input.setText(devices[0]['name'])
                         else:
-                            self.address_input.setText(devices[0]['url'])
+                            self.address_input.setText(f"http://{devices[0]['ip']}/")
         
 
 
@@ -1537,7 +1361,7 @@ class WebBrowser(QMainWindow):
         self.go_button = QPushButton()
         self.go_button.setFixedSize(20, 20)  #  размер кнопки
         self.go_button.setIcon(QIcon("refresh.png"))
-        self.go_button.setStyleSheet("background-color: transparent; border: none; margin-right:4px;")  # Прозрачный фон
+        self.go_button.setStyleSheet("background-color: transparent; border: none;")  # Прозрачный фон
         self.go_button.clicked.connect(self.refresh_page)
 
         #  кнопка поиск
@@ -1577,7 +1401,7 @@ class WebBrowser(QMainWindow):
         buttons_layout.addWidget(self.go_button)
         buttons_layout.addWidget(self.checkbox)
         buttons_layout.addWidget(self.address_input)
-        buttons_layout.addStretch(0)  # Растягивающееся пространство
+        buttons_layout.addStretch()  # Растягивающееся пространство
         buttons_layout.addWidget(self.minimize_button)
         buttons_layout.addWidget(self.close_button)
         buttons_layout.addWidget(spacer_widget)  # Отступ
@@ -1611,25 +1435,14 @@ class WebBrowser(QMainWindow):
         self.setCentralWidget(central_widget)
         layout.addWidget(spacer_bottom_layoutt)  #  отступ снизу
 
-        # стили виджета браузера неработают
+        # стили виджета браузера
         self.browser.setStyleSheet("""
             QWebEngineView {
                 background-color: rgba(0, 0, 0, 255);
                 border-radius: 100px;
             }
         """)
-     
-    def adjust_address_input_width(self):
-        # устанавливаем ширину адресной строки, 
-        self.address_input.setMinimumWidth(190)  # ширина фиксированно-минимальная
-       
-        # ширина зависит от длины текста 
-        #text = self.address_input.text() or self.address_input.placeholderText()  # плейсхолдер
-        #font_metrics = self.address_input.fontMetrics()  # Метрики шрифта
-        #width = font_metrics.horizontalAdvance(text) + 20  # +20 для отступов
-        #min_width = 100  # Минимальная ширина для удобства
-        #max_width = self.width() - 100  
-        #self.address_input.setMinimumWidth(max(min_width, min(width, max_width)))
+
 
     def check_latest_version(self):
         try:
@@ -1643,7 +1456,7 @@ class WebBrowser(QMainWindow):
                     self.update_available = True
                     print(f"Доступна новая версия: {self.latest_version} (текущая: {VERSION})")
                 else:
-                    print(f"Уже последняя версия: {VERSION}")
+                    print(f"У вас последняя версия: {VERSION}")
             else:
                 print(f"Ошибка проверки версии: {response.status_code}")
         except Exception as e:
@@ -1655,53 +1468,75 @@ class WebBrowser(QMainWindow):
             import webbrowser
             webbrowser.open(url)
 
+    def save_settings(self):
+        settings = {
+            "show_names": self.show_names,
+            "gluon_only": self.gluon_only,
+            "wled_search": self.wled_search,
+            "window_width": self.window_width,
+            "window_height": self.window_height,
+            "zoom_factor": self.zoom_factor,
+            "custom_colors_enabled": self.custom_colors_enabled,
+            "custom_border_color": [self.custom_border_color.red(), 
+                                  self.custom_border_color.green(), 
+                                  self.custom_border_color.blue(), 
+                                  self.custom_border_color.alpha()],
+            "custom_back_color": [self.custom_back_color.red(), 
+                                self.custom_back_color.green(), 
+                                self.custom_back_color.blue(), 
+                                self.custom_back_color.alpha()]
+        }
+        with open("settings.json", 'w') as f:
+            json.dump(settings, f, indent=4)
 
 
-#    def toggle_show_names(self):
-#        #Переключаем показ имён и сохранить
-#        self.show_names = not self.show_names
-#        with open("settings.json", 'w') as f:
-#            json.dump({"show_names": self.show_names}, f, indent=4)
-#        print(f"показывать имена в строке: {self.show_names}")
-
+    def toggle_show_names(self):
+        #Переключаем показ имён и Сохранить
+        self.show_names = not self.show_names
+        with open("settings.json", 'w') as f:
+            json.dump({"show_names": self.show_names}, f, indent=4)
+        print(f"Show names toggled to: {self.show_names}")
 
 
     def load_devices_for_autocomplete(self):
+        #Загружаем устройства из discovered_devices.json для автодополнения
         device_list = []
         self.device_map = {}
-        name_count = {}
+        name_count = {}  # Счётчик одинаковых имён
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
                 for device in devices:
                     base_name = device['name']
-                    url = device['url']
+                    ip = device['ip']
+                    # Подсчитываем, сколько раз встречается базовое имя
                     if base_name in name_count:
                         name_count[base_name] += 1
                         display_name = f"{base_name}({name_count[base_name]})"
                     else:
                         name_count[base_name] = 0
                         display_name = base_name
-                    self.device_map[display_name] = url
+                    self.device_map[display_name] = ip
                     if self.show_names:
                         device_list.append(display_name)
                     else:
-                        device_list.append(url)
+                        device_list.append(f"http://{ip}/")
         return device_list
 
 
     def load_selected_device(self, text):
         if text:
             if self.show_names and text in self.device_map:
-                url = self.device_map[text]
-                self.load_page(url)
+                ip = self.device_map[text]
+                self.update_discovered_devices(text, ip)
+                self.load_page(f"http://{ip}/")
             else:
                 self.load_page(text)
   
     def show_completer(self, event: QMouseEvent):
         self.completer.setCompletionPrefix("")  # Префикс для показа всех устройств
         self.address_input.completer().complete()  #  Список
-        QLineEdit.mousePressEvent(self.address_input, event)
+        QLineEdit.mousePressEvent(self.address_input, event)  # Сохранить стандартное поведение
 
     def open_menu(self):
         self.scan_dialog = ScanDialog(self)
@@ -1785,7 +1620,7 @@ class WebBrowser(QMainWindow):
                     QMenu::item:selected {{
                         background-color: {color};
                         color: #000000;
-                        border-radius: 6px;
+                        
                     }}
                 """
                 self.setStyleSheet(menu_style)  # Применяем стили к главному окну
@@ -1797,7 +1632,7 @@ class WebBrowser(QMainWindow):
                     QMenu::item:selected {
                         background-color: #0078D4;
                         color: #000000;
-                        border-radius: 6px;
+                        
                     }
                 """)
         else:
@@ -1807,7 +1642,6 @@ class WebBrowser(QMainWindow):
                 QMenu::item:selected {
                     background-color: #0078D4;
                     color: #000000;
-                    border-radius: 6px;
                              
                 }
             """)
@@ -1835,7 +1669,7 @@ class WebBrowser(QMainWindow):
                 """
                 self.setStyleSheet(checkbox_style)  # Применяем стили к главному окну
             except Exception as e:
-                
+                print(f"Ошибка при обновлении стилей QCheckBox: {e}")
                 # Используем стили по умолчанию в случае ошибки
                 self.setStyleSheet("""
                     QCheckBox {
@@ -1979,7 +1813,7 @@ class WebBrowser(QMainWindow):
     def handle_accent_color(self, color):
         # Обрабатываем полученный цвет
         if self.custom_colors_enabled:
-            self.accent_color = self.custom_border_color  # Используем QColor
+            self.accent_color = self.custom_border_color  # Используем цвет как акцент
             self.border_color = self.custom_border_color
             self.back_color = self.custom_back_color
         else:
@@ -1987,48 +1821,25 @@ class WebBrowser(QMainWindow):
                 self.accent_color = color
                 self.update_border_color(color)  # Обновить цвет рамки из полученного цвета
             else:
-                self.accent_color = self.custom_border_color.name(QColor.NameFormat.HexRgb)
-                self.border_color = self.custom_border_color
-                self.back_color = self.custom_back_color
+                self.accent_color = self.custom_border_color.name(QColor.NameFormat.HexRgb)  # Преобразуем QColor в HEX строку
+                self.border_color = self.custom_border_color  # Устанавливаем цвет рамки
+                self.back_color = self.custom_back_color      # Устанавливаем цвет фона
 
-        # Определяем яркость акцентного цвета и выбираем цвет текста
-        brightness = self.calculate_brightness(self.accent_color)
-        text_color = "#FFFFFF" if brightness < 128 else "#000000"  # Порог 128
-
-        # Обновляем DARK_THEME с учетом цвета текста
+        # Обновить DARK_THEME с новым акцентным цветом
         updated_dark_theme = DARK_THEME.replace(
-            "QListView::item:selected { background-color: 27272f; color: #FFFFFF; }",
-            f"QListView::item:selected {{ background-color: {self.accent_color}; color: {text_color}; border-radius: 6px; }}"
-        ).replace(
-            "QListWidget::item:selected { background-color: #067100; color: #FFFFFF; }",
-            f"QListWidget::item:selected {{ background-color: {self.accent_color}; color: {text_color}; }}"
-        ).replace(
-            "QMenu::item:selected { background-color: #00612a; color: #000000; }",
-            f"QMenu::item:selected {{ background-color: {self.accent_color}; color: {text_color}; border-radius: 6px; }}"
+            "QListView::item:selected { background-color: #27272f; color: #FFFFFF; }",
+            f"QListView::item:selected {{ background-color: {self.accent_color}; color: #000; }}"
         )
-
         QApplication.instance().setStyleSheet(updated_dark_theme)
 
-        # Обновляем динамические стили
-        combined_style = self.get_combined_styles(self.accent_color, text_color)
+        combined_style = self.get_combined_styles(self.accent_color)
         self.setStyleSheet(combined_style)
         self.update()  # Перерисовываем окно
 
-    def calculate_brightness(self, color):
-        """Вычисляет яркость цвета в формате HEX (#RRGGBB). Возвращает значение от 0 до 255."""
-        if isinstance(color, QColor):
-            r, g, b = color.red(), color.green(), color.blue()
-        elif isinstance(color, str) and color.startswith('#'):
-            r = int(color[1:3], 16)
-            g = int(color[3:5], 16)
-            b = int(color[5:7], 16)
-        else:
-            return 128  # Значение по умолчанию, если цвет некорректен
-        # Формула luma
-        return 0.299 * r + 0.587 * g + 0.114 * b
+
 
         
-    def get_combined_styles(self, color, text_color="#000000"):
+    def get_combined_styles(self, color):
         # объединяем стили для всех элементов котрые меняют цвет динамически 
         # если по отдельности применять стили то они перезаписывают друг друга
 
@@ -2045,7 +1856,7 @@ class WebBrowser(QMainWindow):
                 color: #FFFFFF;
                 border: none;
                 border-radius: 6px;
-                 /*padding: 6px; */
+                /* padding: 6px; */
             }}
             QLineEdit:focus {{
                 border: 1px solid {color};
@@ -2076,8 +1887,7 @@ class WebBrowser(QMainWindow):
 
             QMenu::item:selected {{
                 background-color: {color};
-                color: {text_color};
-                border-radius: 6px;
+                color: #000000;
                
             }}
         """
@@ -2140,242 +1950,145 @@ class WebBrowser(QMainWindow):
             point_size                                 # высота (диаметр)
         )
 
+    def load_page(self, ip=None):
+        url = ip if ip else self.address_input.text().strip()
+        if url:
+            original_url = url
+            if not url.startswith("http://") and not url.startswith("https://"):
+                url = "http://" + url
+                original_url = url
 
+            device_ip = url.split('//')[1].split('/')[0]
 
-    def load_page(self, url=None):
-
-        input_url = url if url else self.address_input.text().strip()
-        if input_url:
-            if not (input_url.startswith("http://") or input_url.startswith("https://")):
-                input_url = "http://" + input_url
-            original_url = input_url
-
-            device_host = original_url.split('//')[1].split('/')[0]
-            is_ip = bool(re.match(r'^\d+\.\d+\.\d+\.\d+$', device_host))
-
-            devices = self.load_devices_from_file()
-            if original_url in [d['url'] for d in devices]:
-                device = next(d for d in devices if d['url'] == original_url)
-                devices = [d for d in devices if d['url'] != original_url]
-                devices.insert(0, device)
-                with open("discovered_devices.json", 'w') as f:
-                    json.dump(devices, f, indent=4)
-                self.device_list = self.load_devices_for_autocomplete()
-                self.completer.setModel(QStringListModel(self.device_list))
-            elif is_ip:
+            # Если это ручной ввод IP (не из device_map), отправляем discover
+            if device_ip not in self.device_map.values():
+                # Проверяем, является ли device_ip валидным IP-адресом
                 try:
-                    response = requests.get(f"{original_url}settings?action=discover", timeout=0.3, verify=False)
+                    ipaddress.ip_address(device_ip)  # Проверка валидности IP
+                    response = requests.get(f"http://{device_ip}/settings?action=discover", timeout=0.3, verify=False)
                     if response.status_code == 200:
                         data = response.json()
-                        name = data.get("name", f"Unknown_{device_host}")
-                        self.update_discovered_devices(name, original_url)
-                except requests.RequestException:
+                        name = data.get("name", f"Unknown_{device_ip}")
+                        self.update_discovered_devices(name, device_ip)
+                except ValueError:
+                    # Если device_ip не является IP-адресом (например, имя устройства), игнорируем discover
                     pass
-
-            def handle_availability(is_available):
-                print(f"Доступность {original_url}: {is_available}, is_ip: {is_ip}")
-                if not is_available and is_ip:
-                    self.current_checking_device = original_url  # Сохраняем полный URL
-                    self.check_timer.start(5000)
-                    self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-                    error_html = f"""
-                    <!DOCTYPE html>
-                    <html lang="en" >
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>No Devices Found</title>
-                        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
-                        <style>
-                            body {{
-                                background-color: #1c1d22;
-                                color: #ffffff;
-                                font-family: Arial, sans-serif;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                                justify-content: center;
-                                height: 100vh;
-                                margin: 0;
-                                transition: background-color 2s ease;
-                            }}
-                            .snowman-container {{
-                                font-size: 64px;
-                                margin-bottom: 20px;
-                                color: #150000;
-                                width: 10px;
-                                height: 10px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                position: relative;
-                                transition: color 1s ease;
-                            }}
-                            .snowman-container .eyes {{
-                                display: none;
-                                position: absolute;
-                                top: -5px;
-                                width: 15px;
-                                height: 10px;
-                                background-color: #ff0000;
-                                border-radius: 50%;
-                                animation: look 5s infinite;
-                                z-index: -1;
-                            }}
-                            .snowman-container .moon {{
-                                display: none;
-                                position: absolute;
-                                top: -25px;
-                                left: 20px;
-                                width: 20px;
-                                height: 20px;
-                                background-color: #ffcc008f;
-                                box-shadow: 0px 0px 7px 0px #ff0000de;
-                                border-radius: 50%;
-                                z-index: -2;
-                                filter: blur(1px);
-                            }}
-                            @keyframes look {{
-                                0% {{ opacity: 1; filter: brightness(70%); }}
-                                20% {{ opacity: 0.3; filter: brightness(10%); }}
-                                30% {{ opacity: 0.3; filter: brightness(10%); }}
-                                40% {{ opacity: 1; filter: brightness(60%); }}
-                                45% {{ opacity: 0.8; filter: brightness(50%); }}
-                                60% {{ opacity: 0.2; filter: brightness(20%); }}
-                                80% {{ opacity: 1; filter: brightness(70%); }}
-                                85% {{ opacity: 0.4; filter: brightness(30%); }}
-                                100% {{ opacity: 1; filter: brightness(70%); }}
-                            }}
-                            .message {{
-                               
-                                font-size: 24px;
-                                text-align: center;
-                                color: #5e5e5e;
-                            }}
-                            .error-icon {{
-                                font-size: 52px;
-                                margin-bottom: 20px;
-                                cursor: pointer;
-                                transition: opacity 0.5s ease;
-                            }}
-                            .snowman {{
-                                display: none;
-                                opacity: 0;
-                                transition: opacity 0.5s ease;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class="snowman-container">
-                            <div class="moon"></div>
-                            <div class="eyes"></div>
-                            <span class="snowman">⛇</span>
-                        </div>
-                        <div class="error-icon">⚠️</div>
-                        <div class="message">Устройство недоступно</div>
-
-                        <script>
-                            let bridge;
-                            new QWebChannel(qt.webChannelTransport, function(channel) {{
-                                bridge = channel.objects.pybridge;
-                            }});  
-
-
-                            const errorIcon = document.querySelector('.error-icon');
-                            let clickCount = 0;
-                            errorIcon.addEventListener('click', () => {{
-                                clickCount++;
-                                if (clickCount === 2){{
-                                   const message = document.querySelector('.message')
-                                   message.style.display = 'none';
-                                   if (bridge) {{
-                                       bridge.stop_border_animation();
-                                   }}
-                                }}
-                                if (clickCount === 10) {{
-                                    errorIcon.style.opacity = '0';
-                                    document.body.style.backgroundColor = '#000000';
-
-                                    setTimeout(() => {{
-                                        const snowman = document.querySelector('.snowman');
-                                        snowman.style.display = 'inline';
-                                        setTimeout(() => {{
-                                            snowman.style.opacity = '1';
-                                        }}, 10);
-                                        setTimeout(() => {{
-                                                const eyes = document.querySelector('.eyes');
-                                                eyes.style.display = 'block';
-                                            }}, 2000);
-
-                                        setTimeout(() => {{
-                                            const snowmanContainer = document.querySelector('.snowman-container');
-                                            snowmanContainer.style.color = '#200000';
-
-                                            setTimeout(() => {{
-                                                const eyes = document.querySelector('.eyes');
-                                                eyes.style.display = 'block';
-                                            }}, 2000);
-                                        }}, 7000);
-                                    }}, 5000);
-                                }}
-                            }});
-                        </script>
-                    </body>
-                    </html>
-                    """
-                    self.browser.setHtml(error_html, QUrl(original_url))
-                    self.address_input.setText(original_url if not self.show_names else self.get_name_by_url(original_url))
-                    self.start_border_animation()
+                except requests.RequestException:
+                    # Если запрос не удался, продолжаем без добавления
+                    pass
+                
+            if not self.check_device_availability(device_ip):
+                self.current_checking_device = device_ip
+                self.check_timer.start(5000)
+                error_html = f"""
+                <!DOCTYPE html>
+                <html lang="en" style="--accent: #ff0000;">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Device Offline</title>
+                    <style>
+                        body {{
+                            background-color: #1c1d22;
+                            color: #ffffff;
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100vh;
+                            margin: 0;
+                        }}
+                        .error-icon {{
+                            font-size: 48px;
+                            margin-bottom: 20px;
+                        }}
+                        .error-message {{
+                            font-size: 24px;
+                            text-align: center;
+                        }}
+                        .device-info {{
+                            margin-top: 20px;
+                            color: #888;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-message">Устройство недоступно</div>
+                    <div class="device-info">IP: {device_ip}</div>
+                </body>
+                </html>
+                """
+                self.browser.setHtml(error_html, QUrl(original_url))
+                if self.show_names:
+                    for name, ip in self.device_map.items():
+                        if ip == device_ip:
+                            self.address_input.setText(name)
+                            break
+                    else:
+                        self.address_input.setText(original_url)
                 else:
-                    self.check_timer.stop()
-                    self.current_checking_device = None
-                    self.stop_border_animation()
-                    self.browser.setUrl(QUrl(original_url))
-                    self.address_input.setText(original_url if not self.show_names else self.get_name_by_url(original_url))
-                    QtCore.QTimer.singleShot(1000, self.get_accent_color)
-
-                self.hide()
-                self.show()
-                self.activateWindow()
-
-            if is_ip:
-                self.check_device_availability(original_url, handle_availability)
+                    self.address_input.setText(original_url)
+                self.start_border_animation()
             else:
-                handle_availability(True)
+                self.check_timer.stop()
+                self.current_checking_device = None
+                self.stop_border_animation()
+                self.browser.setUrl(QUrl(url))
+                if self.show_names:
+                    for name, ip in self.device_map.items():
+                        if ip == device_ip:
+                            self.update_discovered_devices(name, device_ip)
+                            self.address_input.setText(name)
+                            break
+                    else:
+                        self.address_input.setText(original_url)
+                else:
+                    for name, ip in self.device_map.items():
+                        if ip == device_ip:
+                            self.update_discovered_devices(name, device_ip)
+                            break
+                    self.address_input.setText(original_url)
+                QtCore.QTimer.singleShot(1000, self.get_accent_color)
+
+            self.hide()
+            self.show()
+            self.activateWindow()
 
 
-    def get_name_by_url(self, url):
-        devices = self.load_devices_from_file()
-        for device in devices:
-            if device['url'] == url:
-                return device['name']
-        return url
 
 
-    def load_devices_from_file(self):
+    def update_discovered_devices(self, name, ip):
+        # Загружаем список устройств
+        devices = []
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
-                return json.load(f)
-        return []
-
-
-
-    def update_discovered_devices(self, name, url):
-        devices = self.load_devices_from_file()
-        devices = [d for d in devices if d['url'] != url]
+                devices = json.load(f)
+    
+        # Удаляем устройство с таким IP, если оно уже есть
+        devices = [d for d in devices if d['ip'] != ip]
+    
+        # Проверяем, сколько устройств с таким именем
         name_count = sum(1 for d in devices if d["name"].startswith(name + "(") or d["name"] == name)
-        unique_name = f"{name}({name_count})" if name_count > 0 else name
-        devices.insert(0, {"name": unique_name, "url": url})
+        if name_count > 0:
+            unique_name = f"{name}({name_count})"
+        else:
+            unique_name = name
+    
+        #  устройство в начало списка с уникальным именем
+        devices.insert(0, {"name": unique_name, "ip": ip})
+    
+        # Сохранить обновлённый список
         with open("discovered_devices.json", 'w') as f:
             json.dump(devices, f, indent=4)
+    
+        # Обновить device_map и автодополнение
         self.device_list = self.load_devices_for_autocomplete()
         self.completer.setModel(QStringListModel(self.device_list))
 
-
-
     def closeEvent(self, event):
         # Закрываем окно сканирования, если оно открыто
-        self.save_settings()
         if hasattr(self, 'scan_dialog') and self.scan_dialog.isVisible():
             self.scan_dialog.close()
         
@@ -2399,141 +2112,21 @@ class WebBrowser(QMainWindow):
         # Обновить URL в поле ввода
         self.address_input.setText(url.toString())
 
+
     def load_last_url(self):
+        # Загружаем последний URL из файла
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
                 if devices:
-                    url = devices[0]['url']
-                    self.browser.setUrl(QUrl(url))
-                    self.address_input.setText(devices[0]['name'] if self.show_names else url)
-                else:
-                    self.show_no_devices_placeholder()
+                    ip = devices[0]['ip']
+                    self.browser.setUrl(QUrl(f"http://{ip}/"))
+                    if self.show_names:
+                        self.address_input.setText(devices[0]['name'])
+                    else:
+                        self.address_input.setText(f"http://{ip}/")
         else:
-            self.show_no_devices_placeholder()
-
-    
-    def show_no_devices_placeholder(self):
-        no_devices_html = """
-        <!DOCTYPE html>
-        <html lang="en" style="--accent: #150000;">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>No Devices Found</title>
-            <style>
-                body {
-                    background-color: #1c1d22;
-                    color: #ffffff;
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100vh;
-                    margin: 0;
-                    transition: background-color 3s ease; /* Плавный переход фона за 3 секунды */
-                }
-                .info-icon {
-                    font-size: 64px;
-                    margin-bottom: 20px;
-                    color: #150000;
-                    width: 10px;
-                    height: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                }
-                .info-icon .background-circle {
-                    display: none; /* Скрыт по умолчанию */
-                    position: absolute;
-                    top: -7px;
-                    width: 15px;
-                    height: 10px;
-                    background-color: #ff0000;
-                    border-radius: 50%;
-                    animation: look 5s infinite;
-                    z-index: -1;
-                }
-                .info-icon .background-moon {
-                    display: none; /* Скрыт по умолчанию */
-                    position: absolute;
-                    top: -30px;
-                    left: 20px;
-                    width: 20px;
-                    height: 20px;
-                    background-color: #ffcc008f;
-                    box-shadow: 0px 0px 7px 0px #ff0000de;
-                    border-radius: 50%;
-                    z-index: -2;
-                    filter: blur(1px);
-                    animation: moon 45s infinite;
-                }
-                @keyframes moon {
-                    0% { opacity: 0; filter: brightness(0%); }
-                    80% { opacity: 0.2; filter: brightness(90%); }
-                    85% { opacity: 0.4; filter: brightness(90%); }
-                    88% { opacity: 0.7; filter: brightness(95%); }
-                    91% { opacity: 0.8; filter: brightness(97%); }
-                    95% { opacity: 0.9; filter: brightness(98%); }
-                    100% { opacity: 1; filter: brightness(100%); }
-                }
-                @keyframes look {
-                    0% { opacity: 1; filter: brightness(70%); }
-                    20% { opacity: 0.3; filter: brightness(10%); }
-                    30% { opacity: 0.3; filter: brightness(10%); }
-                    40% { opacity: 1; filter: brightness(60%); }
-                    45% { opacity: 0.8; filter: brightness(50%); }
-                    60% { opacity: 0.2; filter: brightness(20%); }
-                    80% { opacity: 1; filter: brightness(70%); }
-                    85% { opacity: 0.4; filter: brightness(30%); }
-                    100% { opacity: 1; filter: brightness(70%); }
-                }
-                .message {
-                    margin-top: 30px;
-                    font-size: 24px;
-                    text-align: center;
-                    color: #5e5e5e;
-                    transition: opacity 3s ease; /* Плавное исчезновение за 3 секунды */
-                }
-                .snowman {
-                    display: none; /* Скрыт по умолчанию */
-                    opacity: 0;
-                    transition: opacity 3s ease; /* Плавное появление за 3 секунды */
-                }
-            </style>
-        </head>
-        <body>
-            <div class="info-icon">
-                <div class="background-moon"></div>
-                <div class="background-circle"></div>
-                <span class="snowman">⛇</span>
-            </div>
-            <div class="message">Устройства не обнаружены</div>
-            <script>
-                setTimeout(() => {
-                   
-                    document.body.style.backgroundColor = '#000000';
-                    document.querySelector('.message').style.opacity = '0';
-                    setTimeout(() => {
-                        const snowman = document.querySelector('.snowman');
-                        snowman.style.display = 'inline'; 
-                        setTimeout(() => {
-                            snowman.style.opacity = '1'; 
-                        }, 10); 
-                        setTimeout(() => {
-                            document.querySelector('.info-icon .background-circle').style.display = 'block';
-                        }, 3000);
-                    }, 3000);
-                }, 25000); 
-            </script>
-        </body>
-        </html>
-        """
-        self.browser.setHtml(no_devices_html, QUrl("http://no-devices/"))
-        self.address_input.clear()
-
+            self.browser.setUrl(QUrl("http://192.168.1.132/"))
 
     # Переопределение событий мыши для перемещения окна
     def mousePressEvent(self, event: QMouseEvent):
@@ -2550,11 +2143,10 @@ class WebBrowser(QMainWindow):
             if resize_area.contains(pos):
                 self.resizing = True
                 self.resize_offset = pos - rect.bottomRight()
-                #self.setCursor(QCursor(Qt.CursorShape.SizeFDiagCursor))
             else:
+                # Обычная логика перемещения окна
                 self.dragging = True
                 self.offset = event.position().toPoint()
-                #self.setCursor(QCursor(Qt.CursorShape.ClosedHandCursor))
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if self.resizing:
@@ -2565,8 +2157,8 @@ class WebBrowser(QMainWindow):
             new_width = min(new_width, self.MAX_WINDOW_WIDTH)
             new_height = min(new_height, self.MAX_WINDOW_HEIGHT)
             self.resize(new_width, new_height)
-            #self.setCursor(QCursor(Qt.CursorShape.SizeFDiagCursor))
         elif self.dragging:
+            # Обычная логика перемещения окна
             self.move(self.pos() + event.position().toPoint() - self.offset)
 
     def mouseReleaseEvent(self, event: QMouseEvent):
@@ -2631,46 +2223,65 @@ class WebBrowser(QMainWindow):
         return super(WebBrowser, self).event(event)
    
 
+
     def show_context_menu(self, position):
+       
         menu = QMenu(self)
+      
+
+        # доступно обновление
         if self.update_available:
-            update_text = f"Есть новая версия ({self.latest_version})"
-            update_action = menu.addAction(QIcon("open.png"), update_text)
+            update_text = f"Есть новая версию ({self.latest_version})"
+            update_action = menu.addAction(QIcon("open.png"),update_text)
             update_action.triggered.connect(self.open_latest_release_page)
+            
             menu.addSeparator()
 
 
-        devices_menu = menu.addMenu(QIcon("swap.png"), "Переключить устройство")
+            
+
+        # Подменю для устройств
+        devices_menu = menu.addMenu(QIcon("swap.png"),"Переключить устройство")
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 devices = json.load(f)
                 for device in devices:
-                    device_action = devices_menu.addAction(f"{device['name']} ({device['url']})")
-                    # Передаём только URL устройства
-                    device_action.triggered.connect(lambda checked, url=device['url']: self.load_page(url))
-
+                    device_action = devices_menu.addAction(f"{device['name']} ({device['ip']})")
+                    def make_handler(ip=device['ip']):
+                        return lambda: self.load_page(f"http://{ip}/")
+                    device_action.triggered.connect(make_handler())
 
         menu.addSeparator()
-        scan_action = menu.addAction(QIcon("scan.png"), "Поиск и редактирование")
+
+        # Поиск устройств
+        scan_action = menu.addAction(QIcon("scan.png"), "Поиск устройств")
         scan_action.triggered.connect(self.open_menu)
-        settings_action = menu.addAction(QIcon("settings.png"), "Настройки")
+
+
+        # Настройки
+        settings_action = menu.addAction(QIcon("settings.png"),"Настройки")
         settings_action.triggered.connect(self.open_settings_dialog)
         menu.addSeparator()
+      
+        # Обновить страницу
         refresh_action = menu.addAction(QIcon("refresh.png"), "Обновить")
         refresh_action.triggered.connect(self.refresh_page)
         menu.addSeparator()
-        copy_url_action = menu.addAction(QIcon("copy.png"), "Копировать URL")
+
+        copy_url_action = menu.addAction(QIcon("copy.png"),"Копировать URL")
         copy_url_action.triggered.connect(self.copy_current_url)
-        about_action = menu.addAction(QIcon("info.png"), "О программе")
+
+        about_action = menu.addAction(QIcon("info.png"),"О программе")
         about_action.triggered.connect(self.show_about_dialog)
         menu.addSeparator()
+
         minimize_action = menu.addAction(QIcon("minimize.png"), "Свернуть")
         minimize_action.triggered.connect(self.showMinimized)
+
         close_action = menu.addAction(QIcon("close.png"), "Закрыть")
         close_action.triggered.connect(self.close)
+
         menu.exec(self.browser.mapToGlobal(position))
-
-
 
     def open_settings_dialog(self):
         dialog = SettingsDialog(self)
@@ -2704,10 +2315,10 @@ class WebBrowser(QMainWindow):
 
 
     def toggle_show_names_and_update(self):
-        # Переключаем показ имён и сохраняем
+        # Переключаем значение show_names
         self.show_names = not self.show_names
-        self.save_settings()  # Сохраняем настройки, чтобы изменение сохранилось
-        
+        print(f"Show names toggled to: {self.show_names}")
+
         # Обновить список автодополнения
         self.device_list = self.load_devices_for_autocomplete()
         self.completer.setModel(QStringListModel(self.device_list))
@@ -2720,7 +2331,7 @@ class WebBrowser(QMainWindow):
                     if self.show_names:
                         self.address_input.setText(devices[0]['name'])
                     else:
-                        self.address_input.setText(devices[0]['url'])
+                        self.address_input.setText(f"http://{devices[0]['ip']}/")
 
 
 
@@ -2731,13 +2342,16 @@ class WebBrowser(QMainWindow):
     def clear_browser_cache(self):
         self.profile.clearHttpCache()
 
-
-    def check_device_availability(self, url, callback):
-        signals = WorkerSignals()
-        signals.result.connect(callback)
-        worker = CheckAvailabilityWorker(url, signals, self.check_timeout)  # Используем таймаут из настроек
-        self.threadpool = getattr(self, 'threadpool', QThreadPool())
-        self.threadpool.start(worker)
+    def check_device_availability(self, ip):
+        try:
+            response = requests.get(
+                f"http://{ip}/settings?action=discover",
+                timeout=0.3,
+                verify=False
+            )
+            return response.status_code == 200
+        except:
+            return False
             
     def start_border_animation(self):
         if not hasattr(self, 'border_animation_timer'):
@@ -2745,19 +2359,18 @@ class WebBrowser(QMainWindow):
             self.border_animation_timer.timeout.connect(self.animate_border)
             self.border_animation_value = 0
         self.border_animation_timer.start(50)
-  
-    @pyqtSlot()
+
     def stop_border_animation(self):
         if hasattr(self, 'border_animation_timer'):
             self.border_animation_timer.stop()
-            self.border_color = getattr(self, 'saved_border_color', QColor(49, 113, 49, 150)) #21, 0, 0, 190
+            self.border_color = getattr(self, 'saved_border_color', QColor(49, 113, 49, 150))
             self.update()
 
     def animate_border(self):
         import math
         self.border_animation_value = (self.border_animation_value + 5) % 360
         if not hasattr(self, 'saved_border_color'):
-            self.saved_border_color = QColor(21, 0, 0, 190)
+            self.saved_border_color = getattr(self, 'border_color', QColor(49, 113, 49, 150))
         
         factor = (math.sin(math.radians(self.border_animation_value)) + 1) / 2
         red_color = QColor(255, 0, 0, 150)
@@ -2770,52 +2383,57 @@ class WebBrowser(QMainWindow):
         self.update()
 
     def refresh_page(self):
+
         current_text = self.address_input.text().strip()
         if current_text:
             if self.show_names and current_text in self.device_map:
-                url = self.device_map[current_text]
-                self.load_page(url)
+                # Если отображается имя устройства, берём соответствующий IP
+                ip = self.device_map[current_text]
+                self.load_page(f"http://{ip}/")
             else:
+                # Если это уже URL или IP, используем как есть
                 self.load_page(current_text)
 
 
     def check_current_device(self):
+        
         if not self.current_checking_device:
             return
-
+            
+        # Создаем воркер
+        self.check_worker = CheckDeviceWorker(self.current_checking_device)
+        
         def on_finished(is_available):
             if is_available:
                 device_ip = self.current_checking_device
                 self.check_timer.stop()
                 self.current_checking_device = None
                 self.load_page(f"http://{device_ip}/")
+                self.check_worker.deleteLater()
+        
+        # Подключаем сигнал 
+        self.check_worker.finished.connect(on_finished)
+        
+        # Запускаем проверку
+        self.check_worker.run()
 
-        # Запускаем проверку доступности
-       
-        self.check_device_availability(self.current_checking_device, on_finished)
-
-
-    def check_current_device(self):
-        if not self.current_checking_device:
-            return
-
-        def on_finished(is_available):
-            if is_available:
-                device_url = self.current_checking_device  
-                self.check_timer.stop()
-                self.current_checking_device = None
-                self.load_page(device_url)  # Передаём как есть
-
-        self.check_device_availability(self.current_checking_device, on_finished)
-
-
+    def check_initial_device(self):
+        #Проверка доступности устройства при запуске
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+                if devices:
+                    ip = devices[0]['ip']
+                    self.load_page(f"http://{ip}/")
+        else:
+            self.load_page("http://192.168.1.132/")
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         
         self.setWindowTitle("О программе")
-        self.setMinimumSize(400, 400)  # Размер окна
+        self.setFixedSize(400, 250)  # Размер окна
 
         if NAME == CUSTOM_NAME:
             self.setWindowIcon(QIcon("g_icon.ico"))
@@ -2834,7 +2452,7 @@ class AboutDialog(QDialog):
                 <p><b>Версия:</b> {VERSION}</p>
                 <p><b>Автор:</b> Vanila</p>
                 <p><b>Описание:</b> Программа для отображения и поиска устройств {NAME} в локальной сети 
-                <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings">GitHub</a></p>
+                <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/web-server-for-Libre-Hardware-Monitor">GitHub</a></p>
                 <p>Веб интерфейс работает на библиотеке <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
                 """
             )
@@ -2865,14 +2483,14 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Настройки")
-        self.setMinimumSize(300, 300)  
+        self.setMinimumSize(300, 250)  
         self.parent = parent  # Ссылка на WebBrowser
         
         # Основной layout
         layout = QVBoxLayout(self)
 
         # Чекбокс "Показывать имена устройств"
-        self.show_names_checkbox = QCheckBox("Имена устройств в строке", self)
+        self.show_names_checkbox = QCheckBox("Показывать имена устройств", self)
         self.show_names_checkbox.setChecked(self.parent.show_names)
         self.show_names_checkbox.stateChanged.connect(self.update_show_names)
         layout.addWidget(self.show_names_checkbox)
@@ -2964,12 +2582,7 @@ class SettingsDialog(QDialog):
 
         self.setLayout(layout)
 
-    def load_devices_from_file(self):
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                return json.load(f)
-        return []
-    
+
     def apply_settings(self):
         try:
             width = float(self.width_input.text())
@@ -3047,25 +2660,22 @@ class SettingsDialog(QDialog):
         self.parent.save_settings()
         self.update_colors()  # Обновить цвета после изменения состояния
 
-    def save_settings(self):
-        self.parent.show_names = self.show_names_checkbox.isChecked()  # Пример
-        self.parent.save_settings()  # Вызываем метод WebBrowser
-        
+
 
     def update_show_names(self, state):
         self.parent.show_names = (state == Qt.CheckState.Checked.value)
-        self.save_settings()  
+        self.parent.save_settings()
+        # Обновить address_input
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+                if devices:
+                    if self.parent.show_names:
+                        self.parent.address_input.setText(devices[0]['name'])
+                    else:
+                        self.parent.address_input.setText(f"http://{devices[0]['ip']}/")
         self.parent.device_list = self.parent.load_devices_for_autocomplete()
         self.parent.completer.setModel(QStringListModel(self.parent.device_list))
-        if os.path.exists("discovered_devices.json"):
-                with open("discovered_devices.json", 'r') as f:
-                    devices = json.load(f)
-                    if devices:
-                        if self.parent.show_names:
-                            self.parent.address_input.setText(devices[0]['name'])
-                        else:
-                            self.parent.address_input.setText(devices[0]['url'])
-        
 
     def update_stay_on_top(self, state):
         stay_on_top = (state == Qt.CheckState.Checked.value)
@@ -3116,7 +2726,7 @@ class CheckDeviceWorker(QObject):
         try:
             response = requests.get(
                 f"http://{self.ip}/settings?action=discover",
-                timeout=1.3,
+                timeout=0.3,
                 verify=False
             )
             self.finished.emit(response.status_code == 200)
