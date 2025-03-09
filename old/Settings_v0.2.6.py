@@ -1,4 +1,4 @@
-VERSION = "0.2.7"
+VERSION = "0.2.6"
 NAME = "Settings" # Имя программы, можно переименовать, поменяется имя окна и имя программы в о программе
 #NAME = "GLUONiCA" 
 CUSTOM_NAME = "GLUONiCA" 
@@ -331,8 +331,6 @@ class DiscoverWorker(QRunnable):
 class CheckAvailabilityWorker(QRunnable):
     def __init__(self, url, signals, timeout):
         super().__init__()
-        if not (url.startswith("http://") or url.startswith("https://")):
-            url = f"http://{url}"
         self.url = url
         self.signals = signals
         self.timeout = timeout
@@ -746,9 +744,7 @@ class ScanDialog(QDialog):
             self.highlight_last_device()
 
         device_ip = url.split('//')[1].split('/')[0]
-        full_url = url if url.startswith("http://") or url.startswith("https://") else f"http://{device_ip}"
-        self.web_browser.check_device_availability(full_url, handle_availability)
-        #self.web_browser.check_device_availability(device_ip, handle_availability)
+        self.web_browser.check_device_availability(device_ip, handle_availability)
 
         self.name_input.setText(name_part)
         self.ip_input.setText(url)
@@ -1181,13 +1177,8 @@ class WebBrowser(QMainWindow):
         container.setStyleSheet("background: transparent;")
 
         # Настройка QWebChannel
-       # self.channel = QWebChannel(self)
-       # self.channel.registerObject("pybridge", self)  # Регистрируем сам объект WebBrowser
-       # self.browser.page().setWebChannel(self.channel)
-
-        self.bridge = Bridge(self)  # Передаём WebBrowser как родителя
         self.channel = QWebChannel(self)
-        self.channel.registerObject("pybridge", self.bridge)  # Регистрируем только Bridge
+        self.channel.registerObject("pybridge", self)  # Регистрируем сам объект WebBrowser
         self.browser.page().setWebChannel(self.channel)
 
         # Таймер для проверки доступности
@@ -2742,9 +2733,6 @@ class WebBrowser(QMainWindow):
 
 
     def check_device_availability(self, url, callback):
-        if not (url.startswith("http://") or url.startswith("https://")):
-            url = f"http://{url}"
-
         signals = WorkerSignals()
         signals.result.connect(callback)
         worker = CheckAvailabilityWorker(url, signals, self.check_timeout)  # Используем таймаут из настроек
@@ -2820,10 +2808,7 @@ class WebBrowser(QMainWindow):
 
         self.check_device_availability(self.current_checking_device, on_finished)
 
-class Bridge(QObject):
-    @pyqtSlot()
-    def stop_border_animation(self):
-        self.parent().stop_border_animation()
+
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
