@@ -43,7 +43,7 @@
 <h2 id="relise"  > Версии </h2>
 
 ссылка на последнюю версию программы (собранный exe с иконками) [Settings_app.zip](https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest/download/Settings_app.zip)<br> <br> 
-+ v.0.2.6
++ v.0.2.7
   - если вы открыли доступ к своему устройству из сети интернет, теперь можно добавить и его
     - в файле discovered_devices.json теперь хранятся не ip а url
     - если вы обновили заменой exe файла и остался discovered_devices.json старой версии, то  при старте программы, он будет сконвертирован в новую 
