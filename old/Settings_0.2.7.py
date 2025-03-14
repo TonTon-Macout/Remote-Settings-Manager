@@ -1,19 +1,17 @@
-VERSION = "0.3.1"
-NAME = "RSM" # 
+VERSION = "0.2.7"
+NAME = "Settings" # Имя программы, можно переименовать, поменяется имя окна и имя программы в о программе
 #NAME = "GLUONiCA" 
 CUSTOM_NAME = "GLUONiCA" 
 NAME_VARIABLES = ["GLUON", "gluon", "Gluon"]
-ONLY_CUSTOM = True
-# ◕ Если хотите использовать свое имя, то
-#   • NAME должно полностью совпадать с CUSTOM_NAME
-# ◕ если в дополнение к этому хотите чтобы искало только ваши устройства то
-#   • в NAME_VARIABLES должны быть варианты с котрых может начинаться имя
-#   • а ONLY_CUSTOM = истина, тогда будет искать только устройства с вашим именем, игнорируя все другие устройства
-#   • а в настройках появится чек бокс Искать только {NAME} 
-#     при снятии которого будет искать все устройства с библиотекой Settings в сети 
-# ◕ поиск WLED по умолчанию включен 
-# ◕ плюс свое окно о программе, в классе AboutDialog стоит обновить его текст
-# ◕ в этом случае иконка для приложения должна называться не icon.ico а g_icon.ico
+# Если хотите использовать не просто свое имя, но и чтобы по умолчанию искало только ваши устройства то 
+# NAME должно полностью совпадать с CUSTOM_NAME
+# а в NAME_VARIABLES должны быть варианты с котрых может начинаться имя
+# и по умолчанию будет искать только устройства с вашим именем, игнорируя все другие устройства
+# поиск WLED по умолчанию включен 
+# плюс свое окно о программе, в классе AboutDialog стоит обновить его текст
+# а также в настройках появится чек бокс Искать только {NAME}
+# при снятии которого будет искать все устройства с библиотекой Settings в сети 
+# + иконка для приложения должна называться не icon.ico а g_icon.ico
  
 
 
@@ -162,12 +160,12 @@ DARK_THEME = """
         width: 16px;  /* Ширина индикатора */
         height: 16px;  /* Высота индикатора */
         background-color: #2B2B2B;  /* Фон индикатора */
-        border: 1px solid #9e9e9e;  /* Граница индикатора */
+        border: 1px solid #4A4A4A;  /* Граница индикатора */
         border-radius: 4px;  /* Закругление углов */
     }
     QCheckBox::indicator:checked {
         background-color: #00612a;  /* Фон индикатора при выборе (акцентный цвет ) */
-        border: 1px solid #9e9e9e;  /* Граница индикатора при выборе */
+        border: 1px solid #009c44;  /* Граница индикатора при выборе */
     }
 
     /* Стили для полосы прокрутки (QScrollBar) */
@@ -303,7 +301,7 @@ class DiscoverWorker(QRunnable):
                 if response.status_code == 200:
                     data = response.json()
                     name = data['name']
-                    if NAME == CUSTOM_NAME and self.gluon_only and ONLY_CUSTOM == True:
+                    if NAME == CUSTOM_NAME and self.gluon_only:
                         if any(name.startswith(prefix) for prefix in NAME_VARIABLES):
                             self.signals.result.emit(f"{name} at http://{self.ip}/")
                     else:
@@ -352,17 +350,18 @@ class CheckAvailabilityWorker(QRunnable):
 class ScanDialog(QDialog):
     def __init__(self, web_browser, parent=None):
         super().__init__(parent)
-
         self.wled_search = web_browser.wled_search
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.Dialog)
         self.web_browser = web_browser
         self.setWindowTitle("Поиск и редактирование")
         self.setGeometry(300, 300, 400, 500)
-        self.parent = parent   # Ссылка на WebBrowser
         
         accent_color = self.web_browser.accent_color if hasattr(self.web_browser, 'accent_color') else "#37a93c"
 
-        self.parent.set_icon()
+        if NAME == CUSTOM_NAME:
+            self.setWindowIcon(QIcon("g_icon.ico"))
+        else:
+            self.setWindowIcon(QIcon("icon.ico"))
 
         self.layout = QVBoxLayout(self)
 
@@ -682,7 +681,6 @@ class ScanDialog(QDialog):
         self.scan_button.setText("Сканировать")
         self.stop_flag.value = 1
 
-
     def update_progress(self, value):
         self.completed_ips += value
         self.progress_bar.setValue(self.completed_ips)
@@ -746,7 +744,6 @@ class ScanDialog(QDialog):
             else:
                 self.web_browser.load_page(url)
             self.highlight_last_device()
-            self.web_browser.update_colors()
 
         device_ip = url.split('//')[1].split('/')[0]
         full_url = url if url.startswith("http://") or url.startswith("https://") else f"http://{device_ip}"
@@ -760,8 +757,6 @@ class ScanDialog(QDialog):
         item.setFont(font)
         QTimer.singleShot(400, self.update_list_style)
         self.update_buttons_state()
-        self.web_browser.update_always_on_top_checkbox_style()
-        
 
     def apply_changes(self):
         current_item = self.device_list.currentItem()
@@ -829,7 +824,6 @@ class ScanDialog(QDialog):
 
         # Показываем заглушку в главном окне, если устройств больше нет
         self.web_browser.show_no_devices_placeholder()
-        self.parent.set_title(False)
 
     def delete_device(self):
         current_item = self.device_list.currentItem()
@@ -1009,10 +1003,9 @@ class AuthDialog(QDialog):
 
 
 class WebBrowser(QMainWindow):
-    url_changed = pyqtSignal(str)  # Сигнал для уведомления об изменении URL
     def __init__(self):
         super().__init__()
-        
+        self.setWindowTitle(NAME)
 
         self.check_timeout = 0.3
         self.update_available = False
@@ -1053,76 +1046,43 @@ class WebBrowser(QMainWindow):
         self.resize_area_size = 20
 
        
-        # Устанавливаем значения по умолчанию для цветов до загрузки настроек
-        self.default_border_color = QColor(49, 113, 49, 150)  # Цвет рамки по умолчанию
-        self.default_back_color = QColor(28, 29, 34, 255)     # Цвет шапки по умолчанию
-        self.default_bottom_color = QColor(15, 41, 44, 255)   # Цвет подвала по умолчанию
-        self.no_color = "no" # no - нет, gray - серый, black - Черный цвет шапки и подвала когда показываем плашки
-        self.snow_man_swch = True
-        self.snow_man = False
-        self.title_device = True
-        # Инициализируем переменные с значениями по умолчанию до загрузки из файла
-        self.show_names = True         # Показывать имена устройств
-        self.gluon_only = True         # Искать только GLUON (предполагается из контекста)
-        self.wled_search = True        # Искать устройства WLED
-        self.window_width = self.default_width  # Значение по умолчанию задано ранее в __init__
-        self.window_height = self.default_height  # Значение по умолчанию задано ранее в __init__
-        self.zoom_factor = self.default_zoom_factor  # Значение по умолчанию задано ранее в __init__
-        self.custom_colors_enabled = False  # Использовать пользовательские цвета всегда
-        self.check_timeout = 0.3       # Таймаут проверки доступности (в секундах)
-        self.custom_border_color = self.default_border_color  # Изначально используем цвет по умолчанию
-        self.custom_back_color = self.default_back_color      # Изначально используем цвет по умолчанию
-        self.custom_bottom_color = self.default_bottom_color  # Изначально используем цвет по умолчанию
-        self.device_custom_colors = {}  # Словарь для индивидуальных цветов устройств
+        self.show_names = True
+        self.gluon_only = True
+        self.window_width = default_width
+        self.window_height = default_height
+        self.zoom_factor = default_zoom_factor
+        self.wled_search = True  # По умолчанию включен поиск WLED
+        self.default_border_color = QColor(49, 113, 49, 150)  # Цвет рамки
+        self.default_back_color = QColor(28, 29, 34, 255)
 
-
-        # Загружаем настройки из settings.json, если файл существует
+        self.custom_colors_enabled = False
+        self.custom_border_color = self.default_border_color
+        self.custom_back_color = self.default_back_color
+         # Загружаем настройки из settings.json
         if os.path.exists("settings.json"):
             with open("settings.json", 'r') as f:
-                # Загружаем JSON-данные в словарь
                 settings = json.load(f)
-
-                # Устанавливаем базовые настройки с учётом значений по умолчанию из экземпляра
                 self.show_names = settings.get("show_names", self.show_names)
                 self.gluon_only = settings.get("gluon_only", self.gluon_only)
                 self.wled_search = settings.get("wled_search", self.wled_search)
-                self.snow_man_swch = settings.get("snow_man_swch", self.snow_man_swch)
-                self.snow_man = settings.get("snow_man", self.snow_man)
-                self.title_device = settings.get("title_device", self.title_device)
-                # Ограничиваем размеры окна в пределах MIN и MAX значений
                 self.window_width = max(self.MIN_WINDOW_WIDTH, min(settings.get("window_width", self.window_width), self.MAX_WINDOW_WIDTH))
                 self.window_height = max(self.MIN_WINDOW_HEIGHT, min(settings.get("window_height", self.window_height), self.MAX_WINDOW_HEIGHT))
                 self.zoom_factor = settings.get("zoom_factor", self.zoom_factor)
+                self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
+                self.check_timeout = settings.get("check_timeout", 0.3)
 
-                # Загружаем флаг пользовательских цветов
-                self.custom_colors_enabled = settings.get("custom_colors_enabled", self.custom_colors_enabled)
-                self.check_timeout = settings.get("check_timeout", self.check_timeout)
-
-                # Загружаем пользовательские цвета из файла или используем значения по умолчанию
                 border_color = settings.get("custom_border_color", 
-                                            [self.default_border_color.red(),
-                                             self.default_border_color.green(),
-                                             self.default_border_color.blue(),
-                                             self.default_border_color.alpha()])  # Цвет рамки
+                                         [self.default_border_color.red(),
+                                          self.default_border_color.green(),
+                                          self.default_border_color.blue(),
+                                          self.default_border_color.alpha()])
                 back_color = settings.get("custom_back_color",
-                                          [self.default_back_color.red(),
-                                           self.default_back_color.green(),
-                                           self.default_back_color.blue(),
-                                           self.default_back_color.alpha()])  # Цвет шапки
-                bottom_color = settings.get("custom_bottom_color",
-                                            [self.default_bottom_color.red(),
-                                             self.default_bottom_color.green(),
-                                             self.default_bottom_color.blue(),
-                                             self.default_bottom_color.alpha()])  # Цвет подвала
-
-                # Устанавливаем пользовательские цвета на основе загруженных значений
+                                       [self.default_back_color.red(),
+                                        self.default_back_color.green(),
+                                        self.default_back_color.blue(),
+                                        self.default_back_color.alpha()])
                 self.custom_border_color = QColor(*border_color)
                 self.custom_back_color = QColor(*back_color)
-                self.custom_bottom_color = QColor(*bottom_color)
-
-                # Загружаем индивидуальные цвета для устройств
-                self.device_custom_colors = settings.get("custom_colors", self.device_custom_colors)
-
        
         self.credentials = {} # учетные данные для веб 
        # Применяем загруженные размеры окна
@@ -1133,7 +1093,7 @@ class WebBrowser(QMainWindow):
        # Устанавливаем начальные цвета
         self.border_color = self.default_border_color
         self.back_color = self.default_back_color
-        self.bottom_color = self.default_bottom_color
+
        
         self.load_settings()
         self.migrate_discovered_devices() # Преобразуем в новый формат хранения
@@ -1141,7 +1101,11 @@ class WebBrowser(QMainWindow):
         # Устанавливаем начальные размеры окна и масштаб
 
 
-        
+
+        if NAME == CUSTOM_NAME:
+            self.setWindowIcon(QIcon("g_icon.ico"))
+        else:
+            self.setWindowIcon(QIcon("icon.ico"))
         
         # Устанавливаем флаг для скрытия заголовка окна
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -1191,7 +1155,7 @@ class WebBrowser(QMainWindow):
         self.accent_color = "#37a93c"
         self.initUI()
         
-        
+
         
 
 
@@ -1231,10 +1195,312 @@ class WebBrowser(QMainWindow):
         self.check_timer.timeout.connect(self.check_current_device)
         self.current_checking_device = None
         
-        self.set_title(True)
-        self.set_icon() 
+
         # Проверяем доступность
         QtCore.QTimer.singleShot(0, self.check_initial_device)
+
+
+
+
+    def check_initial_device(self):
+        # Проверка доступности устройства при запуске
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                devices = json.load(f)
+                if devices:
+                    url = devices[0]['url']
+                    self.load_page(url)
+                else:
+                    self.show_no_devices_placeholder()
+        else:
+            self.show_no_devices_placeholder()
+
+    def migrate_discovered_devices(self):
+        #Преобразование старого формата в новый
+        if os.path.exists("discovered_devices.json"):
+            with open("discovered_devices.json", 'r') as f:
+                try:
+                    devices = json.load(f)
+                except json.JSONDecodeError:
+                    devices = []  # Если файл повреждён, начнём с пустого списка
+
+            # Проверяем, есть ли старый формат
+            updated = False
+            for device in devices:
+                if "ip" in device and "url" not in device:
+                    # Преобразуем старый формат в новый
+                    device["url"] = f"http://{device['ip']}/"
+                    del device["ip"]  # Удаляем старый ключ
+                    updated = True
+                elif "url" not in device and "name" in device:
+                    # Если нет ни ip, ни url, но есть name, пропускаем 
+                    continue
+
+            # Сохраняем обновлённый файл, если были изменения
+            if updated:
+                with open("discovered_devices.json", 'w') as f:
+                    json.dump(devices, f, indent=4)
+                print("Поменян формат файла discovered_devices на новую версию")
+
+    def load_settings(self):
+        if os.path.exists("settings.json"):
+            with open("settings.json", 'r') as f:
+                settings = json.load(f)
+                self.show_names = settings.get("show_names", True)
+                self.gluon_only = settings.get("gluon_only", False)
+                self.wled_search = settings.get("wled_search", True)
+                self.window_width = settings.get("window_width", 800)
+                self.window_height = settings.get("window_height", 600)
+                self.zoom_factor = settings.get("zoom_factor", 1.0)
+                self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
+                self.custom_border_color = QColor(*settings.get("custom_border_color", [255, 255, 255, 255]))
+                self.custom_back_color = QColor(*settings.get("custom_back_color", [0, 0, 0, 255]))
+                self.check_timeout = settings.get("check_timeout", 0.3)
+                # Учетные данные
+                if "credentials" in settings:
+                    for url, cred in settings["credentials"].items():
+                        try:
+                            login = base64.b64decode(cred["login"]).decode('utf-8')
+                            password = base64.b64decode(cred["password"]).decode('utf-8')
+                            self.credentials[url] = {"login": login, "password": password}
+                        except Exception as e:
+                            print(f"Ошибка расшифровки учетных данных для {url}: {e}")
+        else:
+            self.credentials = {}
+
+    def save_settings(self):
+        settings = {
+            "show_names": self.show_names,
+            "gluon_only": self.gluon_only,
+            "wled_search": self.wled_search,
+            "window_width": self.window_width,
+            "window_height": self.window_height,
+            "zoom_factor": self.zoom_factor,
+            "custom_colors_enabled": self.custom_colors_enabled,
+            "check_timeout": self.check_timeout,
+            "custom_border_color": [self.custom_border_color.red(), 
+                                   self.custom_border_color.green(), 
+                                   self.custom_border_color.blue(), 
+                                   self.custom_border_color.alpha()],
+            "custom_back_color": [self.custom_back_color.red(), 
+                                 self.custom_back_color.green(), 
+                                 self.custom_back_color.blue(), 
+                                 self.custom_back_color.alpha()],
+            "credentials": {}
+        }
+        for url, cred in self.credentials.items():
+            try:
+                settings["credentials"][url] = {
+                    "login": base64.b64encode(cred["login"].encode('utf-8')).decode('utf-8'),
+                    "password": base64.b64encode(cred["password"].encode('utf-8')).decode('utf-8')
+                }
+            except Exception as e:
+                print(f"Ошибка кодирования учетныйх данных для {url}: {e}")
+        try:
+            with open("settings.json", 'w') as f:
+                json.dump(settings, f, indent=4)
+            print("Настройки сохранены")
+        except Exception as e:
+            print(f"Ошибка при сохранении настроек: {e}")
+
+
+
+    def handle_authentication(self, url, authenticator):
+        url_str = url.toString()
+        saved_login = self.credentials.get(url_str, {}).get("login", "")
+        saved_password = self.credentials.get(url_str, {}).get("password", "")
+        
+        print(f"Запрос авторизации: {url_str}")
+        dialog = AuthDialog(url_str, authenticator.realm(), saved_login, saved_password, self)
+        
+      
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            login, password, remember = dialog.get_credentials()
+            #print(f"Введено: login={login}, password={password}, remember={remember}")
+            
+            if login and password:  # Проверяем что введено
+                authenticator.setUser(login)
+                authenticator.setPassword(password)
+           
+            
+                if remember and login and password:
+                    print(f"Сохранили учетные данные {url_str}")
+                    self.credentials[url_str] = {"login": login, "password": password}
+                    self.save_settings()  # Сохраняем все настройки
+            else:
+             # Если пользователь нажал ок но не ввел данные
+                self.show_device_unavailable_placeholder(url_str)
+                authenticator.setUser("")  # Отменяем
+      
+        else:
+            authenticator.setUser("")
+            print("Авторизация отменена")
+            self.show_device_unavailable_placeholder(url_str)
+            authenticator.setUser("")  
+
+
+
+
+
+    def show_device_unavailable_placeholder(self, url):
+       
+        error_html = f"""
+        <!DOCTYPE html>
+        <html lang="en" style="--accent: #150000;">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>No Devices Found</title>
+            <style>
+                body {{
+                    background-color: #1c1d22;
+                    color: #ffffff;
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    transition: background-color 2s ease;
+                }}
+                .snowman-container {{
+                    font-size: 64px;
+                    margin-bottom: 20px;
+                    color: #140000;
+                    width: 10px;
+                    height: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    transition: color 1s ease;
+                }}
+                .snowman-container .eyes {{
+                    display: none;
+                    position: absolute;
+                    top: -7px;
+                    width: 15px;
+                    height: 10px;
+                    background-color: #ff0000;
+                    border-radius: 50%;
+                    animation: look 5s infinite;
+                    z-index: -1;
+                }}
+                .snowman-container .moon {{
+                    display: none;
+                    position: absolute;
+                    top: -30px;
+                    left: 20px;
+                    width: 20px;
+                    height: 20px;
+                    background-color: #ffcc008f;
+                    box-shadow: 0px 0px 7px 0px #ff0000de;
+                    border-radius: 50%;
+                    z-index: -2;
+                    filter: blur(1px);
+                }}
+                @keyframes look {{
+                    0% {{ opacity: 1; filter: brightness(70%); }}
+                    20% {{ opacity: 0.3; filter: brightness(10%); }}
+                    30% {{ opacity: 0.3; filter: brightness(10%); }}
+                    40% {{ opacity: 1; filter: brightness(60%); }}
+                    45% {{ opacity: 0.8; filter: brightness(50%); }}
+                    60% {{ opacity: 0.2; filter: brightness(20%); }}
+                    80% {{ opacity: 1; filter: brightness(70%); }}
+                    85% {{ opacity: 0.4; filter: brightness(30%); }}
+                    100% {{ opacity: 1; filter: brightness(70%); }}
+                }}
+                .message {{
+                    margin-top: 20px;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                    text-align: center;
+                    color: #5e5e5e;
+                }}
+                .error-icon {{
+                    font-size: 48px;
+                    
+                    cursor: pointer;
+                    transition: opacity 0.5s ease;
+                }}
+                .snowman {{
+                    display: none;
+                    opacity: 0;
+                    transition: opacity 0.5s ease;
+                }}
+                .device-info {{
+                                margin-bottom: 7px;
+                                color: #888;
+                            }}
+                .device-info2 {{
+                    margin-bottom: 7px;
+                    color: #888;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="snowman-container">
+                <div class="moon"></div>
+                <div class="eyes"></div>
+                <span class="snowman">⛇</span>
+            </div>
+            <div class="error-icon">🔒</div>
+            <div class="message">Устройство недоступно</div>
+            <div class="device-info">это устройство требует авторизации</div>
+            <div class="device-info2">обновите страницу и попробуйте снова</div>
+
+            <script>
+                const errorIcon = document.querySelector('.error-icon');
+                let clickCount = 0;
+
+                errorIcon.addEventListener('click', () => {{
+                    clickCount++;
+                    if (clickCount === 2){{
+                                   const message = document.querySelector('.message')
+                                   message.style.display = 'none';
+
+                                   const device_info = document.querySelector('.device-info')
+                                   device_info.style.display = 'none';
+
+                                   const device_info2 = document.querySelector('.device-info2')
+                                   device_info2.style.display = 'none';
+                                }}
+                    if (clickCount === 10) {{
+                        errorIcon.style.opacity = '0';
+                        document.body.style.backgroundColor = '#000000';
+
+                         setTimeout(() => {{
+                              const eyes = document.querySelector('.eyes');
+                              eyes.style.display = 'block';
+                         
+                         }}, 3000);
+
+                        setTimeout(() => {{
+                            const snowman = document.querySelector('.snowman');
+                            snowman.style.display = 'inline';
+                            setTimeout(() => {{
+                                snowman.style.opacity = '1';
+                            }}, 10);
+
+                            setTimeout(() => {{
+                                const snowmanContainer = document.querySelector('.snowman-container');
+                                snowmanContainer.style.color = '#200000';
+
+
+                            }}, 5000);
+                        }}, 2000);
+                    }}
+                }});
+            </script>
+        </body>
+        </html>
+        """
+
+        self.browser.setHtml(error_html, QUrl(url))
+        self.address_input.setText(url if not self.show_names else self.get_name_by_url(url))
+
+
 
 
 
@@ -1293,20 +1559,6 @@ class WebBrowser(QMainWindow):
         # чекбокс поверх окон
         self.checkbox = QCheckBox()
         self.checkbox.stateChanged.connect(self.toggle_on_top)
-
-
-        self.indicator_visible = False  # Флаг видимости индикатора
-        self.indicator_alpha = 0  # Текущая прозрачность (0-150)
-        self.indicator_max_alpha = 150  # Максимальная прозрачность
-        self.indicator_animation_timer = QTimer(self)
-        self.indicator_animation_timer.timeout.connect(self.animate_indicator)
-        self.indicator_color = QColor(255, 0, 0, 0)  # Красный цвет с нулевой прозрачностью
-        self.indicator_fading_in = True  # Направление анимации (True - включение, False - выключение)
-
-        # Таймер для проверки title каждые 5 секунд
-        self.rssi_check_timer = QTimer(self)
-        self.rssi_check_timer.timeout.connect(self.check_rssi)
-        self.rssi_check_timer.start(5000)  # 5000 мс = 5 секунд
 
         # Кнопка "Свернуть"
         self.minimize_button = QPushButton()
@@ -1376,569 +1628,6 @@ class WebBrowser(QMainWindow):
             }
         """)
      
-    def set_title(self, start) :
-        device_name = ""
-        if start == True:
-            if not self.snow_man_swch:
-                if NAME == CUSTOM_NAME:  
-                    device_name = CUSTOM_NAME
-                else: 
-                    device_name = "Remote Settings Management"
-            elif not self.snow_man:
-                if NAME == CUSTOM_NAME:  
-                    device_name = CUSTOM_NAME
-                else: 
-                    device_name = "Remote Settings Management"
-            else:
-                device_name = "Red Snow Man"
-           
-            self.setWindowTitle(device_name)
-            return 
-
-        if not self.title_device:
-            if not self.snow_man_swch:
-                if NAME == CUSTOM_NAME:  
-                    device_name = CUSTOM_NAME
-                else: 
-                    device_name = "Remote Settings Management"
-            elif not self.snow_man:
-                if NAME == CUSTOM_NAME:  
-                    device_name = CUSTOM_NAME
-                else: 
-                    device_name = "Remote Settings Management"
-            else :
-                device_name = "Red Snow Man"
-                
-           
-            self.setWindowTitle(device_name)
-            return
-        
-      
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                devices = json.load(f)
-                if devices:
-                    device_name = devices[0]['name']
-                else: 
-                    device_name = self.address_input.text().strip()
-
-
-
-        
-        if device_name == "http://no-devices/" or device_name == "":
-            if not self.snow_man_swch:
-                if NAME == CUSTOM_NAME:  
-                    device_name = CUSTOM_NAME
-                else: 
-                    device_name = "Remote Settings Management"
-            
-            
-            elif not self.snow_man:
-                if NAME == CUSTOM_NAME:  
-                    device_name = CUSTOM_NAME
-                else: 
-                    device_name = "Remote Settings Management"
-            else :
-                device_name = "Red Snow Man"
-        else :
-            device_name = device_name   + " - " + NAME
-
-        self.setWindowTitle(device_name)
-
-
-    def check_rssi(self):
-        script = """
-            var rssiElement = document.querySelector('.rssi');
-            var titleValue = rssiElement ? rssiElement.getAttribute('title') : 'N/A';
-            titleValue;
-        """
-        self.browser.page().runJavaScript(script, self.handle_rssi)
-
-    def handle_rssi(self, result):
-        if result == "0%":
-            self.start_indicator_animation()  # Включаем индикатор, если title = "0%"
-        elif result and result != "0%":
-            self.stop_indicator_animation()  # Выключаем индикатор, если title > "0%"
-
-
-    def check_initial_device(self):
-        # Проверка доступности устройства при запуске
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                devices = json.load(f)
-                if devices:
-                    url = devices[0]['url']
-                    self.load_page(url)
-                else:
-                    self.show_no_devices_placeholder()
-        else:
-            self.show_no_devices_placeholder()
-
-    def migrate_discovered_devices(self):
-        #Преобразование старого формата в новый
-        if os.path.exists("discovered_devices.json"):
-            with open("discovered_devices.json", 'r') as f:
-                try:
-                    devices = json.load(f)
-                except json.JSONDecodeError:
-                    devices = []  # Если файл повреждён, начнём с пустого списка
-
-            # Проверяем, есть ли старый формат
-            updated = False
-            for device in devices:
-                if "ip" in device and "url" not in device:
-                    # Преобразуем старый формат в новый
-                    device["url"] = f"http://{device['ip']}/"
-                    del device["ip"]  # Удаляем старый ключ
-                    updated = True
-                elif "url" not in device and "name" in device:
-                    # Если нет ни ip, ни url, но есть name, пропускаем 
-                    continue
-
-            # Сохраняем обновлённый файл, если были изменения
-            if updated:
-                with open("discovered_devices.json", 'w') as f:
-                    json.dump(devices, f, indent=4)
-                print("Поменян формат файла discovered_devices на новую версию")
-
-
-    def load_settings(self):
-        # Проверяем, существует ли файл настроек settings.json
-        if os.path.exists("settings.json"):
-            # Открываем файл для чтения
-            with open("settings.json", 'r') as f:
-                # Загружаем JSON-данные в словарь
-                settings = json.load(f)
-
-                # Устанавливаем базовые настройки с значениями по умолчанию
-                self.show_names     = settings.get("show_names", True)  # Показывать имена устройств
-                self.gluon_only     = settings.get("gluon_only", False)  # Искать только GLUON
-                self.wled_search    = settings.get("wled_search", True)  # Искать устройства WLED
-                self.snow_man_swch  = settings.get("snow_man_swch", True)  # Искать устройства WLED
-                self.snow_man       = settings.get("snow_man", False)  # Искать устройства WLED
-                self.title_device   = settings.get("title_device", True)  # Искать устройства WLED
-                self.window_width   = settings.get("window_width", 800)  # Ширина окна
-                self.window_height  = settings.get("window_height", 600)  # Высота окна
-                self.zoom_factor    = settings.get("zoom_factor", 1.0)  # Масштаб браузера
-                self.check_timeout  = settings.get("check_timeout", 0.3)  # Таймаут проверки
-
-                # Устанавливаем флаг использования пользовательских цветов
-                self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
-
-                # Определяем цвета по умолчанию из файла или используем значения по умолчанию из класса
-                border_color = settings.get("custom_border_color", 
-                                            [self.default_border_color.red(),
-                                             self.default_border_color.green(),
-                                             self.default_border_color.blue(),
-                                             self.default_border_color.alpha()])  # Цвет рамки
-                back_color = settings.get("custom_back_color",
-                                          [self.default_back_color.red(),
-                                           self.default_back_color.green(),
-                                           self.default_back_color.blue(),
-                                           self.default_back_color.alpha()])  # Цвет шапки
-                bottom_color = settings.get("custom_bottom_color",
-                                            [self.default_bottom_color.red(),
-                                             self.default_bottom_color.green(),
-                                             self.default_bottom_color.blue(),
-                                             self.default_bottom_color.alpha()])  # Цвет подвала
-
-                # Устанавливаем пользовательские цвета на основе загруженных значений
-                self.custom_border_color = QColor(*border_color)  # Акцентный цвет и рамка
-                self.custom_back_color = QColor(*back_color)      # Цвет шапки
-                self.custom_bottom_color = QColor(*bottom_color)  # Цвет подвала
-
-                # Загружаем индивидуальные цвета для устройств
-                self.device_custom_colors = settings.get("custom_colors", {})  # Словарь с цветами для устройств
-
-                # Загружаем учетные данные
-                if "credentials" in settings:
-                    for url, cred in settings["credentials"].items():
-                        try:
-                            # Декодируем логин и пароль из base64
-                            login = base64.b64decode(cred["login"]).decode('utf-8')
-                            password = base64.b64decode(cred["password"]).decode('utf-8')
-                            self.credentials[url] = {"login": login, "password": password}
-                        except Exception as e:
-                            print(f"Ошибка расшифровки учетных данных для {url}: {e}")
-        else:
-            # Если файла нет, инициализируем пустой словарь учетных данных
-            self.credentials = {}
-
-
-
-    def get_device_custom_colors(self, url):
-        return self.device_custom_colors.get(url, {})
-
-    def credentials_dict(self):
-        credentials_encoded = {}
-        for url, cred in self.credentials.items():
-            try:
-                credentials_encoded[url] = {
-                    "login": base64.b64encode(cred["login"].encode('utf-8')).decode('utf-8'),
-                    "password": base64.b64encode(cred["password"].encode('utf-8')).decode('utf-8')
-                }
-            except Exception as e:
-                print(f"Ошибка кодирования учетных данных для {url}: {e}")
-        return credentials_encoded
-    
-    def save_settings(self):
-        settings = {
-            "show_names": self.show_names,
-            "gluon_only": self.gluon_only,
-            "wled_search": self.wled_search,
-            "snow_man_swch": self.snow_man_swch,
-            "snow_man":    self.snow_man,
-            "title_device":    self.title_device,
-            "window_width": self.window_width,
-            "window_height": self.window_height,
-            "zoom_factor": self.zoom_factor,
-            "custom_colors_enabled": self.custom_colors_enabled,
-            "check_timeout": self.check_timeout,
-            "custom_border_color": [self.custom_border_color.red(), 
-                                   self.custom_border_color.green(), 
-                                   self.custom_border_color.blue(), 
-                                   self.custom_border_color.alpha()],
-            "custom_back_color": [self.custom_back_color.red(), 
-                                 self.custom_back_color.green(), 
-                                 self.custom_back_color.blue(), 
-                                 self.custom_back_color.alpha()],
-            "custom_bottom_color": [
-                                self.custom_bottom_color.red(),
-                                self.custom_bottom_color.green(),
-                                self.custom_bottom_color.blue(),
-                                self.custom_bottom_color.alpha()
-            ],
-            "custom_colors": self.device_custom_colors,
-            "credentials": self.credentials_dict()
-        }
-        try:
-            with open("settings.json", 'w') as f:
-                json.dump(settings, f, indent=4)
-            print("Настройки сохранены")
-        except Exception as e:
-            print(f"Ошибка при сохранении настроек: {e}")
-
-    def load_device_colors(self, url):
-        """Загружает цвета для конкретного устройства"""
-        device_colors = self.device_custom_colors.get(url, {})
-        if device_colors and device_colors.get("use_custom_colors", False):
-            self.accent_color = QColor(*device_colors["accent"]).name(QColor.NameFormat.HexRgb)
-            self.border_color = QColor(*device_colors["accent"])
-            self.back_color = QColor(*device_colors["back"])
-            self.bottom_color = QColor(*device_colors.get("bottom", device_colors["back"]))
-            return True
-        return False
-    
-    def update_colors(self):
-        current_url = self.browser.url().toString()
-        # Если свои цвета всегда
-        if self.custom_colors_enabled:
-            # Используем глобальные пользовательские цвета
-            self.border_color = self.custom_border_color
-            self.back_color = self.custom_back_color
-            self.bottom_color = self.custom_bottom_color
-        elif not self.load_device_colors(current_url):
-            # Если нет специфичных настроек для устройства, получаем цвета через JavaScript
-            self.get_accent_color()
-            self.get_back_color()
-
-        # Обновляем стили
-        brightness = self.calculate_brightness(self.accent_color)
-        text_color = "#FFFFFF" if brightness < 128 else "#000000"
-        combined_style = self.get_combined_styles(self.accent_color, text_color)
-        self.setStyleSheet(combined_style)
-        self.update()
-
-    def get_colors(self):
-        current_url = self.browser.url().toString()
-        device_colors = self.get_device_custom_colors(current_url)
-        
-        if device_colors.get("use_custom_colors", False):
-            self.update_colors()  # Сразу применяем индивидуальные цвета
-        elif self.custom_colors_enabled:
-            self.update_colors()  # Применяем глобальные пользовательские цвета
-        else:
-            # Получаем цвета через JavaScript
-            self.get_accent_color()
-            self.get_back_color()
-
-    def handle_accent_color(self, color):
-        try:
-            # Если браузер уже удалён или скрыт - выходим
-            if not hasattr(self, 'browser') or not self.browser or self.browser.isHidden():
-                return
-        except RuntimeError:
-            return
-        
-        if self.custom_colors_enabled:
-            return
-        current_url = self.browser.url().toString()
-        device_colors = self.get_device_custom_colors(current_url)
-        
-        if device_colors.get("use_custom_colors", False):
-            self.accent_color = QColor(*device_colors["accent"]).name(QColor.NameFormat.HexRgb)
-            self.border_color = QColor(*device_colors["accent"])
-        elif self.custom_colors_enabled:
-            self.accent_color = self.custom_border_color.name(QColor.NameFormat.HexRgb)
-            self.border_color = self.custom_border_color
-        else:
-            if color and isinstance(color, str) and color.startswith('#'):
-                self.accent_color = color
-                self.update_border_color(color)
-            else:
-                self.accent_color = self.custom_border_color.name(QColor.NameFormat.HexRgb)
-                self.border_color = self.custom_border_color
-
-        brightness = self.calculate_brightness(self.accent_color)
-        text_color = "#FFFFFF" if brightness < 128 else "#000000"
-        combined_style = self.get_combined_styles(self.accent_color, text_color)
-        self.setStyleSheet(combined_style)
-        self.update()        
-
-    def update_back_color(self, back_color):
-        try:
-            if not hasattr(self, 'browser') or not self.browser or self.browser.isHidden():
-                return
-            current_url = self.browser.url().toString()
-            device_colors = self.get_device_custom_colors(current_url)
-            
-            if device_colors.get("use_custom_colors", False):
-                self.back_color = QColor(*device_colors["back"])
-            elif self.custom_colors_enabled:
-                self.back_color = self.custom_back_color
-            else:
-                if back_color:
-                    self.back_color = QColor(back_color)
-                else:
-                    self.back_color = self.custom_back_color
-            self.update()
-        except RuntimeError:
-            return
-
-    def handle_authentication(self, url, authenticator):
-        url_str = url.toString()
-        saved_login = self.credentials.get(url_str, {}).get("login", "")
-        saved_password = self.credentials.get(url_str, {}).get("password", "")
-        
-        print(f"Запрос авторизации: {url_str}")
-        dialog = AuthDialog(url_str, authenticator.realm(), saved_login, saved_password, self)
-        
-      
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            login, password, remember = dialog.get_credentials()
-            #print(f"Введено: login={login}, password={password}, remember={remember}")
-            
-            if login and password:  # Проверяем что введено
-                authenticator.setUser(login)
-                authenticator.setPassword(password)
-           
-            
-                if remember and login and password:
-                    print(f"Сохранили учетные данные {url_str}")
-                    self.credentials[url_str] = {"login": login, "password": password}
-                    self.save_settings()  # Сохраняем все настройки
-            else:
-             # Если пользователь нажал ок но не ввел данные
-                self.show_device_unavailable_placeholder(url_str)
-                authenticator.setUser("")  # Отменяем
-      
-        else:
-            authenticator.setUser("")
-            print("Авторизация отменена")
-            self.show_device_unavailable_placeholder(url_str)
-            authenticator.setUser("")  
-
-    def show_device_unavailable_placeholder(self, url):
-        self.swap_header_footer_colors();
-        error_html = f"""
-        <!DOCTYPE html>
-        <html lang="en" style="--accent: #150000;">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>No Devices Found</title>
-            <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
-            <style>
-                body {{
-                    background-color: #1c1d22;
-                    color: #ffffff;
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100vh;
-                    margin: 0;
-                    transition: background-color 2s ease;
-                }}
-                .snowman-container {{
-                    font-size: 64px;
-                    margin-bottom: 20px;
-                    color: #140000;
-                    width: 10px;
-                    height: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                    transition: font-size 2s ease, color 2s ease;
-                }}
-                .snowman-container .eyes {{
-                    display: none;
-                    position: absolute;
-                    top: -6px;
-                    width: 15px;
-                    height: 10px;
-                    background-color: #ff0000;
-                    border-radius: 50%;
-                    animation: look 5s infinite;
-                    z-index: -1;
-                }}
-                .snowman-container .moon {{
-                    display: none;
-                    position: absolute;
-                    top: -30px;
-                    left: 20px;
-                    width: 20px;
-                    height: 20px;
-                    background-color: #ffcc008f;
-                    box-shadow: 0px 0px 7px 0px #ff0000de;
-                    border-radius: 50%;
-                    z-index: -2;
-                    filter: blur(1px);
-                }}
-                @keyframes look {{
-                    0% {{ opacity: 1; filter: brightness(70%); }}
-                    20% {{ opacity: 0.3; filter: brightness(10%); }}
-                    30% {{ opacity: 0.3; filter: brightness(10%); }}
-                    40% {{ opacity: 1; filter: brightness(60%); }}
-                    45% {{ opacity: 0.8; filter: brightness(50%); }}
-                    60% {{ opacity: 0.2; filter: brightness(20%); }}
-                    80% {{ opacity: 1; filter: brightness(70%); }}
-                    85% {{ opacity: 0.4; filter: brightness(30%); }}
-                    100% {{ opacity: 1; filter: brightness(70%); }}
-                }}
-                .message {{
-                    margin-top: 20px;
-                    margin-bottom: 20px;
-                    font-size: 24px;
-                    text-align: center;
-                    color: #5e5e5e;
-                    transition: opacity 2s, height 2s;
-                }}
-                .error-icon {{
-                    font-size: 48px;
-                    
-                    cursor: pointer;
-                    transition: opacity 1s ease;
-                }}
-                .snowman {{
-                    display: none;
-                    opacity: 0;
-                    transition: opacity 1s ease;
-                }}
-                ::selection {{
-                                background: #1c1d22; /* Цвет фона выделения */
-                                
-                            }}
-                .device-info {{
-                                margin-bottom: 7px;
-                                color: #888;
-                            }}
-                .device-info2 {{
-                    margin-bottom: 7px;
-                    color: #888;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="snowman-container">
-                <div class="moon"></div>
-                <div class="eyes"></div>
-                <span class="snowman">⛇</span>
-            </div>
-            <div class="error-icon">🔒</div>
-            <div class="message">Устройство недоступно</div>
-            <div class="device-info">это устройство требует авторизации</div>
-            <div class="device-info2">обновите страницу и попробуйте снова</div>
-
-            <script>
-                const errorIcon = document.querySelector('.error-icon');
-                let clickCount = 0;
-                let bridge;
-                new QWebChannel(qt.webChannelTransport, function(channel) {{
-                    bridge = channel.objects.pybridge;
-                }}); 
-
-                errorIcon.addEventListener('click', () => {{
-                    clickCount++;
-                    if (clickCount === 2){{
-                                   const message = document.querySelector('.message')
-                                   message.style.height = '0';
-                                   message.style.opacity = '0'; 
-
-                                   const device_info = document.querySelector('.device-info')
-                                   device_info.style.display = 'none';
-
-                                   const device_info2 = document.querySelector('.device-info2')
-                                   device_info2.style.display = 'none';
-                                }}
-                    if (clickCount === 10) {{
-                        errorIcon.style.opacity = '0';
-                        document.body.style.backgroundColor = '#000000';
-                        if (bridge) {{
-                                bridge.setSnowMan(true);
-                                bridge.blck_color();
-                            }}
-
-                         setTimeout(() => {{
-                                        const snowman = document.querySelector('.snowman');
-                                        snowman.style.display = 'inline';
-                                        setTimeout(() => {{
-                                            snowman.style.opacity = '1';
-                                        }}, 10);
-                                        setTimeout(() => {{
-                                                const eyes = document.querySelector('.eyes');
-                                                eyes.style.display = 'block';
-                                            }}, 2000);
-
-                                        setTimeout(() => {{
-                                            const snowmanContainer = document.querySelector('.snowman-container');
-                                            snowmanContainer.style.color = '#200000';
-                                            snowmanContainer.style.fontSize = "74px";
-
-                                            setTimeout(() => {{
-                                                const eyes = document.querySelector('.eyes');
-                                                eyes.style.display = 'block';
-                                            }}, 2000);
-
-                                            setTimeout(() => {{
-                                                snowmanContainer.style.color = '#300000';
-                                                snowmanContainer.style.fontSize = "80px"
-                                                 setTimeout(() => {{
-                                                      msg.textContent = 'Snow Settings {VERSION}'; 
-                                                      msg.style.display = 'block'; 
-                                                      msg.style.color = '#300000';
-                                                      msg.style.height  = 'auto';
-                                                      msg.style.opacity = '1'; 
-                                                   }}, 2000);
-                                            }}, 5000);
-
-
-                                        }}, 7000);
-                                    }}, 5000);
-
-
-                    }}
-                }});
-            </script>
-        </body>
-        </html>
-        """
-
-        self.browser.setHtml(error_html, QUrl(url))
-        self.address_input.setText(url if not self.show_names else self.get_name_by_url(url))
-
     def adjust_address_input_width(self):
         # устанавливаем ширину адресной строки, 
         self.address_input.setMinimumWidth(190)  # ширина фиксированно-минимальная
@@ -1975,6 +1664,17 @@ class WebBrowser(QMainWindow):
             import webbrowser
             webbrowser.open(url)
 
+
+
+#    def toggle_show_names(self):
+#        #Переключаем показ имён и сохранить
+#        self.show_names = not self.show_names
+#        with open("settings.json", 'w') as f:
+#            json.dump({"show_names": self.show_names}, f, indent=4)
+#        print(f"показывать имена в строке: {self.show_names}")
+
+
+
     def load_devices_for_autocomplete(self):
         device_list = []
         self.device_map = {}
@@ -1998,6 +1698,7 @@ class WebBrowser(QMainWindow):
                         device_list.append(url)
         return device_list
 
+
     def load_selected_device(self, text):
         if text:
             if self.show_names and text in self.device_map:
@@ -2005,7 +1706,6 @@ class WebBrowser(QMainWindow):
                 self.load_page(url)
             else:
                 self.load_page(text)
-            self.update_always_on_top_checkbox_style() 
   
     def show_completer(self, event: QMouseEvent):
         self.completer.setCompletionPrefix("")  # Префикс для показа всех устройств
@@ -2013,7 +1713,7 @@ class WebBrowser(QMainWindow):
         QLineEdit.mousePressEvent(self.address_input, event)
 
     def open_menu(self):
-        self.scan_dialog = ScanDialog(self, parent=self)
+        self.scan_dialog = ScanDialog(self)
         self.scan_dialog.wled_search = self.wled_search
 
         screen = QApplication.primaryScreen().geometry()
@@ -2029,10 +1729,11 @@ class WebBrowser(QMainWindow):
         self.scan_dialog.move(scan_x, scan_y)
         self.scan_dialog.setWindowFlags(self.scan_dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  # флаг "поверх всех"
         self.scan_dialog.show()
-        # Обновить список устройств после закрытия 
+        # Обновить список устройств после закрытия ScanDialog
         self.scan_dialog.exec()
         self.device_list = self.load_devices_for_autocomplete()
         self.completer.setModel(QStringListModel(self.device_list))
+
 
     def update_line_edit_style(self, color):
         if color and color.startswith('#'):
@@ -2120,6 +1821,7 @@ class WebBrowser(QMainWindow):
                 }
             """)
 
+
     def update_checkbox_style(self, color):
         if color and color.startswith('#'):  # Проверяем, что цвет в формате HEX
             try:
@@ -2131,12 +1833,12 @@ class WebBrowser(QMainWindow):
                         width: 16px;  /* Ширина индикатора */
                         height: 16px;  /* Высота индикатора */
                         background-color: #2B2B2B;  /* Фон индикатора */
-                        border: 1px solid #9e9e9e;  /* Граница индикатора bababb 4A4A4A */
+                        border: 1px solid #4A4A4A;  /* Граница индикатора */
                         border-radius: 4px;  /* Закругление углов */
                     }}
                     QCheckBox::indicator:checked {{
                         background-color: {color};  /* Фон индикатора при выборе (акцентный цвет) */
-                        border: 1px solid #9e9e9e;  /* Граница индикатора при выборе */
+                        border: 1px solid {color};  /* Граница индикатора при выборе */
                         color: #FFFFFF;  /* Цвет текста (галочки) */
                     }}
                 """
@@ -2152,12 +1854,12 @@ class WebBrowser(QMainWindow):
                         width: 16px;
                         height: 16px;
                         background-color: #2B2B2B;
-                        border: 1px solid #9e9e9e;
+                        border: 1px solid #4A4A4A;
                         border-radius: 4px;
                     }
                     QCheckBox::indicator:checked {
                         background-color: #00612a;
-                        border: 1px solid #9e9e9e;
+                        border: 1px solid #009c44;
                         color: #FFFFFF;  /* Цвет текста (галочки) */
                     }
                 """)
@@ -2171,47 +1873,32 @@ class WebBrowser(QMainWindow):
                     width: 16px;
                     height: 16px;
                     background-color: #2B2B2B;
-                    border: 1px solid #9e9e9e;
+                    border: 1px solid #4A4A4A;
                     border-radius: 4px;
                 }
                 QCheckBox::indicator:checked {
                     background-color: #00612a;
-                    border: 1px solid #9e9e9e;
+                    border: 1px solid #009c44;
                     color: #FFFFFF;  /* Цвет текста (галочки) */
                 }
             """)
 
-    def update_always_on_top_checkbox_style(self):
-        current_url = self.browser.url().toString()
-        use_custom_colors = self.custom_colors_enabled or self.device_custom_colors.get(current_url, {}).get("use_custom_colors", False)
 
-        #if use_custom_colors:
-            #back_color = self.custom_back_color if self.custom_colors_enabled else QColor(*self.device_custom_colors[current_url]["back"])
-        #else:
-        #    back_color = QColor(28, 29, 34, 255)  # Цвет по умолчанию
-        back_color = getattr(self, 'back_color', QColor(28, 29, 34, 255)) 
-
-        active_color = back_color.darker(150).name(QColor.NameFormat.HexRgb)
-        inactive_color = back_color.lighter(110).name(QColor.NameFormat.HexRgb)
-        border_color = back_color.lighter(150).name(QColor.NameFormat.HexRgb)
-        self.checkbox.setStyleSheet(f"""
-            QCheckBox::indicator {{
-                background-color: {inactive_color};
-                 border: 1px solid #9e9e9e;
-            }}
-            QCheckBox::indicator:checked {{
-                background-color: {active_color};
-                border: 1px solid #9e9e9e;;
- 
-            }}
-        """)
-        self.checkbox.update()
-        self.update()
 
     def show_about_dialog(self):
-        about_dialog = AboutDialog(self)
+        about_dialog = AboutDialog()
         about_dialog.setWindowFlags(about_dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  #  флаг "поверх всех"
         about_dialog.exec()
+
+    def get_colors(self):
+        self.get_accent_color()
+        self.get_back_color()
+        if not self.custom_colors_enabled:
+            # Если свои цвета не включены и цвета не найдены, используем по умолчанию
+            if not hasattr(self, 'accent_color') or not self.accent_color:
+                self.handle_accent_color(None)
+            if not hasattr(self, 'back_color') or not self.back_color:
+                self.update_back_color(None)
 
     def get_back_color(self):
         # JavaScript для получения значения --back
@@ -2246,10 +1933,9 @@ class WebBrowser(QMainWindow):
         """
         # Выполняем JavaScript и получаем результат
         self.browser.page().runJavaScript(script, self.update_back_color)
+  
 
     def get_accent_color(self):
-        if not hasattr(self, 'browser') or not self.browser:
-            return  # Прерываем, если браузер уже удалён
         #  JavaScript для получения значения --accent
         script = """
         (function() {
@@ -2299,6 +1985,44 @@ class WebBrowser(QMainWindow):
             self.border_color = self.custom_border_color  # Используем цвет из настроек
         self.update()  # Перерисовываем окно
 
+    def handle_accent_color(self, color):
+        # Обрабатываем полученный цвет
+        if self.custom_colors_enabled:
+            self.accent_color = self.custom_border_color  # Используем QColor
+            self.border_color = self.custom_border_color
+            self.back_color = self.custom_back_color
+        else:
+            if color and isinstance(color, str) and color.startswith('#'):
+                self.accent_color = color
+                self.update_border_color(color)  # Обновить цвет рамки из полученного цвета
+            else:
+                self.accent_color = self.custom_border_color.name(QColor.NameFormat.HexRgb)
+                self.border_color = self.custom_border_color
+                self.back_color = self.custom_back_color
+
+        # Определяем яркость акцентного цвета и выбираем цвет текста
+        brightness = self.calculate_brightness(self.accent_color)
+        text_color = "#FFFFFF" if brightness < 128 else "#000000"  # Порог 128
+
+        # Обновляем DARK_THEME с учетом цвета текста
+        updated_dark_theme = DARK_THEME.replace(
+            "QListView::item:selected { background-color: 27272f; color: #FFFFFF; }",
+            f"QListView::item:selected {{ background-color: {self.accent_color}; color: {text_color}; border-radius: 6px; }}"
+        ).replace(
+            "QListWidget::item:selected { background-color: #067100; color: #FFFFFF; }",
+            f"QListWidget::item:selected {{ background-color: {self.accent_color}; color: {text_color}; }}"
+        ).replace(
+            "QMenu::item:selected { background-color: #00612a; color: #000000; }",
+            f"QMenu::item:selected {{ background-color: {self.accent_color}; color: {text_color}; border-radius: 6px; }}"
+        )
+
+        QApplication.instance().setStyleSheet(updated_dark_theme)
+
+        # Обновляем динамические стили
+        combined_style = self.get_combined_styles(self.accent_color, text_color)
+        self.setStyleSheet(combined_style)
+        self.update()  # Перерисовываем окно
+
     def calculate_brightness(self, color):
         """Вычисляет яркость цвета в формате HEX (#RRGGBB). Возвращает значение от 0 до 255."""
         if isinstance(color, QColor):
@@ -2311,6 +2035,7 @@ class WebBrowser(QMainWindow):
             return 128  # Значение по умолчанию, если цвет некорректен
         # Формула luma
         return 0.299 * r + 0.587 * g + 0.114 * b
+
         
     def get_combined_styles(self, color, text_color="#000000"):
         # объединяем стили для всех элементов котрые меняют цвет динамически 
@@ -2345,12 +2070,12 @@ class WebBrowser(QMainWindow):
                 width: 16px;
                 height: 16px;
                 background-color: #2B2B2B;
-                border: 1px solid #9e9e9e;
+                border: 1px solid #4A4A4A;
                 border-radius: 4px;
             }}
             QCheckBox::indicator:checked {{
                 background-color: {color};
-                border: 1px solid #9e9e9e;
+                border: 1px solid {color};
                 color: #FFFFFF;  /* Цвет текста (галочки) */
             }}
         """
@@ -2371,51 +2096,40 @@ class WebBrowser(QMainWindow):
         # Объединяем все стили в одну строку
         combined_style = line_edit_style + checkbox_style + menu_style 
         return combined_style        
- 
+
+        
+
+    def update_back_color(self, back_color):
+        if self.custom_colors_enabled:
+            self.back_color = self.custom_back_color
+        elif back_color:
+            self.back_color = QColor(back_color)
+        else:
+            self.back_color = self.custom_back_color  # Используем цвет из настроек
+        self.update()  # Перерисовываем окно
+
+
     def paintEvent(self, event):
-        #print(f"paintEvent {self.no_color}")
         # окно 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     
         # Получаем цвет рамки и фона
         border_color      = getattr(self, 'border_color', QColor(49, 113, 49, 150))
-        top_color         = getattr(self, 'back_color', QColor(28, 29, 34, 255))  # Цвет по умолчанию
-         # Логика выбора цвета подвала
-        current_url = self.browser.url().toString()
-        if self.custom_colors_enabled:
-            # Если включена галка "Свои цвета всегда", используем глобальный custom_bottom_color
-            bottom_color = self.custom_bottom_color
-        else:
-            # Если "Свои цвета всегда" выключена, проверяем настройки для конкретного устройства
-            device_colors = self.device_custom_colors.get(current_url, {})
-            if device_colors.get("use_custom_colors", False) and "bottom" in device_colors:
-                # Если включена галка "Только для этого устройства" и есть цвет подвала
-                bottom_color = QColor(*device_colors["bottom"])
-            else:
-                # Если ни одна из галок не активна, используем цвет по умолчанию
-                bottom_color = getattr(self, 'back_color', QColor(28, 29, 34, 255))  # Цвет по умолчанию
-                top_color =  top_color.darker(150)
-            
-        if self.no_color == "black":
-            top_color = QColor(0, 0, 0, 255)
-            bottom_color = QColor(0, 0, 0, 255)
-        elif self.no_color == "gray":  
-            top_color = QColor(28, 29, 34, 255)
-            bottom_color = QColor(28, 29, 34, 255)
-        # шапка
-        brush = QBrush(top_color) # Цвет фона
+        back_color        = getattr(self, 'back_color', QColor(28, 29, 34, 255))  # Цвет по умолчанию
+        back_color_top = getattr(self, 'back_color', QColor(28, 29, 34, 255))  # Цвет по умолчанию
+        # Рисуем фон с скруглёнными углами -- меню и заголовок
+        #brush = QBrush(QColor(28, 29, 34, 255))  # Цвет фона
+        back_color =  back_color_top.darker(150)
+        brush = QBrush(back_color_top) # Цвет фона
         painter.setBrush(brush)
         painter.setPen(Qt.PenStyle.NoPen)  # Убираем границу
-        painter.drawRoundedRect(self.rect().adjusted(9, 9, -9, -90), 13, 13)  # + Скругление углов 
-    
-        #подвал
-        brush = QBrush(bottom_color) # Цвет фона
-        painter.setBrush(brush)
+        painter.drawRoundedRect(self.rect().adjusted(9, 90, -9, -9), 15, 15)  # + Скругление углов 
+
+        brush_bottom = QBrush(back_color) # Цвет фона
+        painter.setBrush(brush_bottom)
         painter.setPen(Qt.PenStyle.NoPen)  # Убираем границу
-        painter.drawRoundedRect(self.rect().adjusted(9, 90, -9, -9), 13, 13)  # + Скругление углов 
-        
-       
+        painter.drawRoundedRect(self.rect().adjusted(9, 9, -9, -90), 15, 15)  # + Скругление углов 
     
         # рамка
         pen2 = QPen(border_color, 10)
@@ -2435,81 +2149,15 @@ class WebBrowser(QMainWindow):
             point_size                                 # высота (диаметр)
         )
 
-        indicator_size = 8  # Диаметр индикатора
-        #indicator_x = self.minimize_button.x() - indicator_size - 10  # 5 - отступ слева от кнопки
-        #indicator_y = self.minimize_button.y() + (self.minimize_button.height() - indicator_size) // 2  # Центрируем по вертикали
-        indicator_x = self.scan_button.x() - indicator_size + 13  # 5 - отступ 
-        indicator_y = (self.scan_button.y() + (self.scan_button.height() - indicator_size) // 2 ) - 1 # Центрируем по вертикали
-        painter.setBrush(QBrush(self.indicator_color))
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawEllipse(
-            indicator_x,
-            indicator_y,
-            indicator_size,
-            indicator_size
-        )
-        self.set_icon()
 
-    def start_indicator_animation(self):
-        if not self.indicator_visible:
-            self.indicator_visible = True
-            self.indicator_alpha = 5  # Начинаем с прозрачности
-            self.indicator_fading_in = True  # Начинаем с увеличения прозрачности
-            if not self.indicator_animation_timer.isActive():
-                self.indicator_animation_timer.start(50)  # Интервал 50 мс для плавности
-
-    def stop_indicator_animation(self):
-        if self.indicator_visible:
-            self.indicator_visible = False
-            self.indicator_animation_timer.stop()
-            self.indicator_alpha = 0
-            self.indicator_color.setAlpha(self.indicator_alpha)
-            self.update()  # Перерисовываем окно
-
-    def animate_indicator(self):
-        fade_step = 5  # Шаг изменения прозрачности (уменьшен для большей плавности)
-
-        if self.indicator_visible:
-            if self.indicator_fading_in:
-                # Плавное включение
-                self.indicator_alpha = min(self.indicator_alpha + fade_step, self.indicator_max_alpha)
-                if self.indicator_alpha >= self.indicator_max_alpha:
-                    self.indicator_fading_in = False  # Переключаемся на выключение
-            else:
-                # Плавное выключение
-                self.indicator_alpha = max(self.indicator_alpha - fade_step, 5)
-                if self.indicator_alpha <= 5:
-                    self.indicator_fading_in = True  # Переключаемся на включение
-
-            # Обновляем цвет индикатора
-            self.indicator_color.setAlpha(self.indicator_alpha)
-            self.update()  # Перерисовываем окно
 
     def load_page(self, url=None):
-        print(f"load_page {self.no_color}")
+
         input_url = url if url else self.address_input.text().strip()
         if input_url:
             if not (input_url.startswith("http://") or input_url.startswith("https://")):
                 input_url = "http://" + input_url
             original_url = input_url
-
-            # Сохраняем настройки цветов текущего устройства перед переключением
-           # current_url = self.browser.url().toString()
-           # if current_url in self.device_custom_colors:
-           #     current_colors = self.device_custom_colors[current_url]
-           #     if "use_custom_colors" in current_colors:
-           #         self.device_custom_colors[current_url]["use_custom_colors"] = current_colors["use_custom_colors"]
-
-            # Сохраняем настройки цветов текущего устройства перед переключением
-            current_url = self.browser.url().toString()
-            if current_url:
-                # Копируем текущее состояние устройства, чтобы избежать перезаписи
-                current_colors = self.device_custom_colors.get(current_url, {}).copy()
-                # Сохраняем текущее состояние "use_custom_colors" и цветов
-                #current_colors["use_custom_colors"] = current_colors.get("use_custom_colors", False)
-                self.device_custom_colors[current_url] = current_colors
-                self.save_settings()  # Сохраняем изменения в файл
-
 
             device_host = original_url.split('//')[1].split('/')[0]
             is_ip = bool(re.match(r'^\d+\.\d+\.\d+\.\d+$', device_host))
@@ -2532,19 +2180,16 @@ class WebBrowser(QMainWindow):
                         self.update_discovered_devices(name, original_url)
                 except requests.RequestException:
                     pass
-           
-            
-                    
+
             def handle_availability(is_available):
                 print(f"Доступность {original_url}: {is_available}, is_ip: {is_ip}")
                 if not is_available and is_ip:
                     self.current_checking_device = original_url  # Сохраняем полный URL
                     self.check_timer.start(5000)
                     self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-                    self.swap_header_footer_colors();
                     error_html = f"""
                     <!DOCTYPE html>
-                    <html lang="en"  style="--accent: #150000;>
+                    <html lang="en" >
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2573,13 +2218,12 @@ class WebBrowser(QMainWindow):
                                 align-items: center;
                                 justify-content: center;
                                 position: relative;
-                                transition: font-size 2s ease, color 2s ease;
-                                
+                                transition: color 1s ease;
                             }}
                             .snowman-container .eyes {{
                                 display: none;
                                 position: absolute;
-                                top: -6px;
+                                top: -5px;
                                 width: 15px;
                                 height: 10px;
                                 background-color: #ff0000;
@@ -2616,22 +2260,17 @@ class WebBrowser(QMainWindow):
                                 font-size: 24px;
                                 text-align: center;
                                 color: #5e5e5e;
-                                transition:  opacity 2s, height 2s;
                             }}
                             .error-icon {{
                                 font-size: 52px;
                                 margin-bottom: 20px;
                                 cursor: pointer;
-                                transition: opacity 1s ease;
+                                transition: opacity 0.5s ease;
                             }}
                             .snowman {{
                                 display: none;
                                 opacity: 0;
-                                transition: opacity 1s ease;
-                            }}
-                            ::selection {{
-                                background: #1c1d22; /* Цвет фона выделения */
-                                
+                                transition: opacity 0.5s ease;
                             }}
                         </style>
                     </head>
@@ -2657,9 +2296,7 @@ class WebBrowser(QMainWindow):
                                 clickCount++;
                                 if (clickCount === 2){{
                                    const message = document.querySelector('.message')
-                                   message.style.height = '0';
-                                   message.style.opacity = '0'; 
-
+                                   message.style.display = 'none';
                                    if (bridge) {{
                                        bridge.stop_border_animation();
                                    }}
@@ -2667,10 +2304,6 @@ class WebBrowser(QMainWindow):
                                 if (clickCount === 10) {{
                                     errorIcon.style.opacity = '0';
                                     document.body.style.backgroundColor = '#000000';
-                                    if (bridge) {{
-                                         bridge.setSnowMan(true);
-                                         bridge.blck_color();
-                                     }}
 
                                     setTimeout(() => {{
                                         const snowman = document.querySelector('.snowman');
@@ -2686,19 +2319,11 @@ class WebBrowser(QMainWindow):
                                         setTimeout(() => {{
                                             const snowmanContainer = document.querySelector('.snowman-container');
                                             snowmanContainer.style.color = '#200000';
-                                            snowmanContainer.style.fontSize = "74px";
 
                                             setTimeout(() => {{
                                                 const eyes = document.querySelector('.eyes');
                                                 eyes.style.display = 'block';
                                             }}, 2000);
-
-                                            setTimeout(() => {{
-                                                snowmanContainer.style.color = '#300000';
-                                                snowmanContainer.style.fontSize = "80px"
-                                            }}, 5000);
-
-
                                         }}, 7000);
                                     }}, 5000);
                                 }}
@@ -2717,29 +2342,16 @@ class WebBrowser(QMainWindow):
                     self.browser.setUrl(QUrl(original_url))
                     self.address_input.setText(original_url if not self.show_names else self.get_name_by_url(original_url))
                     QtCore.QTimer.singleShot(1000, self.get_accent_color)
-                    self.no_color = "no" # 
-
-                    
-                    self.set_title(False)
-
 
                 self.hide()
                 self.show()
                 self.activateWindow()
-                #self.set_icon()
-                QTimer.singleShot(100, self.set_icon)
 
             if is_ip:
                 self.check_device_availability(original_url, handle_availability)
             else:
                 handle_availability(True)
-        
-        
-        self.update_colors()
-        if url:
-            self.url_changed.emit(url)
-        self.update_always_on_top_checkbox_style()  # Обновляем стиль чекбокса "Поверх всех"
-        self.update_checkbox_style(self.accent_color) 
+
 
     def get_name_by_url(self, url):
         devices = self.load_devices_from_file()
@@ -2748,11 +2360,14 @@ class WebBrowser(QMainWindow):
                 return device['name']
         return url
 
+
     def load_devices_from_file(self):
         if os.path.exists("discovered_devices.json"):
             with open("discovered_devices.json", 'r') as f:
                 return json.load(f)
         return []
+
+
 
     def update_discovered_devices(self, name, url):
         devices = self.load_devices_from_file()
@@ -2765,93 +2380,13 @@ class WebBrowser(QMainWindow):
         self.device_list = self.load_devices_for_autocomplete()
         self.completer.setModel(QStringListModel(self.device_list))
 
-    def set_icon(self):
-        if not self.snow_man:
-            print("рано")
-            if NAME == CUSTOM_NAME:
-                self.setWindowIcon(QIcon("g_icon.ico"))
-            else:
-                self.setWindowIcon(QIcon("icon.ico")) 
-            return
-        if not self.snow_man_swch:
-            print("ненадо")
-            if NAME == CUSTOM_NAME:
-                self.setWindowIcon(QIcon("g_icon.ico"))
-            else:
-                self.setWindowIcon(QIcon("icon.ico"))    
 
-            return
-        print("меняем")
-        icon_folder = "browser_data"
-        icon_path = os.path.join(icon_folder, "icon_sm.ico")
-        github_url = "https://raw.githubusercontent.com/TonTon-Macout/web-server-for-Libre-Hardware-Monitor/main/icon_sm.ico"
-
-        # Создаём папку browser_data, если её нет
-        if not os.path.exists(icon_folder):
-            os.makedirs(icon_folder)
-
-        # Проверяем, существует ли иконка и не пустой ли файл
-        if os.path.exists(icon_path) and os.path.getsize(icon_path) > 0:
-            print(f"Иконка уже существует по пути: {icon_path}")
-            self.setWindowIcon(QIcon(icon_path))
-            print("Иконка установлена из локального файла")
-        else:
-            try:
-                # Добавляем заголовок User-Agent, чтобы избежать блокировки GitHub
-                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-                response = requests.get(github_url, headers=headers, timeout=10)
-                response.raise_for_status()  # Проверяем, что запрос успешен
-
-                # Сохраняем иконку
-                with open(icon_path, "wb") as f:
-                    f.write(response.content)
-                print(f"Иконка скачана в: {icon_path}")
-
-                # Устанавливаем иконку для окна
-                if os.path.exists(icon_path):
-                    self.setWindowIcon(QIcon(icon_path))
-                    print("Иконка установлена")
-                else:
-                    print("Ошибка: файл иконки не найден после сохранения")
-                    if NAME == CUSTOM_NAME:
-                        fallback_icon = "g_icon.ico"
-                    else:
-                        fallback_icon = "icon.ico"
-                    if os.path.exists(fallback_icon):
-                        self.setWindowIcon(QIcon(fallback_icon))
-                        print(f"Установлена запасная иконка: {fallback_icon}")
-                    else:
-                        print(f"Запасная иконка не найдена: {fallback_icon}")
-
-            except requests.exceptions.RequestException as e:
-                print(f"Ошибка при скачивании иконки: {e}")
-                if NAME == CUSTOM_NAME:
-                    fallback_icon = "g_icon.ico"
-                else:
-                    fallback_icon = "icon.ico"
-                if os.path.exists(fallback_icon):
-                    self.setWindowIcon(QIcon(fallback_icon))
-                    print(f"Установлена запасная иконка: {fallback_icon}")
-                else:
-                    print(f"Запасная иконка не найдена: {fallback_icon}")
 
     def closeEvent(self, event):
         # Закрываем окно сканирования, если оно открыто
         self.save_settings()
         if hasattr(self, 'scan_dialog') and self.scan_dialog.isVisible():
             self.scan_dialog.close()
-
-        # Останавливаем таймеры
-        if hasattr(self, 'check_timer'):
-            self.check_timer.stop()
-        if hasattr(self, 'rssi_check_timer'):
-            self.rssi_check_timer.stop()
-        if hasattr(self, 'border_animation_timer'):
-            self.border_animation_timer.stop()
-        if hasattr(self, 'indicator_animation_timer'):
-            self.indicator_animation_timer.stop()
-
-
         
         # Создаем пустую страницу
         empty_page = QWebEnginePage(self)
@@ -2863,18 +2398,15 @@ class WebBrowser(QMainWindow):
         self.browser.deleteLater()
         # Удаляем профиль
         self.profile.deleteLater()
-        
         # Принимаем событие закрытия
         event.accept()
         # Вызываем родительский метод
         super().closeEvent(event)
 
+
     def update_url(self, url):
         # Обновить URL в поле ввода
         self.address_input.setText(url.toString())
-        self.update_colors()
-        self.url_changed.emit(url.toString())  # Испускаем сигнал при изменении URL
-        self.update_always_on_top_checkbox_style()  
 
     def load_last_url(self):
         if os.path.exists("discovered_devices.json"):
@@ -2888,180 +2420,129 @@ class WebBrowser(QMainWindow):
                     self.show_no_devices_placeholder()
         else:
             self.show_no_devices_placeholder()
+
     
-    # черные шапка и подвал когда показываем заглушку
-    def swap_header_footer_colors(self):
-        self.no_color = "gray"
-        print(f"меняем цвет на серый")
-        #  принудительно поменять цвета шапки и подвала без сохранения
-        #self.back_color = QColor(0, 0, 0, 255)
-        #self.bottom_color = QColor(0, 0, 0, 255)
-
-        # Перерисовываем окно с новыми цветами
-        # self.update()
-
     def show_no_devices_placeholder(self):
-        self.swap_header_footer_colors()
-        print(f"Нет устройств для отображения")
-        no_devices_html = f"""
-            <!DOCTYPE html>
-            <html lang="en" style="--accent: #150000;">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>No Devices Found</title>
-                <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
-                <style>
-                    body {{
-                        background-color: #1c1d22;
-                        color: #ffffff;
-                        font-family: Arial, sans-serif;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        height: 100vh;
-                        margin: 0;
-                        transition: background-color 2s ease;
-                    }}
-                    .snowman-container {{
-                        font-size: 64px;
-                        margin-bottom: 20px;
-                        color: #150000;
-                        width: 10px;
-                        height: 10px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        position: relative;
-                        transition: font-size 2s ease, color 2s ease;
-                    }}
-                    .snowman-container .eyes {{
-                        display: none;
-                        position: absolute;
-                        top: -6px;
-                        width: 15px;
-                        height: 10px;
-                        background-color: #ff0000;
-                        border-radius: 50%;
-                        animation: look 5s infinite;
-                        z-index: -1;
-                    }}
-                    .snowman-container .moon {{
-                        display: none;
-                        position: absolute;
-                        top: -25px;
-                        left: 20px;
-                        width: 20px;
-                        height: 20px;
-                        background-color: #ffcc008f;
-                        box-shadow: 0px 0px 7px 0px #ff0000de;
-                        border-radius: 50%;
-                        z-index: -2;
-                        filter: blur(1px);
-                    }}
-                    @keyframes look {{
-                        0% {{ opacity: 1; filter: brightness(70%); }}
-                        20% {{ opacity: 0.3; filter: brightness(10%); }}
-                        30% {{ opacity: 0.3; filter: brightness(10%); }}
-                        40% {{ opacity: 1; filter: brightness(60%); }}
-                        45% {{ opacity: 0.8; filter: brightness(50%); }}
-                        60% {{ opacity: 0.2; filter: brightness(20%); }}
-                        80% {{ opacity: 1; filter: brightness(70%); }}
-                        85% {{ opacity: 0.4; filter: brightness(30%); }}
-                        100% {{ opacity: 1; filter: brightness(70%); }}
-                    }}
-                    .message {{
-                        font-size: 24px;
-                        text-align: center;
-                        color: #5e5e5e;
-                        transition:  opacity 2s, height 2s;
-                    }}
-                    .error-icon {{
-                        font-size: 52px;
-                        margin-bottom: 20px;
-                        cursor: pointer;
-                        transition: opacity 1s ease;
-                    }}
-                    .snowman {{
-                        display: none;
-                        opacity: 0;
-                        transition: opacity 1s ease;
-                    }}
-                    ::selection {{
-                        background: #1c1d22;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="snowman-container">
-                    <div class="moon"></div>
-                    <div class="eyes"></div>
-                    <span class="snowman">⛇</span>
-                </div>
-                <div class="error-icon"></div>
-                <div class="message">Устройства не обнаружены</div>
-
-                <script>
-                        let bridge;
-                        new QWebChannel(qt.webChannelTransport, function(channel) {{
-                            bridge = channel.objects.pybridge;
-                        }}); 
-
-                        setTimeout(() => {{
-                            document.body.style.backgroundColor = '#000000';
-                             const msg = document.querySelector('.message');
-                            msg.style.height = '0';
-                            msg.style.opacity = '0'; 
-
-                            if (bridge) {{
-                                bridge.setSnowMan(true);
-                                bridge.blck_color();
-                            }}
-
-                            setTimeout(() => {{
-                                const snowman = document.querySelector('.snowman');
-                                snowman.style.display = 'inline';
-                                setTimeout(() => {{
-                                    snowman.style.opacity = '1';
-                                }}, 10);
-                                setTimeout(() => {{
-                                    const eyes = document.querySelector('.eyes');
-                                    eyes.style.display = 'block';
-                                }}, 2000);
-
-                                setTimeout(() => {{
-                                    const snowmanContainer = document.querySelector('.snowman-container');
-                                    snowmanContainer.style.color = '#200000';
-                                    snowmanContainer.style.fontSize = "74px";
-
-                                    setTimeout(() => {{
-                                        const eyes = document.querySelector('.eyes');
-                                        eyes.style.display = 'block';
-                                    }}, 2000);
-
-                                    setTimeout(() => {{
-                                        snowmanContainer.style.color = '#300000';
-                                        snowmanContainer.style.fontSize = "80px";
-                                        setTimeout(() => {{
-                                           msg.textContent = 'Red Snow Men {VERSION}'; 
-                                           msg.style.display = 'block'; 
-                                           msg.style.color = '#300000';
-                                           msg.style.height  = 'auto';
-                                           msg.style.opacity = '1'; 
-                                        }}, 2000);
-                                    }}, 5000);
-                                    
-                                }}, 7000);
-                            }}, 5000);
-                        }}, 25000);
-                    
-                </script>
-            </body>
-            </html>
+        no_devices_html = """
+        <!DOCTYPE html>
+        <html lang="en" style="--accent: #150000;">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>No Devices Found</title>
+            <style>
+                body {
+                    background-color: #1c1d22;
+                    color: #ffffff;
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    transition: background-color 3s ease; /* Плавный переход фона за 3 секунды */
+                }
+                .info-icon {
+                    font-size: 64px;
+                    margin-bottom: 20px;
+                    color: #150000;
+                    width: 10px;
+                    height: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                }
+                .info-icon .background-circle {
+                    display: none; /* Скрыт по умолчанию */
+                    position: absolute;
+                    top: -7px;
+                    width: 15px;
+                    height: 10px;
+                    background-color: #ff0000;
+                    border-radius: 50%;
+                    animation: look 5s infinite;
+                    z-index: -1;
+                }
+                .info-icon .background-moon {
+                    display: none; /* Скрыт по умолчанию */
+                    position: absolute;
+                    top: -30px;
+                    left: 20px;
+                    width: 20px;
+                    height: 20px;
+                    background-color: #ffcc008f;
+                    box-shadow: 0px 0px 7px 0px #ff0000de;
+                    border-radius: 50%;
+                    z-index: -2;
+                    filter: blur(1px);
+                    animation: moon 45s infinite;
+                }
+                @keyframes moon {
+                    0% { opacity: 0; filter: brightness(0%); }
+                    80% { opacity: 0.2; filter: brightness(90%); }
+                    85% { opacity: 0.4; filter: brightness(90%); }
+                    88% { opacity: 0.7; filter: brightness(95%); }
+                    91% { opacity: 0.8; filter: brightness(97%); }
+                    95% { opacity: 0.9; filter: brightness(98%); }
+                    100% { opacity: 1; filter: brightness(100%); }
+                }
+                @keyframes look {
+                    0% { opacity: 1; filter: brightness(70%); }
+                    20% { opacity: 0.3; filter: brightness(10%); }
+                    30% { opacity: 0.3; filter: brightness(10%); }
+                    40% { opacity: 1; filter: brightness(60%); }
+                    45% { opacity: 0.8; filter: brightness(50%); }
+                    60% { opacity: 0.2; filter: brightness(20%); }
+                    80% { opacity: 1; filter: brightness(70%); }
+                    85% { opacity: 0.4; filter: brightness(30%); }
+                    100% { opacity: 1; filter: brightness(70%); }
+                }
+                .message {
+                    margin-top: 30px;
+                    font-size: 24px;
+                    text-align: center;
+                    color: #5e5e5e;
+                    transition: opacity 3s ease; /* Плавное исчезновение за 3 секунды */
+                }
+                .snowman {
+                    display: none; /* Скрыт по умолчанию */
+                    opacity: 0;
+                    transition: opacity 3s ease; /* Плавное появление за 3 секунды */
+                }
+            </style>
+        </head>
+        <body>
+            <div class="info-icon">
+                <div class="background-moon"></div>
+                <div class="background-circle"></div>
+                <span class="snowman">⛇</span>
+            </div>
+            <div class="message">Устройства не обнаружены</div>
+            <script>
+                setTimeout(() => {
+                   
+                    document.body.style.backgroundColor = '#000000';
+                    document.querySelector('.message').style.opacity = '0';
+                    setTimeout(() => {
+                        const snowman = document.querySelector('.snowman');
+                        snowman.style.display = 'inline'; 
+                        setTimeout(() => {
+                            snowman.style.opacity = '1'; 
+                        }, 10); 
+                        setTimeout(() => {
+                            document.querySelector('.info-icon .background-circle').style.display = 'block';
+                        }, 3000);
+                    }, 3000);
+                }, 25000); 
+            </script>
+        </body>
+        </html>
         """
         self.browser.setHtml(no_devices_html, QUrl("http://no-devices/"))
         self.address_input.clear()
+
 
     # Переопределение событий мыши для перемещения окна
     def mousePressEvent(self, event: QMouseEvent):
@@ -3124,13 +2605,13 @@ class WebBrowser(QMainWindow):
         # Масштаб из настроек
         self.browser.setZoomFactor(self.zoom_factor)
 
-#    def focusInEvent(self, event):
-#        print("focusInEvent")
-#        super(WebBrowser, self).focusInEvent(event)
-#
-#    def focusOutEvent(self, event):
-#        print("focusOutEvent")
-#        super(WebBrowser, self).focusOutEvent(event)
+    def focusInEvent(self, event):
+        print("focusInEvent")
+        super(WebBrowser, self).focusInEvent(event)
+
+    def focusOutEvent(self, event):
+        print("focusOutEvent")
+        super(WebBrowser, self).focusOutEvent(event)
 
     def kostyle(self):
         if self.checkbox.isChecked():
@@ -3144,10 +2625,10 @@ class WebBrowser(QMainWindow):
 
     def showEvent(self, event):
         print("showEvent")
-#        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
         super(WebBrowser, self).showEvent(event)
 
-#    def event(self, event):
+    def event(self, event):
 #         if event.type() == QtCore.QEvent.Type.WindowActivate:
 #                 print("WindowActivate")
 #                 if self.hidden_flag:
@@ -3156,7 +2637,7 @@ class WebBrowser(QMainWindow):
 #         elif event.type() == QtCore.QEvent.Type.WindowDeactivate:
 #                 print("WindowDeactivate")
 #                 self.hidden_flag = True  # Поднимаем флаг при сворачивании или уходе на второй план
-#        return super(WebBrowser, self).event(event)
+        return super(WebBrowser, self).event(event)
    
 
     def show_context_menu(self, position):
@@ -3250,7 +2731,7 @@ class WebBrowser(QMainWindow):
                     else:
                         self.address_input.setText(devices[0]['url'])
 
-        self.set_title()
+
 
     def copy_current_url(self):
         url = self.browser.url().toString()
@@ -3308,23 +2789,22 @@ class WebBrowser(QMainWindow):
                 self.load_page(url)
             else:
                 self.load_page(current_text)
-        self.update_always_on_top_checkbox_style()
 
 
-#    def check_current_device(self):
-#        if not self.current_checking_device:
-#            return
-#
-#        def on_finished(is_available):
-#            if is_available:
-#                device_ip = self.current_checking_device
-#                self.check_timer.stop()
-#                self.current_checking_device = None
-#                self.load_page(f"http://{device_ip}/")
-#
-#        # Запускаем проверку доступности
-#       
-#        self.check_device_availability(self.current_checking_device, on_finished)
+    def check_current_device(self):
+        if not self.current_checking_device:
+            return
+
+        def on_finished(is_available):
+            if is_available:
+                device_ip = self.current_checking_device
+                self.check_timer.stop()
+                self.current_checking_device = None
+                self.load_page(f"http://{device_ip}/")
+
+        # Запускаем проверку доступности
+       
+        self.check_device_availability(self.current_checking_device, on_finished)
 
 
     def check_current_device(self):
@@ -3344,33 +2824,18 @@ class Bridge(QObject):
     @pyqtSlot()
     def stop_border_animation(self):
         self.parent().stop_border_animation()
-    
-
-    @pyqtSlot()
-    def blck_color(self):
-        self.parent().no_color = "black" # 
-        self.parent().update() 
-
-    @pyqtSlot(bool)
-    def setSnowMan(self, value):
-        if self.parent():
-            self.parent().snow_man = value
-            print(f"snow_man изменён на: {self.parent().snow_man}")
-            self.parent().save_settings()
-        else:
-            print("Ошибка:setSnowMan родительский объект не найден")
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         
-
         self.setWindowTitle("О программе")
         self.setMinimumSize(400, 400)  # Размер окна
-        self.parent = parent 
 
-        self.parent.set_icon()
-            
+        if NAME == CUSTOM_NAME:
+            self.setWindowIcon(QIcon("g_icon.ico"))
+        else:
+            self.setWindowIcon(QIcon("icon.ico"))
 
         # Layout для окна
         layout = QVBoxLayout()
@@ -3389,20 +2854,13 @@ class AboutDialog(QDialog):
                 """
             )
         else: 
-            if not self.parent.snow_man_swch  or  not self.parent.snow_man: 
-                name = "Remote Settings Management"
-            else :
-                name = "Red Snow Man"
-
             about_text.setText(
                 f"""
-                <h2>{name}</h2>
+                <h2>{NAME} App</h2>
                 <p><b>Версия:</b> {VERSION}</p>
                 <p><b>Автор:</b> Vanila</p>
-                <p><b>Описание:</b> </p>
-                <p>программа для поиска и отображения веб-интерфейса устройств в локальной сети и интернет:</p>
-                <p> • с установленной библиотекой <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
-                <p> • с установленным <a href="https://github.com/wled/WLED">WLED</a></p>
+                <p><b>Описание:</b> программа для поиска и отображения устройств в локальной сети с установленной библиотекой <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
+                <p>так же может искать устройства с <a href="https://github.com/wled/WLED">WLED</a></p>
                 <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings">GitHub</a></p>
                 
                 """
@@ -3421,11 +2879,10 @@ class AboutDialog(QDialog):
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.setWindowTitle("Настройки - RSM")
+        self.setWindowTitle("Настройки")
         self.setMinimumSize(300, 300)  
         self.parent = parent  # Ссылка на WebBrowser
-        self.parent.set_icon()
+        
         # Основной layout
         layout = QVBoxLayout(self)
 
@@ -3434,13 +2891,6 @@ class SettingsDialog(QDialog):
         self.show_names_checkbox.setChecked(self.parent.show_names)
         self.show_names_checkbox.stateChanged.connect(self.update_show_names)
         layout.addWidget(self.show_names_checkbox)
-       
-       
-        
-        self.title_device_checkbox = QCheckBox("Имена - в названии окна", self)
-        self.title_device_checkbox.setChecked(self.parent.title_device)
-        self.title_device_checkbox.stateChanged.connect(self.update_title_device)
-        layout.addWidget(self.title_device_checkbox)
 
         # Чекбокс "Искать устройства WLED"
         self.wled_search_checkbox = QCheckBox("Искать устройства WLED", self)
@@ -3448,19 +2898,12 @@ class SettingsDialog(QDialog):
         self.wled_search_checkbox.stateChanged.connect(self.update_wled_search)
         layout.addWidget(self.wled_search_checkbox)
 
-        if NAME == CUSTOM_NAME and  ONLY_CUSTOM == True :
+        if NAME == CUSTOM_NAME :
             # Чекбокс "Искать только GLUON"
             self.gluon_only_checkbox = QCheckBox(f"Искать только {CUSTOM_NAME}", self)
             self.gluon_only_checkbox.setChecked(self.parent.gluon_only)
             self.gluon_only_checkbox.stateChanged.connect(self.update_gluon_only)
             layout.addWidget(self.gluon_only_checkbox)
-
-        if self.parent.snow_man: 
-            self.snow_man_checkbox = QCheckBox(f"Снеговик", self)
-            self.snow_man_checkbox.setChecked(self.parent.snow_man_swch)
-            self.snow_man_checkbox.stateChanged.connect(self.update_snow_man_swch)
-            layout.addWidget(self.snow_man_checkbox)
-
 
 
         separator = QFrame()
@@ -3477,44 +2920,20 @@ class SettingsDialog(QDialog):
 
 
         # Чекбокс "Свои цвета"
-        self.custom_colors_checkbox = QCheckBox("Свои цвета для всех", self)
+        self.custom_colors_checkbox = QCheckBox("Свои цвета всегда", self)
         self.custom_colors_checkbox.setChecked(self.parent.custom_colors_enabled)
         self.custom_colors_checkbox.stateChanged.connect(self.update_custom_colors)
         layout.addWidget(self.custom_colors_checkbox)
-        
-        # Метка с текущим URL
-        current_url = self.parent.browser.url().toString() or "Нет активного устройства"
-        #self.device_url_label = QLabel(f"Текущее устройство: {current_url}", self)
-        #layout.addWidget(self.device_url_label)
-
-        # Только для открытого устройства
-        self.device_specific_colors_checkbox = QCheckBox("Только для этого устройства", self)
-        custom_colors = self.parent.get_device_custom_colors(current_url)
-        self.device_specific_colors_checkbox.setChecked(
-            custom_colors.get("use_custom_colors", False) if custom_colors else False
-        )
-        self.device_specific_colors_checkbox.setEnabled(
-            current_url != "Нет активного устройства" and not self.parent.custom_colors_enabled
-        )
-        self.device_specific_colors_checkbox.stateChanged.connect(self.update_device_specific_colors)
-        layout.addWidget(self.device_specific_colors_checkbox)
 
         # Кнопка выбора цвета рамки
-        self.border_color_button = QPushButton("", self)
+        self.border_color_button = QPushButton("Цвет рамки по умолчанию", self)
         self.border_color_button.clicked.connect(self.choose_border_color)
-        # Кнопка выбора цвета фона
-        self.back_color_button = QPushButton("", self)
-        self.back_color_button.clicked.connect(self.choose_back_color)
-        # Кнопка выбора цвета нижней части
-        self.bottom_color_button = QPushButton("", self)
-        self.bottom_color_button.clicked.connect(self.choose_bottom_color)
-
-      
-        self.update_button_texts()
         layout.addWidget(self.border_color_button)
+
+        # Кнопка выбора цвета фона
+        self.back_color_button = QPushButton("Цвет фона по умолчанию", self)
+        self.back_color_button.clicked.connect(self.choose_back_color)
         layout.addWidget(self.back_color_button)
-        layout.addWidget(self.bottom_color_button)
-       
 
 
         separator2 = QFrame()
@@ -3559,7 +2978,6 @@ class SettingsDialog(QDialog):
 
 
         self.setLayout(layout)
-        self.parent.url_changed.connect(self.update_on_url_change)
 
     def load_devices_from_file(self):
         if os.path.exists("discovered_devices.json"):
@@ -3608,166 +3026,44 @@ class SettingsDialog(QDialog):
         if self.parent.custom_colors_enabled:
             self.parent.border_color = self.parent.custom_border_color
             self.parent.back_color = self.parent.custom_back_color
-            self.parent.bottom_color = self.parent.custom_bottom_color
         else:
             # Если "Свои цвета" выключены, вызываем получение цветов
             self.parent.get_colors()
         self.parent.update()  # Перерисовываем главное окно
-    
-    def update_button_texts(self):
-        """Обновляет текст кнопок в зависимости от состояния чекбокса."""
-        current_url = self.parent.browser.url().toString()
-        use_device_specific = (self.device_specific_colors_checkbox.isChecked() and 
-                             self.device_specific_colors_checkbox.isEnabled())
-        
-        if use_device_specific:
-            self.border_color_button.setText("Цвет рамки этого устройства")
-            self.back_color_button.setText("Цвет шапки этого устройства")
-            self.bottom_color_button.setText("Цвет подвала этого устройства")
-        else:
-            self.border_color_button.setText("Цвет рамки по умолчанию")
-            self.back_color_button.setText("Цвет шапки по умолчанию")
-            self.bottom_color_button.setText("Цвет подвала по умолчанию")
 
     def choose_border_color(self):
-        current_url = self.parent.browser.url().toString()
-        use_device_specific = (self.device_specific_colors_checkbox.isChecked() and 
-                             self.device_specific_colors_checkbox.isEnabled())
-        
-        initial_color = (QColor(*self.parent.get_device_custom_colors(current_url)["accent"]) 
-                        if use_device_specific and self.parent.get_device_custom_colors(current_url)
-                        else self.parent.custom_border_color)
-        
+        # Диалог выбора цвета рамки
         color = QColorDialog.getColor(
-            initial_color,
+            self.parent.custom_border_color,
             self,
             "Выберите цвет рамки",
             QColorDialog.ColorDialogOption.ShowAlphaChannel
         )
         if color.isValid():
-            if use_device_specific and current_url:
-                custom_colors = self.parent.get_device_custom_colors(current_url) or {}
-                custom_colors["accent"] = [color.red(), color.green(), color.blue(), color.alpha()]
-                self.parent.device_custom_colors[current_url] = custom_colors
-            else:
-                self.parent.custom_border_color = color
+            self.parent.custom_border_color = color
             self.parent.save_settings()
-            self.parent.update_colors()
-
-    def choose_bottom_color(self):
-        current_url = self.parent.browser.url().toString()
-        use_device_specific = (self.device_specific_colors_checkbox.isChecked() and 
-                              self.device_specific_colors_checkbox.isEnabled())
-
-        initial_color = (QColor(*self.parent.get_device_custom_colors(current_url)["bottom"])
-                        if use_device_specific and self.parent.get_device_custom_colors(current_url)
-                        else self.parent.custom_bottom_color)
-
-        color = QColorDialog.getColor(
-            initial_color,
-            self,
-            "Выберите цвет подвала",
-            QColorDialog.ColorDialogOption.ShowAlphaChannel
-        )
-        if color.isValid():
-            if use_device_specific and current_url:
-                custom_colors = self.parent.get_device_custom_colors(current_url) or {}
-                custom_colors["bottom"] = [color.red(), color.green(), color.blue(), color.alpha()]
-                self.parent.device_custom_colors[current_url] = custom_colors
-            else:
-                self.parent.custom_bottom_color = color
-            self.parent.save_settings()
-            self.parent.update_colors()
-
-    def update_on_url_change(self, new_url):
-        current_url = new_url or "Нет активного устройства"
-        custom_colors = self.parent.get_device_custom_colors(current_url)
-        # Отключаем сигнал перед обновлением галочки
-        self.device_specific_colors_checkbox.blockSignals(True)
-        self.device_specific_colors_checkbox.setChecked(
-            custom_colors.get("use_custom_colors", False) if custom_colors else False
-        )
-        self.device_specific_colors_checkbox.setEnabled(
-            current_url != "Нет активного устройства" and not self.parent.custom_colors_enabled
-        )
-        # Включаем сигнал обратно
-        self.device_specific_colors_checkbox.blockSignals(False)
-        self.update_button_texts()
+            self.update_colors()  # Обновить цвета сразу после выбора
 
     def choose_back_color(self):
-        current_url = self.parent.browser.url().toString()
-        use_device_specific = (self.device_specific_colors_checkbox.isChecked() and 
-                              self.device_specific_colors_checkbox.isEnabled())
-
-        initial_color = (QColor(*self.parent.get_device_custom_colors(current_url)["back"])
-                        if use_device_specific and self.parent.get_device_custom_colors(current_url)
-                        else self.parent.custom_back_color)
-
+       #Диалог выбора цвета фона
         color = QColorDialog.getColor(
-            initial_color,
+            self.parent.custom_back_color,
             self,
-            "Выберите цвет шапки",
+            "Выберите цвет фона",
             QColorDialog.ColorDialogOption.ShowAlphaChannel
         )
         if color.isValid():
-            if use_device_specific and current_url:
-                custom_colors = self.parent.get_device_custom_colors(current_url) or {}
-                custom_colors["back"] = [color.red(), color.green(), color.blue(), color.alpha()]
-                self.parent.device_custom_colors[current_url] = custom_colors
-            else:
-                self.parent.custom_back_color = color
+            self.parent.custom_back_color = color
             self.parent.save_settings()
-            self.parent.update_colors()
+            self.update_colors()  # Обновить цвета сразу после выбора
 
     def update_custom_colors(self, state):
         self.parent.custom_colors_enabled = (state == Qt.CheckState.Checked.value)
-        self.device_specific_colors_checkbox.setEnabled(not self.parent.custom_colors_enabled)
         self.parent.save_settings()
-        self.update_button_texts()
-        self.parent.update_colors()
-        self.parent.update_always_on_top_checkbox_style()  # Обновляем стиль чекбокса
-        QTimer.singleShot(100, self.parent.set_icon)
-
-    def update_device_specific_colors(self, state):
-        current_url = self.parent.browser.url().toString()
-        if not current_url or current_url == "Нет активного устройства":
-            return
-        
-        use_custom = (state == Qt.CheckState.Checked.value)
-        custom_colors = self.parent.device_custom_colors.get(current_url, {}).copy()
-        
-        custom_colors["use_custom_colors"] = use_custom
-        if "accent" not in custom_colors:
-            custom_colors["accent"] = [
-                self.parent.custom_border_color.red(),
-                self.parent.custom_border_color.green(),
-                self.parent.custom_border_color.blue(),
-                self.parent.custom_border_color.alpha()
-            ]
-        if "back" not in custom_colors:
-            custom_colors["back"] = [
-                self.parent.custom_back_color.red(),
-                self.parent.custom_back_color.green(),
-                self.parent.custom_back_color.blue(),
-                self.parent.custom_back_color.alpha()
-            ]
-        if "bottom" not in custom_colors:
-            custom_colors["bottom"] = [
-                self.parent.custom_bottom_color.red(),
-                self.parent.custom_bottom_color.green(),
-                self.parent.custom_bottom_color.blue(),
-                self.parent.custom_bottom_color.alpha()
-            ]
-
-        self.parent.device_custom_colors[current_url] = custom_colors
-        self.parent.save_settings()
-        self.update_button_texts()  # Обновляем текст кнопок
-        self.parent.update_colors()
-        self.parent.update_always_on_top_checkbox_style()  # Обновляем стиль чекбокса
-        QTimer.singleShot(100, self.parent.set_icon) 
+        self.update_colors()  # Обновить цвета после изменения состояния
 
     def save_settings(self):
-        self.parent.show_names = self.show_names_checkbox.isChecked()  # 
+        self.parent.show_names = self.show_names_checkbox.isChecked()  # Пример
         self.parent.save_settings()  # Вызываем метод WebBrowser
         
 
@@ -3784,10 +3080,7 @@ class SettingsDialog(QDialog):
                             self.parent.address_input.setText(devices[0]['name'])
                         else:
                             self.parent.address_input.setText(devices[0]['url'])
-    def update_title_device(self, state):
-        self.parent.title_device = (state == Qt.CheckState.Checked.value)
-        self.save_settings()  
-        self.parent.set_title(False)
+        
 
     def update_stay_on_top(self, state):
         stay_on_top = (state == Qt.CheckState.Checked.value)
@@ -3802,13 +3095,9 @@ class SettingsDialog(QDialog):
             # Cостояние gluon_only, нужно для поиска только своих устройств если используется свое имя 
             self.parent.gluon_only = (state == Qt.CheckState.Checked.value)
             self.parent.save_settings()
+
             print(f"GLUON_only updated to: {self.parent.gluon_only}")
-     
-    def update_snow_man_swch(self, state):
-        self.parent.snow_man_swch = (state == Qt.CheckState.Checked.value)
-        self.parent.save_settings()
-        self.parent.set_icon()
-        self.parent.set_title(False)
+
 
 
 

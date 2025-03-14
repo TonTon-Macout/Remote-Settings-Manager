@@ -68,8 +68,9 @@ REM Замена запятых на точки в номере версии (е
 set "version=%version:,=.%"
 echo.
 REM Создаем имя исполняемого файла и папки
-set "exe_name=%name%_app_v%version%"
-set "dir_name=%exe_name%"
+set "exe_name=%name%_v%version%"
+REM set "dir_name=%exe_name%"
+set "dir_name=Settings_app"
 echo Будет создан исполняемый файл: %exe_name%.exe
 echo Имя папки для сборки: %dir_name%
 echo.
