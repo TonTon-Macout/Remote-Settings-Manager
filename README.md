@@ -69,7 +69,7 @@
 
 <h2 id="relise"  > Версии </h2>
 
-ссылка на последнюю версию программы (собранный exe с иконками) [Settings_app.zip](https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest/download/Settings_app.zip)<br> <br> 
+ссылка на последнюю версию программы (собранный exe с иконками) [Settings_app.zip](https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest/download/RSM.exe)<br> <br> 
 + v.0.6.0
   - много мелких обновлений исправлений, еще больше незаметных
     - улучшил внешний вид, добавил функциональности
