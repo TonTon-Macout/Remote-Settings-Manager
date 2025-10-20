@@ -1,9 +1,9 @@
-VERSION = "0.6.1"
+VERSION = "0.6.0"
 NAME = "RSM" # 
 
 TEST_SPLASH = 0.1 # пауза при заполнении прогрес бара
  
-DEBUG = True # вывод в консоль
+DEBUG = False # вывод в консоль
 STAMP = True # префикс со временем
 REPO = "TonTon-Macout/APP-for-AlexGyver-Settings"  # Репо
 
@@ -51,6 +51,8 @@ def resource_path(relative_path):
     else:
         # Если программа запущена как скрипт, используем относительный путь
         return os.path.join(os.path.abspath("."), relative_path)
+
+
 
 class Debug:
     _log_level = "INFO"
@@ -139,6 +141,8 @@ class Debug:
     def brown(cls, message):
         """Выводит сообщение в консоль приглушенным коричневым цветом (8-битная палитра)"""
         cls._print_message(message, "\033[38;5;94m")
+
+
 
 DARK_THEME = """
     /* Базовые стили для всех виджетов */
@@ -504,6 +508,7 @@ class Url:
         except (ValueError, AttributeError):
             return False
 
+   
     @classmethod    
     def check_url(cls, url):
         """Проверяет, является ли URL допустимым и не заглушка ли это\n
@@ -543,6 +548,9 @@ class Url:
             Debug.info("   ^^^[check_url]^^^\n")
             return False
 
+    
+
+
 class WebBrowser(QMainWindow):
     url_changed = pyqtSignal(str)  # Сигнал для уведомления об изменении URL
     def __init__(self, splash=None):
@@ -554,7 +562,7 @@ class WebBrowser(QMainWindow):
             QApplication.processEvents()
             time.sleep(TEST_SPLASH)
 
-        self.check_timeout = 0.7 # в секундах
+        self.check_timeout = 0.5
         self.update_available = False
         self.latest_version = None
         
@@ -620,7 +628,7 @@ class WebBrowser(QMainWindow):
         self.window_height = self.default_height  # Значение по умолчанию задано ранее в __init__
         self.zoom_factor = self.default_zoom_factor  # Значение по умолчанию задано ранее в __init__
         self.custom_colors_enabled = False  # Использовать пользовательские цвета всегда
-        self.check_timeout = 0.7       # Таймаут проверки доступности (в секундах)
+        self.check_timeout = 0.5       # Таймаут проверки доступности (в секундах)
         self.custom_border_color = self.default_border_color  # Изначально используем цвет по умолчанию
         self.custom_back_color = self.default_back_color      # Изначально используем цвет по умолчанию
         self.custom_bottom_color = self.default_bottom_color  # Изначально используем цвет по умолчанию
@@ -1253,7 +1261,7 @@ class WebBrowser(QMainWindow):
                 self.window_width   = settings.get("window_width", 800)  # Ширина окна
                 self.window_height  = settings.get("window_height", 600)  # Высота окна
                 self.zoom_factor    = settings.get("zoom_factor", 1.0)  # Масштаб браузера
-                self.check_timeout  = settings.get("check_timeout", 0.7)  # Таймаут проверки
+                self.check_timeout  = settings.get("check_timeout", 0.5)  # Таймаут проверки
 
                 # Устанавливаем флаг использования пользовательских цветов
                 self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
@@ -3932,7 +3940,7 @@ class WebBrowser(QMainWindow):
 
 
     def check_device_availability(self, url, callback):
-        
+        Debug.purple(f"→→→  [check_device_availability] Асинхронная проверка доступности {url}")
         if not (url.startswith("http://") or url.startswith("https://")):
             url = f"http://{url}"
 
@@ -4173,7 +4181,7 @@ class CheckAvailabilityWorker(QRunnable):
 
             self.url = url
             self.signals = signals
-            self.timeout = timeout*4
+            self.timeout = timeout
 
         except ValueError as e:
             Debug.error(f"Ошибка в CheckAvailabilityWorker: {e}")
@@ -4187,8 +4195,7 @@ class CheckAvailabilityWorker(QRunnable):
             is_ip = Url.is_ip_address(self.url)
 
             timeout = self.timeout if is_ip else max(self.timeout * 10, 3.0)
-            Debug.purple(f"→→→  [CheckAvailabilityWorker] Асинхронная проверка доступности {self.url}, с таймаутом {timeout} секунд")
-           
+
             if is_ip:
                 # Для IP - HTTP проверка
                 response = requests.get(self.url, timeout=timeout, verify=False)
@@ -5212,6 +5219,8 @@ class ScanDialog(QDialog):
         self.update_buttons_state()
 
 
+        
+
     def apply_changes(self):
         current_item = self.device_list.currentItem()
         if current_item:
@@ -5268,6 +5277,9 @@ class ScanDialog(QDialog):
         else:
             QMessageBox.warning(self, "Ошибка", "Выберите устройство для редактирования!")
 
+
+
+
     def get_darker_color(self, color, factor):
         """Возвращает более тёмный оттенок цвета"""
         if isinstance(color, str) and color.startswith('#'):
@@ -5306,6 +5318,10 @@ class ScanDialog(QDialog):
 
         if not base_name or not url: return
 
+
+        
+        
+        
 
     def clear_devices(self):
         self.device_list.clear()
@@ -5504,6 +5520,8 @@ class SubnetHistoryManager:
 
     def get_history(self):
         return self.history
+
+
 SUBNET_HISTORY_MANAGER = SubnetHistoryManager()
 
 
