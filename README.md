@@ -168,7 +168,7 @@
 ```pip install pyinstaller```
 
 установить библиотеки<br>
-```pip install pyinstaller PyQt6 PyQt6-WebEngine psutil requests beautifulsoup4 urllib3 lxml```
+```pip install PyQt6 PyQt6-WebEngine psutil requests beautifulsoup4 urllib3 lxml```
 
 запуск скрипта<br>
 ```python Settings.py```
