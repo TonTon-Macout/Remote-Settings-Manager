@@ -1,9 +1,9 @@
-VERSION = "1.0.0"
+VERSION = "0.6.1"
 NAME = "RSM" # 
 
 TEST_SPLASH = 0.1 # пауза при заполнении прогрес бара
  
-DEBUG = False # вывод в консоль
+DEBUG = True # вывод в консоль
 STAMP = True # префикс со временем
 REPO = "TonTon-Macout/APP-for-AlexGyver-Settings"  # Репо
 
@@ -53,7 +53,8 @@ def resource_path(relative_path):
         return os.path.join(os.path.abspath("."), relative_path)
 
 class Debug:
-    
+    _log_level = "INFO"
+
     @classmethod
     def _print_message(cls, message, color_code, prefix_char=""):
         if not DEBUG:
@@ -810,8 +811,7 @@ class WebBrowser(QMainWindow):
             return        
         
 
-        self.url_color = "#ffffff"
-        
+
         self.update_colors()
         # Запускаем асинхронную проверку типа устройства
         self.check_type_device_async()
@@ -1434,12 +1434,6 @@ class WebBrowser(QMainWindow):
         # Применяем стили
         brightness = self.calculate_brightness(self.accent_color)
         text_color = "#FFFFFF" if brightness < 128 else "#000000"
-        
-
-        
-        
-        
-        
         combined_style = self.get_combined_styles(self.accent_color, text_color)
         self.setStyleSheet(combined_style)
         self.update()
@@ -2737,24 +2731,11 @@ class WebBrowser(QMainWindow):
         if not color or not color.startswith('#'):
             color = "#0078D4"  # Цвет по умолчанию, если цвет не задан
         
-
-        
         back_color = getattr(self, 'back_color', QColor(30, 30, 30, 255))
         back_color_hex = back_color.name(QColor.NameFormat.HexRgb)
         
-        current_url = Url.get_base_url(self.browser.url().toString())
-        device_colors = self.get_device_custom_colors(current_url)
-
-        if (device_colors and device_colors.get("use_custom_colors", False) ) or self.custom_colors_enabled:
-            brightness = self.calculate_brightness(self.back_color) 
-        else: 
-            brightness = self.calculate_brightness(self.back_color.darker(150)) #
-        
-        url_color = "#e3e3e3" if brightness < 150 else "#545454"
-
-        
-        #brightness = self.calculate_brightness(self.back_color.darker(150))
-        #text_address_color = "#e3e3e3" if brightness < 150 else "#545454"
+        brightness = self.calculate_brightness(self.back_color.darker(150))
+        text_address_color = "#e3e3e3" if brightness < 150 else "#545454"
         # Стили для QLineEdit
         line_edit_style = f"""
             QLineEdit {{
@@ -2765,7 +2746,7 @@ class WebBrowser(QMainWindow):
                  /*padding: 6px; */
             }}
             QLineEdit#addressInput {{
-                color: {url_color};  /* Только для address_input */
+                color: {text_address_color};  /* Только для address_input */
                 font-weight: 400;
             }}
             QLineEdit:focus {{
