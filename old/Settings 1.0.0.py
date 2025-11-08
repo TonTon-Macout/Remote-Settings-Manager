@@ -1,4 +1,4 @@
-VERSION = "1.1.1"
+VERSION = "1.0.0"
 NAME = "RSM" # 
 
 TEST_SPLASH = 0.1 # пауза при заполнении прогрес бара
@@ -610,12 +610,10 @@ class WebBrowser(QMainWindow):
         self.title_device = True
         # Инициализируем переменные с значениями по умолчанию до загрузки из файла
         self.show_names = True         # Показывать имена устройств
-        self.gluon_only = True         # Искать только GLUON 
+        self.gluon_only = True         # Искать только GLUON (предполагается из контекста)
         self.wled_search = True        # Искать устройства WLED
-        self.settings_search = True        # Искать устройства WLED
         self.ha_search = True          # Искать устройства Home Assistant
         self.ha_port = 8123            # Порт Home Assistant
-        self.ui_search = True 
 
         self.window_width = self.default_width  # Значение по умолчанию задано ранее в __init__
         self.window_height = self.default_height  # Значение по умолчанию задано ранее в __init__
@@ -641,11 +639,9 @@ class WebBrowser(QMainWindow):
                 # Устанавливаем базовые настройки с учётом значений по умолчанию из экземпляра
                 self.show_names     = settings.get("show_names", self.show_names)
                 self.gluon_only     = settings.get("gluon_only", self.gluon_only)
-                self.settings_search    = settings.get("settings_search", self.settings_search)
                 self.wled_search    = settings.get("wled_search", self.wled_search)
                 self.ha_search      = settings.get("ha_search", True)
                 self.ha_port        = settings.get("ha_port", 8123)
-                self.ui_search      = settings.get("ui_search", True)
                 self.snow_man_swch  = settings.get("snow_man_swch", self.snow_man_swch)
                 self.snow_man       = settings.get("snow_man", self.snow_man)
                 self.title_device   = settings.get("title_device", self.title_device)
@@ -1248,11 +1244,9 @@ class WebBrowser(QMainWindow):
                 # Устанавливаем базовые настройки с значениями по умолчанию
                 self.show_names     = settings.get("show_names", True)  # Показывать имена устройств
                 self.gluon_only     = settings.get("gluon_only", False)  # Искать только GLUON - нет
-                self.settings_search    = settings.get("settings_search", True)  # Искать устройства Settings
                 self.wled_search    = settings.get("wled_search", True)  # Искать устройства WLED
                 self.ha_search      = settings.get("ha_search", True)
                 self.ha_port        = settings.get("ha_port", 8123)
-                self.ui_search      = settings.get("ui_search", True)
                 self.snow_man_swch  = settings.get("snow_man_swch", True)  # Искать устройства WLED
                 self.snow_man       = settings.get("snow_man", False)  # Искать устройства WLED
                 self.title_device   = settings.get("title_device", True)  # Искать устройства WLED
@@ -1324,11 +1318,9 @@ class WebBrowser(QMainWindow):
         settings = {
             "show_names": self.show_names,
             "gluon_only": self.gluon_only,
-            "settings_search": self.settings_search,
             "wled_search": self.wled_search,
             "ha_search": self.ha_search,
             "ha_port": self.ha_port,
-            "ui_search": self.ui_search,
             "snow_man_swch": self.snow_man_swch,
             "snow_man":    self.snow_man,
             "title_device":    self.title_device,
@@ -2173,16 +2165,10 @@ class WebBrowser(QMainWindow):
         QLineEdit.mousePressEvent(self.address_input, event)
 
     def open_menu(self):
-        # Закрываем окно настроек, если оно открыто
-        if hasattr(self, 'dialog') and self.dialog.isVisible():
-            self.dialog.close()
-            
         self.scan_dialog = ScanDialog(self, parent=self)
-        self.scan_dialog.settings_search = self.settings_search
         self.scan_dialog.wled_search = self.wled_search
         self.scan_dialog.ha_search = self.ha_search
         self.scan_dialog.ha_port = self.ha_port
-        self.scan_dialog.ui_search = self.ui_search
 
 
         screen = QApplication.primaryScreen().geometry()
@@ -3899,11 +3885,7 @@ class WebBrowser(QMainWindow):
 
 
     def open_settings_dialog(self):
-        # Закрываем окно сканирования, если оно открыто
-        if hasattr(self, 'scan_dialog') and self.scan_dialog.isVisible():
-            self.scan_dialog.close()
-            
-        self.dialog = SettingsDialog(self)
+        dialog = SettingsDialog(self)
 
         # Получаем размеры экрана
         screen = QApplication.primaryScreen().geometry()
@@ -3912,24 +3894,24 @@ class WebBrowser(QMainWindow):
         # Вычисляем координаты для окна настроек
         settings_x = 0
         # Проверяем, есть ли место слева от главного окна
-        if main_window_pos.left() >= self.dialog.width() + 10:
+        if main_window_pos.left() >= dialog.width() + 10:
             # Размещаем слева
-            settings_x = main_window_pos.left() - self.dialog.width() - 10
+            settings_x = main_window_pos.left() - dialog.width() - 10
         # Проверяем, есть ли место справа от главного окна
-        elif main_window_pos.right() + self.dialog.width() + 10 <= screen.width():
+        elif main_window_pos.right() + dialog.width() + 10 <= screen.width():
             # Размещаем справа
             settings_x = main_window_pos.right() + 10
         else:
             # Если нет места ни слева, ни справа, размещаем по центру главного окна
-            settings_x = main_window_pos.left() + (main_window_pos.width() - self.dialog.width()) // 2
+            settings_x = main_window_pos.left() + (main_window_pos.width() - dialog.width()) // 2
 
         # Вычисляем Y координату (выравнивание по вертикали с главным окном)
         settings_y = main_window_pos.top()
 
         # Устанавливаем позицию окна настроек
-        self.dialog.move(settings_x, settings_y)
-        self.dialog.setWindowFlags(self.dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  # флаг "поверх всех"
-        self.dialog.show()  # открываем
+        dialog.move(settings_x, settings_y)
+        dialog.setWindowFlags(dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)  # флаг "поверх всех"
+        dialog.show()  # открываем
 
 
 
@@ -4061,34 +4043,31 @@ class WorkerSignals(QObject):
     result = pyqtSignal(object)
     value = 0  # Для флага остановки
 class DiscoverWorker(QRunnable):
-    def __init__(self, ip, signals, stop_flag, wled_search=True, ha_search=True, ha_port=8123, ui_search=True, settings_search=True):
+    def __init__(self, ip, signals, stop_flag, wled_search=True, ha_search=True, ha_port=8123):
         super().__init__()
         self.ip = ip
         self.signals = signals
         self.stop_flag = stop_flag
         self.timeout = 0.5
-        self.settings_search = settings_search
         self.wled_search = wled_search
         self.ha_search = ha_search
         self.ha_port = ha_port
-        self.ui_search = ui_search
     
     def run(self):
         try:
             if self.stop_flag.value == 1:
                 return
             # Ищем Settings    
-            if self.settings_search:
-                url = f"http://{self.ip}/settings?action=discover"
-                try:
-                    response = requests.get(url, timeout=self.timeout)
-                    if response.status_code == 200:
-                        data = response.json()
-                        name = data.get('name', '')
-                        self.signals.result.emit(f"{name} at http://{self.ip}/ settings")
-                        return 
-                except requests.RequestException:
-                    pass
+            url = f"http://{self.ip}/settings?action=discover"
+            try:
+                response = requests.get(url, timeout=self.timeout)
+                if response.status_code == 200:
+                    data = response.json()
+                    name = data.get('name', '')
+                    self.signals.result.emit(f"{name} at http://{self.ip}/ settings")
+                    return 
+            except requests.RequestException:
+                pass
             # Wled       
             if self.wled_search:
                 url = f"http://{self.ip}/json/info"
@@ -4098,7 +4077,6 @@ class DiscoverWorker(QRunnable):
                         data = response.json()
                         name = data.get('name', f"WLED_{self.ip}")
                         self.signals.result.emit(f"{name} at http://{self.ip}/ wled")
-                        return
                 except requests.RequestException:
                     pass
 
@@ -4115,67 +4093,10 @@ class DiscoverWorker(QRunnable):
                 except requests.RequestException:
                     pass
                 
-            # Поиск любого веб-интерфейса
-            if self.ui_search:
-                try:
-                    # Получаем содержимое страницы
-                    response = requests.get(f"http://{self.ip}/", timeout=self.timeout, verify=False, allow_redirects=True)
-                    if response.status_code == 200:
-                        soup = BeautifulSoup(response.text, "html.parser") 
-                        title_tag = soup.title.string.strip() if soup.title and soup.title.string else None
-                        og_title = None
-                        meta_title = None 
-                        h1_text = None
-                        header_text = None
-
-                        # og:title и похожие
-                        og = soup.find("meta", property="og:title") or soup.find("meta", attrs={"name": "og:title"})
-                        if og and og.get("content"):
-                            og_title = og.get("content").strip()
-
-                        # meta name="title" или application-name  
-                        mt = soup.find("meta", attrs={"name": "title"}) or soup.find("meta", attrs={"name": "application-name"})
-                        if mt and mt.get("content"):
-                            meta_title = mt.get("content").strip()
-
-                        # og:site_name как запасной meta_title
-                        site_name = soup.find("meta", property="og:site_name")
-                        if site_name and site_name.get("content"):
-                            if not meta_title:
-                                meta_title = site_name.get("content").strip()
-
-                        # h1
-                        h1 = soup.find("h1")
-                        if h1 and h1.get_text(strip=True):
-                            h1_text = h1.get_text(strip=True)
-
-                        # Ищем header или блоки с классами
-                        header_candidates = soup.find_all(lambda tag: tag.name in ["header", "div", "span", "nav"] and tag.get("class"))
-                        for tag in header_candidates:
-                            classes = " ".join(tag.get("class"))
-                            if re.search(r'(header|masthead|site-header|header-title|brand|logo|navbar|branding)', classes, re.I):
-                                txt = tag.get_text(separator=" ", strip=True)
-                                if txt:
-                                    header_text = txt
-                                    break
-                                
-                        # Ищем элемент по id
-                        if not header_text:
-                            header_by_id = soup.find(attrs={"id": re.compile(r'(header|masthead|branding)', re.I)})
-                            if header_by_id:
-                                header_text = header_by_id.get_text(separator=" ", strip=True)
-
-                        # Приоритет выбора имени
-                        name = title_tag or og_title or meta_title or header_text or h1_text or f"Web UI {self.ip}"
-
-                        # Отправляем результат
-                        self.signals.result.emit(f"{name} at http://{self.ip}/ ui")
-
-                except Exception:
-                    pass
+                
                     
         except Exception as e:
-            Debug.error(f"Error in DiscoverWorker: {e}")
+            Debug.info(f"Error in DiscoverWorker: {e}")
         finally:
             self.signals.progress.emit(1)
 
@@ -4426,19 +4347,6 @@ class CheckDeviceTypeWorker(QRunnable):
                 except Exception as e:
                     Debug.error(f"[CheckDeviceTypeWorker] Home Assistant ошибка: {e}")
 
-                # Router detection (новое) — проверяем корневую страницу и заголовки
-                try:
-                    resp = requests.get(base_url + '/', timeout=timeout, verify=False, allow_redirects=True)
-                    if resp.status_code == 200:
-                        text = (resp.text or "").lower()
-                        server_hdr = (resp.headers.get('server') or "").lower()
-                        router_signatures = ['tplink', 'tp-link', 'd-link', 'dlink', 'netgear', 'linksys', 'asus', 'mikrotik', 'openwrt', 'luci', 'gateway', 'router', 'mediatek']
-                        if any(s in text for s in router_signatures) or any(s in server_hdr for s in router_signatures):
-                            Debug.cyan(f"[CheckDeviceTypeWorker] Найден Router")
-                            self.signals.result.emit('router')
-                            return
-                except Exception:
-                    pass
 
             # Если требуется авторизация
             if auth_fond:
@@ -4655,11 +4563,9 @@ class ScanDialog(QDialog):
     def __init__(self, web_browser, parent=None):
         super().__init__(parent)
         Debug.warning("\n=== OPEN ScanDialog ===")
-        self.settings_search = web_browser.settings_search
         self.wled_search = web_browser.wled_search
         self.ha_search = web_browser.ha_search
         self.ha_port = web_browser.ha_port
-        self.ui_search = web_browser.ui_search
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.Dialog)
         self.web_browser = web_browser
         self.setWindowTitle("Поиск и редактирование")
@@ -5030,11 +4936,9 @@ class ScanDialog(QDialog):
                 ip, 
                 signals, 
                 self.stop_flag, 
-                settings_search = self.settings_search,
-                wled_search = self.wled_search,
+                wled_search=self.wled_search,
                 ha_search = self.ha_search,
-                ha_port = self.ha_port,
-                ui_search = self.ui_search
+                ha_port = self.ha_port
             )
             worker.timeout = timeout
             self.threadpool.start(worker)
@@ -5720,10 +5624,9 @@ class AboutDialog(QDialog):
             <p><b>Версия:</b> {VERSION}</p>
             <p><b>Автор:</b> Vanila</p>
             <p><b>Описание:</b> </p>
-            <p>программа для поиска и отображения веб-интерфейсов устройств в локальной сети и интернет:</p>
+            <p>программа для поиска и отображения веб-интерфейса устройств в локальной сети и интернет:</p>
             <p> • с установленной библиотекой <a href="https://github.com/GyverLibs/Settings">AlexGyver Settings</a></p>
             <p> • с установленным <a href="https://github.com/wled/WLED">WLED</a></p>
-            <p> • любых устройств с веб интерфейсом в локальной сети</p>
             <p> • устройств добавленных вручную, в том числе из сети "интернет"</p>
             <p><b>Ссылка на проект:</b> <a href="https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings">GitHub</a></p>
             
@@ -5772,27 +5675,6 @@ class SettingsDialog(QDialog):
         self.title_device_checkbox.setChecked(self.parent.title_device)
         self.title_device_checkbox.stateChanged.connect(self.update_title_device)
         devices_box_layout.addWidget(self.title_device_checkbox)
-        
-        # разделитель
-        separator = QFrame()
-        #separator.setFrameShape(QFrame.Shape.HLine)  # Горизонтальная линия
-        #separator.setFrameShadow(QFrame.Shadow.Sunken)  # Эффект углубления
-        devices_box_layout.addWidget(separator)
-
-        separator.setStyleSheet("""
-            QFrame {
-                background-color: rgba(90, 90, 90, 0.7); 
-                max-height: 2px;
-                margin: 3px 0px 3px 0px;
-            }
-        """)
-        
-        # Чекбокс "Искать устройства Settings"
-        self.settings_checkbox = QCheckBox("Искать устройства Settings", self)
-        self.settings_checkbox.setToolTip("При сканировании будет искать устройства с Settings")
-        self.settings_checkbox.setChecked(self.parent.settings_search)
-        self.settings_checkbox.stateChanged.connect(self.update_settings_search)
-        devices_box_layout.addWidget(self.settings_checkbox)
        
         # Чекбокс "Искать устройства WLED"
         self.wled_search_checkbox = QCheckBox("Искать устройства WLED", self)
@@ -5808,7 +5690,6 @@ class SettingsDialog(QDialog):
         self.homeassistant_search_checkbox.stateChanged.connect(self.update_ha_search)
         devices_box_layout.addWidget(self.homeassistant_search_checkbox)
         
-
 
         # Поле ввода порта Home Assistant
         ha_port_layout = QHBoxLayout()
@@ -5828,40 +5709,21 @@ class SettingsDialog(QDialog):
         devices_box_layout.addWidget(self.ha_port_widget)
 
 
-        # Чекбокс "Искать "
-        self.ui_search_checkbox = QCheckBox("Искать все", self)
-        self.ui_search_checkbox.setToolTip("При сканировании будет искать все устройства с доступным веб интерфейсом")
 
-        # Сначала подключаем обработчики
-        self.ui_search_checkbox.stateChanged.connect(self.update_search_checkboxes)
-        self.ui_search_checkbox.stateChanged.connect(self.update_ui_search)
-
-        # Устанавливаем начальное значение
-        self.ui_search_checkbox.setChecked(self.parent.ui_search)
-
-        
-        
-
-
-
-        devices_box_layout.addWidget(self.ui_search_checkbox)
+ 
+ 
         devices_box.setLayout(devices_box_layout)
         layout.addWidget(devices_box)
-        
 
-        self.update_search_checkboxes(self.parent.ui_search)
-        
         # Чекбокс "Поверх окон"
         #self.stay_on_top_checkbox = QCheckBox("Поверх окон", self)
         #self.stay_on_top_checkbox.setChecked(self.parent.checkbox.isChecked())
         #self.stay_on_top_checkbox.stateChanged.connect(self.update_stay_on_top)
         #layout.addWidget(self.stay_on_top_checkbox)
-        #separator = QFrame()
-        #separator.setFrameShape(QFrame.Shape.HLine)  # Горизонтальная линия
-        #separator.setFrameShadow(QFrame.Shadow.Sunken) 
-        #layout.addWidget(separator)
-        
-
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)  # Горизонтальная линия
+        separator.setFrameShadow(QFrame.Shadow.Sunken) 
+        layout.addWidget(separator)
 
         colors_box = QGroupBox("Цвета", self)
         colors_box_layout = QVBoxLayout()
@@ -5981,48 +5843,7 @@ class SettingsDialog(QDialog):
         self.adjustSize()  
         self.parent.save_settings()
 
-    def update_search_checkboxes(self, state):
-        """Обновляет визуал и блокировку зависимых чекбоксов при изменении 'Искать все'"""
-        try:
-            is_checked = (int(state) == int(Qt.CheckState.Checked))
-        except Exception:
-            is_checked = bool(state)
 
-        if is_checked:
-            # Включаем флаги в родителе (чтобы логика поиска знала)
-            self.parent.settings_search = True
-            self.parent.wled_search = True
-            self.parent.ha_search = True
-
-            # Ставим галочки и блокируем, делаем текст серым
-            for cb in (self.settings_checkbox, self.wled_search_checkbox, self.homeassistant_search_checkbox):
-                cb.blockSignals(True)
-                cb.setChecked(True)
-                cb.blockSignals(False)
-                cb.setEnabled(False)
-                cb.setStyleSheet("""
-                    QCheckBox { color: #888888; }
-                """)
-        else:
-            # Разблокируем, НЕ снимаем галочки, восстанавливаем стиль
-            for cb in (self.settings_checkbox, self.wled_search_checkbox, self.homeassistant_search_checkbox):
-                cb.setEnabled(True)
-                cb.setStyleSheet("""
-                    QCheckBox { color: #FFFFFF; }
-                     
-                """)
-
-        # Видимость порта HA всегда по реальному состоянию HA-чекбокса
-        self.ha_port_widget.setVisible(self.homeassistant_search_checkbox.isChecked())
-
-        # Сохраняем ui_search в родителе и сохраняем настройки
-        self.parent.ui_search = self.ui_search_checkbox.isChecked()
-        self.parent.save_settings()
-
-    def update_ui_search(self):
-        # Только сохраняем флаг "Искать все" — визуальные изменения делает update_search_checkboxes
-        self.parent.ui_search = self.ui_search_checkbox.isChecked()
-        self.parent.save_settings()
 
 
     def update_ha_port(self):
@@ -6354,14 +6175,6 @@ class SettingsDialog(QDialog):
 
 
 
-
-    
-    def update_settings_search(self, state):
-        self.parent.settings_search = (state == Qt.CheckState.Checked.value)
-        self.parent.save_settings()
-
-        Debug.info(f"Settings updated to: {self.parent.settings_search}")
-        
     def update_wled_search(self, state):
         self.parent.wled_search = (state == Qt.CheckState.Checked.value)
         self.parent.save_settings()
