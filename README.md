@@ -71,7 +71,7 @@
 
 <h2 id="relise"  > Версии </h2>
 
-ссылка на последнюю версию программы (собранный exe) [RSM.exe](https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest/download/RSM.exe)<br> <br> 
+ссылка на скачивание последней версии программы (собранный exe) (https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest)<br> <br> 
 + v1.1.1
   -  добавил поиск любого веб-интерфейса в локальной сети
 + v1.0.0
