@@ -9,6 +9,7 @@
 
 
 ## Версия Android
+### Для Android 11 и выше
 <div align="left">
   <a href="#">
   <img src="https://img.shields.io/badge/Android-%23727272?style=flat&logoColor=white"
