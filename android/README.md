@@ -10,7 +10,7 @@
 
 ## Версия Android
 <div align="left">
-  <a href=".README.md">
+  <a href="#">
   <img src="https://img.shields.io/badge/Android-%23727272?style=flat&logoColor=white"
        width="100" height="35" alt="Android">
 </a>
