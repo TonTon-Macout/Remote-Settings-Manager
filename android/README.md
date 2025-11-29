@@ -24,3 +24,35 @@
   
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
+
+-----------------------
+
+<img width="4824" height="2412" alt="Без имени-2" src="https://github.com/user-attachments/assets/02c23b5c-aefa-413c-9d92-d2c38720275f" />
+
+
+## Возможности приложения:
++ поиск в локальной сети и отображение устройств, с  **Settings**, **WLED**, **Home Assistant**, любых других доступных вебинтерфейсов
+  + добавление веб-интерфейсов устройств вручную
+    - можно добавить сайт, надпример alexgyver.ru и добавить его как устройство
++ удобное переключение между устройствами
++ ярлык с именем открытого устройсво
+  + можно перемещать вверх вниз по экрану свайпом влево
+  + жестом вправо можно задвинуть, если мешает имя
++ список устройсв находится в видвигающейся снизу слайдпанели
+  + выдвигается по клику на ярлык, а если отключен то по кнопке или жесту назад
++ автоопределение подсети
+  + можно ввести вручную  
++ возможность переименовать устройства
++ несколько тем приложения
+  
+
+
+<h2 id="relise"  > Версии </h2>
+
+ссылка на скачивание последней версии программы (собранный apk) (https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1)<br> <br> 
++ v1.1.1
+  - тест релиз
+
+<br>
+
+
