@@ -21,6 +21,9 @@
 </a>
 </div>
 
+<a href="[./README.md](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1)"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="APK Latest"></a>
+<a href="[./README.md](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1)"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+
 
 
 --------------
