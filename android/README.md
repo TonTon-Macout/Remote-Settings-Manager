@@ -19,3 +19,7 @@
        width="100" height="35" alt="Windows">
 </a>
 </div>
+
+-----------------------
+
+Ссылка на последний    <a href="[./README.md](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1)"><img src="https://img.shields.io/badge/APK-latest-brightpurple?style=flat" alt="APK Latest"></a>
