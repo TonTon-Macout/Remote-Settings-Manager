@@ -15,7 +15,7 @@
        width="100" height="35" alt="Android">
 </a>
 <a href="/README.md">
-  <img src="https://img.shields.io/badge/Windows-%2371C035?style=flat&logoColor=white"
+  <img src="https://img.shields.io/badge/Windows-%230078D6?style=flat&logoColor=white"
        width="100" height="35" alt="Windows">
 </a>
 </div>
