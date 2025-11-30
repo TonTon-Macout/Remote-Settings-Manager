@@ -21,8 +21,8 @@
 </a>
 </div>
 
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="APK Latest"></a>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 
 
 
@@ -81,7 +81,7 @@
 
 <h2 id="relise"  > Версии </h2>
 
-ссылка на скачивание последней версии программы (собранный exe) (https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest)<br> <br> 
+ссылка на последнюю версию программы (https://github.com/TonTon-Macout/APP-for-AlexGyver-Settings/releases/latest)<br> <br> 
 + v1.1.1
   -  добавил поиск любого веб-интерфейса в локальной сети
 + v1.0.0
