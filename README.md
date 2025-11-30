@@ -1,4 +1,4 @@
-# Remote Settings Management
+# Remote Settings Manager 
 
 ### Приложение для поиска в локальной сети и отображения вебморды устройств
 + с установленной библиотекой [Settings AlexGyver](https://github.com/GyverLibs/Settings) 
