@@ -8,7 +8,7 @@
 + и вебморд устройств добавленных вручную, в.т.ч. и с доступом из сети интернет </br></br>
 
 
-## Версия для Windows
+------------------------------
 
 <div align="left">
 <a href="#">
@@ -21,12 +21,19 @@
 </a>
 </div>
 
+
+
+<br>
+
+
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 
 
 
---------------
+<br>
+
+## Версия для Windows
 
 Программа написанна на Python, exe можно собрать самому из скрипта, [инструкция ниже ↓](#compiler)<br> 
 Или скачать скомпилированный exe, [последняя версия  ↓](#relise)<br><br>
