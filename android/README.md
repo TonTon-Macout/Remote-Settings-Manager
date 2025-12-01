@@ -50,7 +50,9 @@
 
 <h2 id="relise"  > Версии </h2>
 
-ссылка на скачивание последней версии программы (собранный apk) (https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.1)<br> <br> 
+ссылка на скачивание последней версии программы (собранный apk) (https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4)<br> <br> 
++ [1.1.4](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4)
+  + мелкие улучшения и исправления косяков
 + v1.1.1
   - тест релиз
 
