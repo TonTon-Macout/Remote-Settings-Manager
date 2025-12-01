@@ -7,9 +7,9 @@
 + любых устройсв с доступным веб интерфейсом (роутеры, принтеры, самоделки etc.)
 + и вебморд устройств добавленных вручную, в.т.ч. и с доступом из сети интернет </br></br>
 
+-----------------------
 
-## Версия Android
-### Для Android 11 и выше
+
 <div align="left">
   <a href="#">
   <img src="https://img.shields.io/badge/Android-%23727272?style=flat&logoColor=white"
@@ -21,12 +21,18 @@
 </a>
 </div>
 
------------------------
+<br>
   
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
------------------------
+
+<br>
+
+## Версия Android (11 и выше)
+
+
+
 
 <img width="4824" height="2412" alt="Без имени-2" src="https://github.com/user-attachments/assets/02c23b5c-aefa-413c-9d92-d2c38720275f" />
 
