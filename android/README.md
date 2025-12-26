@@ -29,7 +29,7 @@
 
 <br>
   
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.0"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
 
