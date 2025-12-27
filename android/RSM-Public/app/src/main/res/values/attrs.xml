@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ГЛАВНАЯ -->
+    <!-- Заголовок выпадающей панели -->
+    <attr name="headerBackgroundSrc" format="reference" />
+    <!-- цвет фона выпадающей панели (когда моно тема) -->
+    <attr name="headerBackground" format="color" />
+
+    <!-- фон кнопки в выпадающей панли -->
+    <attr name="buttonBackground" format="reference" />
+    <!-- цвет кнолпки в выпадающей панели -->
+    <attr name="buttonBackgroundTint" format="color" />
+    <!-- цвет текста кнопки в выпадающей панели -->
+    <attr name="textButtonBackgroundTint" format="color" />
+    <!-- цвет обводки кнолпки в выпадающей панели и адресной строки -->
+    <attr name="buttonStrokeTint" format="color" />
+
+    <!-- цвет адресной строки в выпадающей панели -->
+    <attr name="addressBackgroundTint" format="color"/>
+    <!-- цвет текста адресной строки в выпадающей панели -->
+    <attr name="textAddressBackgroundTint" format="color"/>
+
+
+
+    <!-- цвет текста устройства  в выпадающей панели -->
+    <attr name="textDeviceTint" format="color" />
+    <!-- цвет иконки  устройства  в выпадающей панели -->
+    <attr name="textDeviceIconsTint" format="color" />
+    <!-- цвет разделителя  в выпадающей панели -->
+    <attr name="deviceDividerBackground" format="color" />
+
+    <!-- УСТРОЙСТВА -->
+    <!-- Заголовок -->
+    <attr name="headerScanBackgroundSrc" format="reference" />
+    <!-- цвет кнолпки  -->
+    <attr name="buttonScanBackgroundTint" format="color" />
+    <!-- фон кнопки  -->
+    <attr name="buttonScanBackground" format="reference" />
+    <!-- цвет обводки кнолпки в выпадающей панели -->
+    <attr name="buttonScanStrokeTint" format="color" />
+
+    <!-- цвет текста кнопки -->
+    <attr name="textButtonScanBackgroundTint" format="color" />
+    <!-- цвет текста устройства -->
+    <attr name="textScanDeviceTint" format="color" />
+
+    <!-- фон нового устройства -->
+    <attr name="newDeviceScanBackground" format="reference" />
+    <!-- цвет нового устройства (центр) -->
+    <attr name="newDeviceScanTint" format="color" />
+
+
+
+    <!-- цвет разделителя устройства -->
+    <attr name="deviderDeviceScanTint" format="color" />
+    <!-- цвет текста в параметрах -->
+    <attr name="textScanTint" format="color" />
+
+
+
+    <!-- НАСТРОЙКИ -->
+    <!-- Заголовок -->
+    <attr name="headerSettingsBackground" format="reference" />
+    <!-- цвет  -->
+    <attr name="SettingsBackgroundTintBottom" format="color" />
+    <attr name="SettingsBackgroundTintTop" format="color" />
+    <attr name="SettingsBackgroundTintAngle" format="integer" />
+
+    <!-- цвет знака вопроса в настройках и устройствах  -->
+    <attr name="questionTint" format="color" />
+
+
+
+
+
+
+
+
+
+
+
+    <!-- МОНОТЕМА -->
+    <attr name="monoBaseColor" format="color|reference" />
+    <attr name="monoTextColor" format="color|reference" />
+    <attr name="monoButtonColor" format="color|reference" />
+    <attr name="monoButtonTextColor" format="color|reference" />
+    <attr name="monoButtonStrokeColor" format="color|reference" />
+
+</resources>

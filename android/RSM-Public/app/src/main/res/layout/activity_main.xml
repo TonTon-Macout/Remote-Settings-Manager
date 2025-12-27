@@ -1,0 +1,982 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="false"
+    android:paddingTop="0dp"
+    app:umanoFabMode="leave_behind"
+    tools:background="#00000000"
+    tools:context=".MainActivity">
+
+    <eightbitlab.com.blurview.BlurTarget
+        android:id="@+id/target"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        app:umanoDragView="@+id/dragView"
+        app:umanoFadeColor="?attr/headerBackground"
+        app:umanoInitialState="collapsed"
+        app:umanoOverlay="true"
+        app:umanoPanelHeight="0dp"
+        app:umanoParallaxOffset="270dp"
+        app:umanoScrollableView="@+id/devices_list"
+        app:umanoShadowHeight="0dp"
+
+        tools:layout_marginTop="500dp"
+        tools:umanoFadeColor="#D71212"
+        tools:umanoInitialState="expanded"
+        tools:umanoPanelHeight="900dp"
+
+        >
+
+        <!-- MAIN CONTENT -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="50dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                    <WebView
+                        android:id="@+id/web_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:backgroundTint="@color/white"
+                        tools:visibility="gone"
+
+                        />
+
+
+
+                <!-- Плейсхолдер "Нет устройств велком" -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/placeholder_no_devices_welcome"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    android:orientation="vertical"
+
+                    android:visibility="gone"
+
+                    >
+
+                    <!--                    android:src="@drawable/anim_no_device_welcome"   -->
+                    <!--                    android:src="@drawable/welcome_no_devices"-->
+                    <ImageView
+                        android:id="@+id/image_nodevices_welcome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:clickable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:onClick="playAnimWelcome"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/anim_no_device_welcome"
+
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintBottom_toTopOf="@+id/text_nodevices_welcome"
+
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintWidth_max="400dp" />
+
+                    <TextView
+                        android:id="@+id/text_nodevices_welcome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Добро пожаловать!"
+                        android:textColor="#ABABAB"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+
+                        app:layout_constraintBottom_toTopOf="@+id/btn_add_device_conts_welcome"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/image_nodevices_welcome" />
+
+                    <com.lihang.ShadowLayout
+                        android:id="@+id/btn_add_device_conts_welcome"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="16dp"
+                        android:transitionName="button_transition"
+
+                        app:hl_angle="0"
+                        app:hl_cornerRadius="22dp"
+                        app:hl_shadowColor="#9AA2A2A2"
+
+                        app:hl_shadowLimit="16dp"
+                        app:hl_shadowOffsetX="0dp"
+
+
+                        app:hl_shadowOffsetY="0dp"
+                        app:hl_strokeColor="#FFFFFF"
+                        app:hl_strokeWith="4dp"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_nodevices_welcome">
+
+                        <com.lihang.SmartLoadingView
+                            android:id="@+id/btn_add_devices_welcome"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:background="#F8EFEF"
+
+
+                            android:elevation="8dp"
+                            android:onClick="openScanButton"
+
+                            android:paddingHorizontal="16dp"
+
+                            android:paddingVertical="8dp"
+
+                            android:shadowColor="#87000000"
+
+
+                            android:shadowDx="0"
+                            android:shadowDy="0"
+
+                            android:shadowRadius="32"
+                            android:text=" Поиск устройств "
+
+                            android:textColor="#AD9B93"
+
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+
+
+                            app:cornerRadius="22dp"
+
+
+                            app:hl_animaled_text=" Поиск устройств "
+                            app:hl_button_type="smart_button"
+                            app:hl_corners_radius="22dp"
+                            app:hl_unEnabled_background="#346CA460"
+
+
+                            />
+                    </com.lihang.ShadowLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Плейсхолдер "Нет устройств" -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/placeholder_no_devices"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    android:orientation="vertical"
+
+                    android:visibility="gone"
+
+                    >
+
+                    <ImageView
+                        android:id="@+id/image_nodevice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/no_devises_anim"
+
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintBottom_toTopOf="@+id/text_nodevice"
+
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintWidth_max="400dp" />
+
+                    <TextView
+                        android:id="@+id/text_nodevice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text=" "
+                        android:textColor="#ABABAB"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+
+                        app:layout_constraintBottom_toTopOf="@+id/btn_add_device_cont"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/image_nodevice" />
+
+                    <com.lihang.ShadowLayout
+                        android:id="@+id/btn_add_device_cont"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="16dp"
+                        android:transitionName="button_transition"
+
+                        app:hl_angle="0"
+                        app:hl_cornerRadius="22dp"
+                        app:hl_shadowColor="#9AA2A2A2"
+
+                        app:hl_shadowLimit="16dp"
+                        app:hl_shadowOffsetX="0dp"
+
+
+                        app:hl_shadowOffsetY="0dp"
+                        app:hl_strokeColor="#FFFFFF"
+                        app:hl_strokeWith="4dp"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_nodevice">
+
+                        <com.lihang.SmartLoadingView
+                            android:id="@+id/btn_add_device"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:background="#F8EFEF"
+
+
+                            android:elevation="8dp"
+                            android:onClick="openScanButton"
+
+                            android:paddingHorizontal="16dp"
+
+                            android:paddingVertical="8dp"
+
+                            android:shadowColor="#87000000"
+
+
+                            android:shadowDx="0"
+                            android:shadowDy="0"
+
+                            android:shadowRadius="32"
+                            android:text=" Поиск устройств "
+
+                            android:textColor="#AD9B93"
+
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+
+
+                            app:cornerRadius="22dp"
+
+
+                            app:hl_animaled_text=" Поиск устройств "
+                            app:hl_button_type="smart_button"
+                            app:hl_corners_radius="22dp"
+                            app:hl_unEnabled_background="#346CA460"
+
+
+                            />
+                    </com.lihang.ShadowLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Плейсхолдер "Устройство недоступно" -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/placeholder_device_unavailable"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="invisible">
+
+                    <TextView
+                        android:id="@+id/error_text"
+                        android:layout_width="270dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bubble"
+                        android:elevation="8dp"
+
+                        android:gravity="center"
+                        android:minHeight="140dp"
+
+                        android:paddingHorizontal="16dp"
+
+                        android:paddingTop="16dp"
+
+                        android:paddingBottom="26dp"
+
+                        android:text="Ошибка: Что-то пошло не так"
+                        android:textColor="#AD9B93"
+                        android:visibility="invisible"
+
+
+                        app:layout_constraintBottom_toTopOf="@+id/image_unavailable"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <ImageView
+                        android:id="@+id/image_unavailable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:clickable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:onClick="egg"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/no_connection"
+
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintBottom_toTopOf="@+id/text_unavailable"
+
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/error_text"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintWidth_max="400dp"
+
+                        />
+
+                    <TextView
+                        android:id="@+id/text_unavailable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Устройство недоступно"
+                        android:textColor="#ABABAB"
+                        android:textSize="18sp"
+
+                        app:layout_constraintBottom_toTopOf="@+id/btn_reload_cont"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/image_unavailable" />
+
+
+                    <com.lihang.ShadowLayout
+                        android:id="@+id/btn_reload_cont"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="16dp"
+                        android:transitionName="button_transition"
+
+                        app:hl_angle="0"
+                        app:hl_cornerRadius="22dp"
+                        app:hl_shadowColor="#9AA2A2A2"
+
+                        app:hl_shadowLimit="16dp"
+                        app:hl_shadowOffsetX="0dp"
+
+
+                        app:hl_shadowOffsetY="0dp"
+                        app:hl_strokeColor="#FFFFFF"
+                        app:hl_strokeWith="4dp"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_unavailable">
+                        <!--                    android:background="#F8EFEF"-->
+                        <com.lihang.SmartLoadingView
+                            android:id="@+id/btn_reload"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:background="#F8EFEF"
+
+
+                            android:elevation="8dp"
+                            android:onClick="openReloadButton"
+
+
+                            android:paddingHorizontal="16dp"
+
+                            android:paddingVertical="8dp"
+
+
+                            android:shadowColor="#87000000"
+                            android:shadowDx="0"
+
+                            android:shadowDy="0"
+                            android:shadowRadius="32"
+
+
+                            android:text=" Обновить "
+                            android:textColor="#AD9B93"
+
+
+                            android:textSize="12sp"
+
+
+                            android:textStyle="bold"
+                            app:cornerRadius="22dp"
+                            app:hl_button_type="smart_button"
+                            app:hl_corners_radius="22dp"
+
+
+                            />
+
+                    </com.lihang.ShadowLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </FrameLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- SLIDING LAYOUT -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:visibility="visible"
+
+            >
+
+
+            <!-- Фоновое изображение -->
+            <ImageView
+                android:id="@+id/header_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitStart"
+                android:src="?attr/headerBackgroundSrc"
+
+                tools:src="@drawable/header_background_yellow"
+                tools:visibility="visible" />
+
+            <!-- Основной контент поверх изображения -->
+            <LinearLayout
+                android:id="@+id/dragView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:focusable="false"
+
+
+                android:orientation="vertical"
+                android:paddingTop="30dp"
+
+                tools:background="#B11F1F">
+
+                <!-- Заголовок -->
+                <LinearLayout
+                    android:id="@+id/titlebar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_gravity="end"
+                    android:backgroundTint="@android:color/transparent"
+                    android:orientation="horizontal"
+
+                    tools:backgroundTint="#C51919"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@android:color/transparent"
+                        android:orientation="horizontal">
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Кнопки управления -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/btn_devices"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="?attr/buttonBackground"
+                        android:elevation="4dp"
+                        android:gravity="center"
+
+                        android:text="Устройства"
+                        android:textColor="?attr/textButtonBackgroundTint"
+
+                        app:cornerRadius="22dp" />
+
+                    <TextView
+                        android:id="@+id/btn_settings"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="?attr/buttonBackground"
+                        android:elevation="4dp"
+                        android:gravity="center"
+                        android:text="Настройки"
+                        android:textColor="?attr/textButtonBackgroundTint"
+
+                        />
+                </LinearLayout>
+
+                <!-- адресная область -->
+                <LinearLayout
+                    android:id="@+id/address_area_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+
+                    tools:visibility="visible"
+
+
+                    >
+
+
+                    <!-- сеть -->
+                    <FrameLayout
+                        android:id="@+id/spinner_network_container"
+                        android:layout_width="0dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="3dp"
+                        android:layout_weight="100"
+                        android:background="@drawable/network_spiner_background"
+                        android:gravity="center_vertical"
+
+                        android:minWidth="28dp"
+                        android:visibility="visible"
+                        tools:visibility="visible"
+
+
+                        >
+
+
+                        <Spinner
+                            android:id="@+id/spinner_network"
+                            android:layout_width="187dp"
+                            android:layout_height="match_parent"
+
+
+                            android:background="@android:color/transparent"
+                            android:dropDownWidth="wrap_content"
+                            android:dropDownHorizontalOffset="200dp"
+
+                            android:dropDownVerticalOffset="30dp"
+                            android:ellipsize="end"
+
+                            android:gravity="center_vertical"
+                            android:paddingVertical="0dp"
+                            android:paddingStart="32dp"
+
+                            android:paddingEnd="12dp"
+                            android:popupBackground="@drawable/spinner_dropdown_background"
+
+                            android:popupElevation="4dp"
+                            android:singleLine="true"
+
+                            app:helperText="выберите сеть"
+                            app:placeholderText="сеть"
+
+                            />
+                        <!--                                android:src="@drawable/baseline_arrow_left_24"-->
+
+
+                        <!-- тип разделения сети / соответсвие  -->
+                        <ImageView
+                            android:id="@+id/split_network_manual"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:layout_gravity="start|center_vertical"
+                            android:layout_marginStart="2dp"
+
+
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:src="@drawable/ic_wifi_circle"
+                            tools:tint="#2E7A33"
+
+                            />
+                        <!-- стрелка вниз -->
+                        <ImageView
+                            android:id="@+id/arrow"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginEnd="12dp"
+
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="?attr/textAddressBackgroundTint" />
+
+
+                        <!-- количество устройств -->
+                        <TextView
+                            android:id="@+id/device_count"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="start|center_vertical"
+                            android:layout_marginHorizontal="3dp"
+                            android:layout_marginVertical="2dp"
+                            android:alpha="1"
+                            android:background="@drawable/network_spiner_background"
+                            android:gravity="center"
+                            android:minWidth="22dp"
+                            android:minHeight="22dp"
+                            android:text="0"
+                            android:textColor="?attr/textAddressBackgroundTint"
+
+                            android:textSize="10sp"
+                            tools:textColor="#B10D0D"
+
+                            />
+
+                    </FrameLayout>
+
+                    <!-- адресное + добавить -->
+                    <LinearLayout
+                        android:id="@+id/url_autocomplete_input_container"
+                        android:layout_width="0dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="3dp"
+                        android:layout_weight="100"
+
+                        android:clipChildren="false"
+
+                        android:clipToPadding="false"
+                        android:gravity="center_vertical"
+
+                        android:minWidth="28dp"
+                        android:orientation="horizontal">
+                        <!-- адресное поле -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="28dp"
+                            android:layout_weight="1">
+                            <!-- адресное поле    -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+
+                                android:background="@drawable/network_spiner_background"
+                                android:orientation="horizontal"
+                                app:cardBackgroundColor="@android:color/transparent"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp"
+
+                                >
+
+                                <!--
+                                app:boxBackgroundColor="?attr/addressBackgroundTint"
+                                app:boxStrokeColor="@color/text_input_stroke_color"
+                                android:layout_marginTop="3dp"
+                                -->
+                                <com.google.android.material.textfield.TextInputLayout
+
+                                    style="@style/CustomOutlinedBoxStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+
+
+                                    app:boxBackgroundColor="#00000000"
+                                    app:boxBackgroundMode="outline"
+                                    app:boxCornerRadiusBottomEnd="22dp"
+                                    app:boxCornerRadiusBottomStart="22dp"
+                                    app:boxCornerRadiusTopEnd="22dp"
+                                    app:boxCornerRadiusTopStart="22dp"
+                                    app:boxStrokeColor="@color/text_input_stroke_color"
+                                    app:boxStrokeWidth="0dp"
+                                    app:hintTextColor="@color/hint_text_color_selector"
+
+
+                                    >
+
+                                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                        android:id="@+id/url_autocomplete_input"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:imeOptions="actionGo"
+                                        android:inputType="textUri"
+
+                                        android:paddingVertical="5dp"
+                                        android:paddingStart="32dp"
+                                        android:paddingEnd="12sp"
+                                        android:textColor="?attr/textAddressBackgroundTint"
+
+                                        android:textColorHint="#A0A0A0"
+                                        android:textSize="14sp" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                            </LinearLayout>
+
+                            <!--значек соединения -->
+                            <ImageView
+                                android:id="@+id/connection_type"
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_gravity="start|center_vertical"
+                                android:layout_marginStart="2dp"
+
+
+                                android:clickable="false"
+                                android:focusable="false"
+                                android:src="@drawable/ic_http"
+                                tools:tint="#2E7A33"
+
+                                />
+
+                        </FrameLayout>
+
+                        <!-- кнопка добавить / кнопка обновить -->
+                        <FrameLayout
+                            android:id="@+id/add_refresh_contqiner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible"
+
+
+                            >
+
+                            <!-- кнопка добавить -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/add_device_button"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="6dp"
+
+                                android:background="@drawable/add_button_background"
+                                android:onClick="addDevice"
+
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:textSize="12sp"
+                                android:visibility="gone"
+
+                                app:backgroundTint="@null" />
+
+                            <!-- кнопка обновить -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/refresh_device_button"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="6dp"
+
+                                android:background="@drawable/refresh_button_beckground"
+                                android:gravity="center"
+                                android:onClick="refreshDevice"
+
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:textSize="12sp"
+                                android:visibility="gone"
+                                app:backgroundTint="@null"
+
+                                tools:visibility="visible" />
+                        </FrameLayout>
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <com.lihang.ShadowLayout
+                    android:id="@+id/devices_list_cont"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:layout_marginStart="-4dp"
+                    android:layout_marginEnd="-4dp"
+                    android:layout_marginBottom="-4dp"
+
+                    android:clipChildren="false"
+                    app:hl_angle="0"
+                    app:hl_cornerRadius_leftTop="32dp"
+                    app:hl_cornerRadius_rightTop="32dp"
+                    app:hl_shadowColor="#8F1B1B1B"
+                    app:hl_shadowLimit="4dp"
+
+
+                    app:hl_shadowOffsetX="0dp"
+                    app:hl_shadowOffsetY="0dp"
+
+                    app:hl_strokeWith="0dp"
+
+                    tools:visibility="gone">
+                    <!-- Список устройств -->
+                    <ListView
+                        android:id="@+id/devices_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/slide_panel_background"
+                        android:clipToPadding="false"
+                        android:divider="@null"
+                        android:dividerHeight="1dp"
+                        android:paddingTop="20dp"
+
+                        tools:visibility="gone"
+
+
+                        />
+
+                </com.lihang.ShadowLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+    </eightbitlab.com.blurview.BlurTarget>
+    <ProgressBar
+        android:id="@+id/web_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateTint="?attr/SettingsBackgroundTintTop"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+
+    <!-- Ярлык  -->
+    <LinearLayout
+        android:id="@+id/floating_titlebar_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="174dp"
+        android:backgroundTint="@android:color/transparent"
+        android:minHeight="45dp"
+        android:orientation="horizontal"
+
+
+        >
+        <!--
+        android:background="@drawable/background_device_name"
+         android:background="@drawable/label_background"
+        -->
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/blur"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:background="@drawable/label_background"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+
+            android:elevation="8dp"
+
+            >
+
+            <LinearLayout
+                android:id="@+id/floating_titlebar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+
+
+                android:backgroundTint="@null"
+
+                android:clipToOutline="true"
+
+                android:elevation="1dp"
+                android:minHeight="32dp"
+
+                android:orientation="horizontal"
+
+                android:outlineProvider="background"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+
+                android:translationZ="1dp"
+                >
+
+                <ImageView
+                    android:id="@+id/floating_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="arrow"
+                    android:src="@drawable/baseline_arrow_left_24"
+                    app:tint="@color/white"
+
+
+                    />
+
+                <TextView
+                    android:id="@+id/floating_address_field"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="7dp"
+                    android:shadowColor="#CC000000"
+                    android:shadowDx="0"
+                    android:shadowDy="3"
+                    android:shadowRadius="12"
+
+                    android:text="Нет устройств"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:visibility="visible"
+
+                    />
+            </LinearLayout>
+        </eightbitlab.com.blurview.BlurView>
+
+    </LinearLayout>
+
+</FrameLayout>

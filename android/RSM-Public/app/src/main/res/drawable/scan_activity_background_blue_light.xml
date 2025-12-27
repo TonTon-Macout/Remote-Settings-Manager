@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <!-- Первый градиент -->
+            <gradient
+                android:startColor="#00a2ae"
+                android:endColor="#004177"
+                android:angle="45" />
+
+            <!-- Скругления только снизу -->
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="40dp"
+                android:bottomRightRadius="40dp" />
+        </shape>
+    </item>
+
+    <item>
+        <shape>
+            <!-- Второй градиент поверх первого -->
+            <gradient
+                android:startColor="#7A000902"
+                android:centerColor="#00005D20"
+                android:endColor="#00005D20"
+                android:angle="270" />
+
+            <!-- Такие же скругления -->
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="40dp"
+                android:bottomRightRadius="40dp" />
+        </shape>
+    </item>
+
+</layer-list>

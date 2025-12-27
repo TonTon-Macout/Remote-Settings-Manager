@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Твой градиент (пример, подставь свой) -->
+<gradient
+    android:startColor="#48806E"
+    android:endColor="#00697C"
+    android:angle="270" />
+
+<!-- Скругление ТОЛЬКО снизу -->
+<corners
+    android:bottomLeftRadius="40dp"
+    android:bottomRightRadius="40dp"
+    android:topLeftRadius="0dp"
+    android:topRightRadius="0dp" />
+
+<!-- Опционально: небольшой отступ снизу для тени, чтобы она не обрезалась -->
+<padding android:bottom="8dp" />
+</shape>
+
+
+

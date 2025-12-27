@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Цвет, когда поле в фокусе (пользователь печатает) -->
+    <item android:color="#00000000" android:state_focused="true"/>
+
+    <!-- Цвет по умолчанию (до фокуса).  -->
+    <item android:color="#00000000"/>
+</selector>

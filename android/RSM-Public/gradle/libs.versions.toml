@@ -1,0 +1,52 @@
+[versions]
+agp = "8.13.2"
+kotlin = "2.0.0"
+
+# --- Библиотеки AndroidX ---
+activity = "1.9.0"
+appcompat = "1.7.0"
+constraintlayout = "2.1.4"
+coordinatorlayout = "1.2.0"
+coreKtx = "1.13.1"
+coreAnimation = "1.0.0"
+espressoCore = "3.6.1"
+junitVersion = "1.2.1"
+preferenceKtx = "1.2.1"
+swiperefreshlayout = "1.1.0"
+
+# --- Сторонние библиотеки ---
+androidsvg = "1.4"
+coroutines = "1.8.1"
+firebaseAppdistributionGradle = "5.2.0"
+json = "20240303"
+jsoup = "1.18.1"
+junit = "4.13.2"
+material = "1.12.0"
+slidingPanel = "3.7.0"
+
+[libraries]
+# --- AndroidX ---
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "coordinatorlayout" }
+androidx-core-animation = { group = "androidx.core", name = "core-animation", version.ref = "coreAnimation" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+
+# --- Сторонние ---
+androidsvg = { module = "com.caverock:androidsvg", version.ref = "androidsvg" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" } # было kotlinxCoroutinesAndroid, переименовал
+firebase-appdistribution-gradle = { group = "com.google.firebase", name = "firebase-appdistribution-gradle", version.ref = "firebaseAppdistributionGradle" }
+json = { module = "org.json:json", version.ref = "json" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+sliding-panel = { module = "io.github.minyushov:sliding-panel", version.ref = "slidingPanel" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

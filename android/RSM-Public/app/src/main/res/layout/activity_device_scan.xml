@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+
+    android:transitionName="button_transition"
+
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <!-- ВЕРХНЯЯ ПАНЕЛЬ         app:hl_layoutBackground="@drawable/scan_activity_background"-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:background="?attr/headerSettingsBackground"
+                android:clipChildren="false"
+                android:clipToPadding="true"
+                android:elevation="1dp"
+                android:paddingBottom="0dp"
+
+                >
+
+
+                <LinearLayout
+                    android:id="@+id/scan_background"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="vertical"
+                    android:paddingStart="0dp"
+
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="0dp"
+
+
+                    >
+
+
+                    <!--        -->
+                    <LinearLayout
+                        android:id="@+id/scan_background2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="0dp"
+                        android:background="?attr/headerScanBackgroundSrc"
+                        android:gravity="top"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingTop="0dp"
+
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="0dp"
+
+
+                        >
+
+                        <!-- Фоновое изображение -->
+
+                        <!-- Контент поверх изображения -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:orientation="vertical"
+                            android:paddingTop="12dp">
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="32dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="end"
+                                android:orientation="horizontal"
+                                android:padding="8dp">
+
+                                <LinearLayout
+                                    android:id="@+id/back"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:background="?android:attr/selectableItemBackground">
+
+                                    <ImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:contentDescription="назад"
+                                        android:paddingStart="8dp"
+                                        android:src="@drawable/arrow_back" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingStart="12dp"
+                                        android:shadowColor="#44000000"
+                                        android:shadowDx="0"
+
+                                        android:shadowDy="0"
+                                        android:shadowRadius="9"
+                                        android:text="Назад"
+                                        android:textColor="#ffffff" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/spoiler_header"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:background="?android:attr/selectableItemBackground">
+
+                                    <TextView
+                                        android:id="@+id/tv_spoiler_title"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:drawablePadding="8dp"
+                                        android:gravity="end|center_vertical"
+                                        android:paddingStart="8dp"
+                                        android:paddingEnd="12dp"
+                                        android:shadowColor="#44000000"
+                                        android:shadowDx="0"
+                                        android:shadowDy="0"
+
+                                        android:shadowRadius="9"
+                                        android:text="Параметры"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="16sp" />
+
+                                    <ImageView
+                                        android:id="@+id/spoiler_arrow"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:contentDescription="Раскрыть"
+                                        android:elevation="4dp"
+
+                                        android:src="@drawable/ic_settings" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/spoiler_content"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="vertical"
+                                android:visibility="gone"
+                                tools:visibility="visible">
+
+                                <CheckBox
+                                    android:id="@+id/checkbox_settings"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="36dp"
+                                    android:layout_marginVertical="0dp"
+                                    android:checked="true"
+
+                                    android:minHeight="0dp"
+                                    android:paddingVertical="0dp"
+
+                                    android:text="Settings"
+
+                                    android:textColor="#FFFFFF"
+                                    tools:textColor="#3E1212"
+                                    tools:visibility="visible"
+
+
+                                    />
+
+                                <CheckBox
+                                    android:id="@+id/checkbox_wled"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="36dp"
+                                    android:layout_marginVertical="0dp"
+                                    android:checked="true"
+                                    android:minHeight="0dp"
+                                    android:paddingVertical="0dp"
+
+                                    android:text="WLED"
+                                    android:textColor="#FFFFFF"
+                                    tools:textColor="#3E1212" />
+
+                                <LinearLayout
+                                    android:id="@+id/checkbox_ha_container"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_ha"
+                                        android:layout_width="0dp"
+                                        android:layout_height="36dp"
+                                        android:layout_marginVertical="0dp"
+                                        android:layout_weight="1"
+                                        android:minHeight="0dp"
+
+                                        android:paddingVertical="0dp"
+
+                                        android:text="Home Assistant"
+                                        android:textColor="#FFFFFF"
+                                        tools:textColor="#3E1212" />
+
+                                    <EditText
+                                        android:id="@+id/edit_ha_port"
+                                        android:layout_width="100dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginVertical="0dp"
+                                        android:autofillHints="8123"
+                                        android:background="@android:color/transparent"
+                                        android:gravity="center"
+                                        android:hint="8123"
+                                        android:inputType="number"
+                                        android:minHeight="0dp"
+                                        android:paddingVertical="0dp"
+                                        android:text="8123"
+                                        android:textColor="#FFFFFF"
+                                        tools:textColor="#3E1212"
+
+                                        android:textSize="14sp" />
+                                </LinearLayout>
+
+                                <CheckBox
+                                    android:id="@+id/checkbox_search_ui"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="0dp"
+                                    android:minHeight="0dp"
+
+                                    android:paddingVertical="8dp"
+                                    android:text="Искать любой веб-интерфейс"
+                                    android:textColor="#FFFFFF"
+                                    tools:textColor="#3E1212"
+
+                                    />
+
+
+                                <LinearLayout
+                                    android:id="@+id/ports_container"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingStart="32dp"
+                                    >
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:gravity="start"
+                                        android:text="Порты:"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="14sp"
+                                        tools:textColor="#3E1212" />
+
+                                    <EditText
+                                        android:id="@+id/ports"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="0dp"
+                                        android:autofillHints="80, 443, 8080, 81, 8888"
+                                        android:hint="80, 443, 8080, 81, 8888"
+                                        android:inputType="text"
+                                        android:textSize="14sp"
+                                        android:digits="0123456789,;. "
+                                        android:textColor="#FFFFFF"
+                                        tools:textColor="#3E1212"
+
+                                        android:background="@android:color/transparent"
+                                        android:layout_marginVertical="0dp"
+                                        android:paddingVertical="0dp"
+                                        />
+                                </LinearLayout>
+
+
+
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+
+                                    >
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="32dp"
+                                        android:gravity="start"
+                                        android:text="Таймаут:"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="14sp"
+                                        tools:textColor="#3E1212" />
+
+                                    <EditText
+                                        android:id="@+id/edit_timeout"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="0dp"
+                                        android:hint="Таймаут (мс)"
+                                        android:inputType="number"
+                                        android:textColor="#FFFFFF" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="32dp"
+                                        android:gravity="start"
+                                        android:text="Подсеть:"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="14sp"
+                                        tools:textColor="#3E1212" />
+
+                                    <Spinner
+                                        android:id="@+id/spinner_subnet"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+
+                                        android:background="@android:color/transparent"
+
+                                        android:dropDownVerticalOffset="36dp"
+                                        android:paddingVertical="4dp"
+                                        android:popupBackground="@drawable/spinner_dropdown_background" />
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        />
+                                    <ImageView
+                                        android:id="@+id/settings_info"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="end|center_vertical"
+                                        android:layout_marginEnd="8dp"
+                                        android:src="@drawable/ic_question_circle"
+                                        android:background="?attr/selectableItemBackgroundBorderless"
+                                        android:clickable="true"
+                                        android:focusable="true"
+
+
+                                        />
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+
+                            <FrameLayout
+                                android:id="@+id/spinner_network_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/network_spiner_background"
+                                android:visibility="visible"
+                                tools:visibility="visible">
+
+
+                                <Spinner
+                                    android:id="@+id/spinner_network"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@android:color/transparent"
+                                    android:dropDownWidth="wrap_content"
+
+                                    android:dropDownHorizontalOffset="-30dp"
+                                    android:dropDownVerticalOffset="30dp"
+                                    android:paddingVertical="4dp"
+                                    android:paddingStart="72dp"
+
+                                    android:paddingEnd="12dp"
+                                    android:popupBackground="@drawable/spinner_dropdown_background"
+
+                                    />
+                                <!--                                android:src="@drawable/baseline_arrow_left_24"-->
+                                <TextView
+                                    android:id="@+id/device_count"
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start|center_vertical"
+                                    android:layout_marginStart="30dp"
+                                    android:background="@drawable/network_spiner_background"
+                                    android:gravity="center"
+                                    android:paddingHorizontal="12dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="0"
+                                    android:textColor="?attr/textAddressBackgroundTint"
+
+                                    android:textSize="12sp"
+                                    tools:textColor="#B10D0D"
+
+                                    />
+
+                                <ImageView
+                                    android:id="@+id/split_network_manual"
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:layout_gravity="start|center_vertical"
+                                    android:layout_marginStart="2dp"
+
+
+                                    android:clickable="false"
+                                    android:focusable="false"
+                                    android:src="@drawable/ic_wifi_circle"
+                                    tools:tint="#2E7A33"
+
+                                    />
+
+                                <ImageView
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:layout_gravity="end|center_vertical"
+                                    android:layout_marginEnd="12dp"
+
+                                    android:clickable="false"
+                                    android:focusable="false"
+                                    android:src="@android:drawable/arrow_down_float"
+                                    app:tint="?attr/textAddressBackgroundTint" />
+
+                            </FrameLayout>
+
+
+                            <LinearLayout
+                                style="?android:attr/buttonBarStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/button_clear"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:background="@drawable/clear_button_background"
+                                    android:padding="0dp"
+                                    android:text="×"
+                                    android:textColor="#ffffff"
+                                    android:visibility="gone"
+                                    app:backgroundTint="@null"
+                                    tools:visibility="visible" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/button_scan"
+                                    android:layout_width="0dp"
+                                    android:layout_height="40dp"
+                                    android:layout_marginEnd="8dp"
+
+                                    android:layout_weight="1"
+                                    android:background="?attr/buttonScanBackground"
+                                    android:text="Сканировать"
+                                    android:textColor="?attr/textButtonScanBackgroundTint"
+                                    android:textSize="14sp"
+
+                                    app:backgroundTint="@null"
+                                    tools:background="@drawable/scan_button_background"
+
+                                    tools:textColor="#FFFFFF" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/button_add"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="?attr/buttonScanBackground"
+                                    android:padding="0dp"
+
+                                    android:text="+"
+                                    android:textColor="?attr/textButtonScanBackgroundTint"
+                                    app:backgroundTint="@null"
+                                    tools:background="@drawable/scan_button_background"
+                                    tools:textColor="#FFFFFF" />
+                            </LinearLayout>
+
+                            <Button
+                                android:id="@+id/button_stop"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:backgroundTint="#A81B1B"
+                                android:text="Стоп"
+                                android:textColor="#FFFFFF" />
+
+                            <LinearLayout
+                                android:id="@+id/progress_bar_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone">
+
+                                <com.google.android.material.progressindicator.LinearProgressIndicator
+                                    android:id="@+id/progress_bar"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_marginEnd="0dp"
+                                    android:layout_weight="1"
+                                    android:indeterminate="false"
+                                    android:max="100"
+                                    app:indicatorColor="#51C199"
+                                    app:trackColor="#036A7A" />
+
+                                <TextView
+                                    android:id="@+id/tv_progress_percent"
+                                    android:layout_width="48dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="12dp"
+                                    android:gravity="end"
+                                    android:includeFontPadding="false"
+                                    android:text="0%"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="24dp"
+                                android:text="Найденные устройства"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/settings_separator"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:elevation="1dp"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="-40dp"
+                android:clipChildren="false"
+                android:clipToOutline="false"
+                android:elevation="4dp"
+
+                android:orientation="vertical">
+                <!-- СПИСОК УСТРОЙСТВ  -->
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_refresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="0dp"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/settings_background"
+                        android:clipToOutline="true"
+
+                        android:clipToPadding="false"
+
+                        android:fillViewport="true"
+                        android:paddingTop="50dp"
+
+                        >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="32dp">
+
+                            <LinearLayout
+                                android:id="@+id/layout_devices"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </ScrollView>
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/web_progress_cont"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+
+            >
+
+            <ProgressBar
+                android:id="@+id/web_progress"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="?attr/buttonScanBackgroundTint"
+                android:visibility="visible"
+                tools:visibility="gone" />
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+
+</LinearLayout>

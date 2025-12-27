@@ -1,0 +1,53 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512"
+
+    >
+    <group
+        android:scaleX="0.9"
+        android:scaleY="0.9"
+        android:pivotX="256"
+        android:pivotY="256">
+        <!--
+         android:fillColor="?attr/buttonScanStrokeTint"
+
+
+        <path
+            android:fillColor="?attr/buttonBackgroundTint"
+            tools:fillColor="#FFff00"
+            android:pathData="M256,256m-216,0a216,216 0,1 1,432 0a216,216 0,1 1,-432 0"
+            />  -->
+        <path
+            android:fillColor="?attr/buttonStrokeTint"
+            tools:fillColor="#FF0000"
+            android:pathData="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z
+                             M256,472c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z"/>
+    </group>
+
+
+
+    <group
+        android:scaleX="21"
+        android:scaleY="21"
+        android:pivotX="-.1"
+        android:pivotY="-.8"
+        >
+        <path
+            android:fillColor="#00000000"
+
+            android:pathData="M12 17V16.9929M12 14.8571C12 11.6429 15 12.3571 15 9.85714C15 8.27919 13.6568 7 12 7C10.6567 7 9.51961 7.84083 9.13733 9"
+            android:strokeWidth="2"
+            android:strokeColor="?attr/questionTint"
+            tools:strokeColor="#091464"
+            android:strokeLineCap="round"
+
+            />
+
+    </group>
+
+
+
+</vector>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Первый слой: фон -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/buttonBackgroundTint" />
+            <corners android:radius="16dp" />
+            <stroke
+                android:width="1dp"
+                android:color="?attr/buttonStrokeTint" />
+        </shape>
+    </item>
+
+    <!-- Второй слой: векторная иконка с отступами -->
+    <item>
+        <inset
+            android:drawable="@drawable/ic_plus"
+            android:insetLeft="4dp"
+            android:insetTop="4dp"
+            android:insetRight="4dp"
+            android:insetBottom="4dp" />
+    </item>
+</layer-list>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:shape="rectangle">
+
+    <!-- Цвет фона выпадающего списка -->
+    <solid
+        android:color="?attr/addressBackgroundTint"
+        tools:color="#BAC8A4"
+
+        />
+
+    <!-- Скругление углов. Увеличьте значение для более круглых углов -->
+    <corners android:radius="8dp" />
+
+    <!-- Рамка (кайма) -->
+    <stroke
+        android:width="2dp"
+        android:color="?attr/buttonStrokeTint"
+        tools:color="#EF0000"
+
+        /> <!-- Цвет рамки, чуть светлее фона -->
+
+</shape>

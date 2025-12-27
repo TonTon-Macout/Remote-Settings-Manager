@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">RSM</string>
+
+    <string name="theme_default">По умолчанию</string>
+    <string name="theme_mono">Кудрово</string>
+    <string name="theme_green">Домашняя</string>
+    <string name="theme_black">Лес</string>
+    <string name = "theme_orange">Зеленая</string>
+    <string name = "theme_colors">Кавай</string>
+    <string name = "theme_gray">Гравюра</string>
+    <string name = "theme_palered">Бледно-красная</string>
+    <string name = "theme_bluelight">Энцелад</string>
+    <string name = "theme_purple">Город</string>
+    <string name = "theme_yellow">Снеговик</string>
+    <string name = "theme_red">Красная планета</string>
+    <string name = "theme_blue">Кеплер-186ф</string>
+    <string name = "theme_purplegradient">Негатив</string>
+    <string name = "theme_yellowgreen">Аракес</string>
+    <string name = "theme_colorgradient">Гикеан</string>
+
+
+</resources>

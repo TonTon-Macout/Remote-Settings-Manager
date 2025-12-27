@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Просто один цвет вместо градиента -->
+    <solid android:color="#CA4343" />
+
+    <!-- Оставляем скруглённые углы, как у тебя и было -->
+    <corners android:radius="16dp" />
+
+</shape>

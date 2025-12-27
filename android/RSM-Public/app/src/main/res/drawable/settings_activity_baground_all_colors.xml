@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <!-- Первый градиент -->
+            <gradient
+                android:startColor="?attr/SettingsBackgroundTintTop"
+                android:endColor="?attr/SettingsBackgroundTintBottom"
+                android:angle="?attr/SettingsBackgroundTintAngle" />
+
+            <!-- Скругления только снизу -->
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+
+
+
+</layer-list>

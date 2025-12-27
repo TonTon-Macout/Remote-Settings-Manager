@@ -1,0 +1,1414 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    >
+
+    <LinearLayout
+        android:id="@+id/main_content"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f4f4f4"
+
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical">
+        <!--    android:background="@drawable/scan_activity_background"-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:background="?attr/headerSettingsBackground"
+            android:clipChildren="false"
+            android:clipToPadding="true"
+            android:elevation="1dp"
+            android:paddingBottom="0dp"
+
+            >
+            <!--        -->
+            <LinearLayout
+                android:id="@+id/scan_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginHorizontal="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+
+                android:paddingBottom="0dp"
+
+
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="end"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="8dp"
+
+                    android:paddingTop="22dp"
+                    android:paddingBottom="0dp">
+
+                    <LinearLayout
+                        android:id="@+id/back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:contentDescription="назад"
+                            android:paddingStart="8dp"
+                            android:src="@drawable/arrow_back" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingStart="12dp"
+                            android:shadowColor="#62000000"
+                            android:shadowDx="0"
+
+
+                            android:shadowDy="0"
+                            android:shadowRadius="9"
+                            android:text="Назад"
+                            android:textColor="#ffffff" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/spoiler_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_spoiler_title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawablePadding="8dp"
+                            android:gravity="end|center_vertical"
+                            android:onClick="buttonAbout"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="12dp"
+                            android:shadowColor="#62000000"
+                            android:shadowDx="0"
+                            android:shadowDy="0"
+
+                            android:shadowRadius="9"
+                            android:text="О программе"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp" />
+                        <!-- <ImageView
+                             android:id="@+id/spoiler_arrow"
+                             android:layout_width="24dp"
+                             android:layout_height="24dp"
+                             android:contentDescription="Раскрыть"
+                             android:src="@drawable/ic_settings" /> -->
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/settings_separator"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:elevation="1dp"
+            android:orientation="vertical" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-40dp"
+            android:clipChildren="false"
+            android:clipToOutline="false"
+            android:elevation="4dp"
+
+            android:orientation="vertical">
+            <!-- СПИСОК настроек -->
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/settings_background"
+                android:clipToOutline="true"
+
+                android:clipToPadding="false"
+
+                android:fillViewport="true"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="50dp"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="32dp"
+
+
+                    >
+
+
+                    <!-- Выбор темы оформления -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp"
+
+                        >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <!-- темы -->
+                            <LinearLayout
+                                android:id="@+id/theme_selector_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="12dp"
+                                android:paddingBottom="12dp">
+
+
+                                <!-- Название темы и выпадающий список -->
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+
+                                    >
+
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Тема оформления"
+                                        android:textColor="#9D9797"
+                                        android:textSize="16sp" />
+
+                                    <Spinner
+                                        android:id="@+id/theme_spinner"
+                                        style="@android:style/Widget.Spinner"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:background="@android:color/transparent"
+                                        android:padding="8dp"
+                                        android:textColor="#736E6E" />
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+                                <!-- Разделитель -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:background="#E0E0E0" />
+
+                                <!-- База -->
+                                <LinearLayout
+                                    android:id="@+id/color_picker_button_base"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?android:attr/selectableItemBackground"
+                                    android:clickable="true"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="База"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <View
+                                        android:id="@+id/color_preview_base"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:background="@drawable/circle"
+                                        android:clipToOutline="true"
+                                        android:outlineProvider="background"
+                                        android:outlineSpotShadowColor="#086257" />
+
+                                </LinearLayout>
+
+
+                                <!-- Текст -->
+                                <LinearLayout
+                                    android:id="@+id/color_picker_button_text"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?android:attr/selectableItemBackground"
+                                    android:clickable="true"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Текст"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <View
+                                        android:id="@+id/color_preview_text"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:background="@drawable/circle"
+                                        android:clipToOutline="true"
+                                        android:outlineProvider="background"
+                                        android:outlineSpotShadowColor="#086257" />
+
+                                </LinearLayout>
+
+                                <!-- Кнопки -->
+                                <LinearLayout
+                                    android:id="@+id/color_picker_button_button"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?android:attr/selectableItemBackground"
+                                    android:clickable="true"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Кнопки"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <View
+                                        android:id="@+id/color_preview_button"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:background="@drawable/circle"
+                                        android:clipToOutline="true"
+                                        android:outlineProvider="background"
+                                        android:outlineSpotShadowColor="#086257" />
+
+                                </LinearLayout>
+
+
+                                <!-- Текст кнопок -->
+                                <LinearLayout
+                                    android:id="@+id/color_picker_button_text_button"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?android:attr/selectableItemBackground"
+                                    android:clickable="true"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Текст кнопок"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <View
+                                        android:id="@+id/color_preview_text_button"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:background="@drawable/circle"
+                                        android:clipToOutline="true"
+                                        android:outlineProvider="background"
+                                        android:outlineSpotShadowColor="#086257" />
+
+                                </LinearLayout>
+
+                                <!-- цвет обводки Кнопки -->
+                                <LinearLayout
+                                    android:id="@+id/color_picker_button_stroke"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?android:attr/selectableItemBackground"
+                                    android:clickable="true"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp"
+
+                                    >
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Обводка кнопок"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <View
+                                        android:id="@+id/color_preview_button_stroke"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:background="@drawable/circle"
+                                        android:clipToOutline="true"
+                                        android:outlineProvider="background"
+                                        android:outlineSpotShadowColor="#086257" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <!-- Разделитель -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="0dp"
+                                android:layout_marginEnd="0dp"
+                                android:background="#E0E0E0" />
+
+                            <!-- Верхняя часть с чекбоксом -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Однотонный цвет иконки"
+                                    android:textColor="#736E6E"
+                                    android:textSize="16sp" />
+
+                                <com.google.android.material.switchmaterial.SwitchMaterial
+                                    android:id="@+id/switch_solid_color_icon"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="false"
+
+
+                                    app:thumbTint="@color/selector_thumb_color"
+                                    app:trackTint="@color/selector_track_color"
+
+
+                                    />
+
+                            </LinearLayout>
+
+                            <!-- Разделитель -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="36dp"
+                                android:layout_marginEnd="16dp"
+                                android:background="#55E0E0E0" />
+
+                            <!-- Нижняя часть с кнопкой выбора цвета -->
+                            <LinearLayout
+                                android:id="@+id/color_picker_button"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="     Выбрать цвет иконки"
+                                    android:textColor="#736E6E"
+                                    android:textSize="16sp" />
+
+                                <View
+                                    android:id="@+id/color_preview"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:background="@drawable/circle"
+                                    android:clipToOutline="true"
+                                    android:outlineProvider="background"
+                                    android:outlineSpotShadowColor="#086257" />
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:id="@+id/snow_man_container"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="gone"
+                                tools:visibility="visible">
+                                <!-- Разделитель -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="0dp"
+                                    android:layout_marginEnd="0dp"
+                                    android:background="#E0E0E0" />
+                                <!-- Чекбокс Снеговик -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:clickable="true"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp"
+
+                                    >
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Снеговик"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <com.google.android.material.switchmaterial.SwitchMaterial
+                                        android:id="@+id/switch_snowman"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:checked="false"
+
+                                        app:thumbTint="@color/selector_thumb_color"
+                                        app:trackTint="@color/selector_track_color"
+
+                                        />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/switch_snowman_animation_container"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:visibility="gone">
+
+
+                                    <!-- Разделитель -->
+                                    <View
+                                        android:layout_width="match_parent"
+                                        android:layout_height="1dp"
+                                        android:layout_marginStart="36dp"
+                                        android:layout_marginEnd="16dp"
+                                        android:background="#55E0E0E0" />
+                                    <!-- Чекбокс анимация  Снеговик -->
+                                    <LinearLayout
+
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:clickable="true"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal"
+                                        android:paddingTop="8dp"
+                                        android:paddingBottom="8dp">
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:text="     Анимация"
+                                            android:textColor="#736E6E"
+                                            android:textSize="16sp" />
+
+                                        <com.google.android.material.switchmaterial.SwitchMaterial
+                                            android:id="@+id/switch_snowman_animation"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:checked="false"
+
+                                            app:thumbTint="@color/selector_thumb_color"
+                                            app:trackTint="@color/selector_track_color"
+
+                                            />
+
+                                    </LinearLayout>
+
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+
+                    <!-- Чекбокс Адресная строка -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Адресная строка"
+                                android:textColor="#736E6E"
+                                android:textSize="16sp" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switch_address_input"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+
+                                app:thumbTint="@color/selector_thumb_color"
+                                app:trackTint="@color/selector_track_color"
+
+                                />
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+                    <!-- Чекбокс Пинговать устройства -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:gravity="center_vertical"
+                            >
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Проверять доступность устройств (ping)"
+                                android:textColor="#736E6E"
+                                android:textSize="16sp" />
+                            <ImageView
+                                android:id="@+id/ping_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_question_circle"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:paddingHorizontal="4dp" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switch_ping_devices"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+
+                                app:thumbTint="@color/selector_thumb_color"
+                                app:trackTint="@color/selector_track_color"
+
+                                />
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+
+                    <!-- Чекбокс Посхалочка -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Посхалочка"
+                                android:textColor="#736E6E"
+                                android:textSize="16sp" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switch_easter_egg"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+
+                                app:thumbTint="@color/selector_thumb_color"
+                                app:trackTint="@color/selector_track_color"
+
+                                />
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+
+                    <!-- Чекбокс - Открывать последние устройство при старте -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Открывать последние устройство при старте"
+                                android:textColor="#736E6E"
+                                android:textSize="16sp" />
+
+
+
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switch_open_last_device"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+
+                                app:thumbTint="@color/selector_thumb_color"
+                                app:trackTint="@color/selector_track_color"
+
+                                />
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+                    <!-- Блок с чекбоксами "Ярлык" и "Иконка в ярлыке" -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp"
+
+                        >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <!-- Верхняя часть с чекбоксом Ярлык -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                >
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Ярлык"
+                                    android:textColor="#736E6E"
+                                    android:textSize="16sp"
+
+                                    />
+                                <ImageView
+                                    android:id="@+id/label_info"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_question_circle"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:paddingHorizontal="4dp" />
+
+                                <com.google.android.material.switchmaterial.SwitchMaterial
+                                    android:id="@+id/label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+
+                                    app:thumbTint="@color/selector_thumb_color"
+                                    app:trackTint="@color/selector_track_color"
+
+                                    />
+
+                            </LinearLayout>
+
+                            <!-- Разделитель -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="36dp"
+                                android:layout_marginEnd="16dp"
+                                android:background="#55E0E0E0" />
+
+                            <!-- Средняя часть с чекбоксом Иконка в ярлыке -->
+
+                            <!-- Разделитель -->
+                            <LinearLayout
+                                android:id="@+id/icon_in_label_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="     Иконка в ярлыке"
+                                    android:textColor="#736E6E"
+                                    android:textSize="16sp" />
+
+                                <com.google.android.material.switchmaterial.SwitchMaterial
+                                    android:id="@+id/switch_icon_in_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+
+                                    app:thumbTint="@color/selector_thumb_color"
+                                    app:trackTint="@color/selector_track_color"
+
+                                    />
+
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="36dp"
+                                android:layout_marginEnd="16dp"
+                                android:background="#55E0E0E0" />
+
+                            <!-- Кнопка назад - развернуть панель -->
+                            <LinearLayout
+                                android:id="@+id/back_button_expand_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?android:attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp">
+
+                                <TextView
+                                    android:id="@+id/back_button_expand_label"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="     Назад - разворачивает панель"
+                                    android:textColor="#736E6E"
+                                    android:textSize="16sp" />
+
+                                <com.google.android.material.switchmaterial.SwitchMaterial
+                                    android:id="@+id/switch_back_button_expand"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+
+                                    app:thumbTint="@color/selector_thumb_color"
+                                    app:trackTint="@color/selector_track_color"
+
+                                    />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+                    <!-- Чекбокс проверка версии строка -->
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:gravity="center_vertical"
+                            >
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Проверять новую версию при старте"
+                                android:textColor="#736E6E"
+                                android:textSize="16sp"
+
+                                />
+
+                            <ImageView
+                                android:id="@+id/switch_check_version_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_question_circle"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:paddingHorizontal="4dp" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switch_check_version"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+
+                                app:thumbTint="@color/selector_thumb_color"
+                                app:trackTint="@color/selector_track_color"
+
+                                />
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+
+                    <com.lihang.ShadowLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:hl_cornerRadius="0dp"
+                        app:hl_layoutBackground="@drawable/settings_item_background"
+                        app:hl_shadowColor="#23000000"
+                        app:hl_shadowHiddenLeft="true"
+                        app:hl_shadowHiddenRight="true"
+                        app:hl_shadowLimit="4dp"
+
+                        >
+
+                        <!-- общий контейнер -->
+                        <LinearLayout
+
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingTop="0dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="0dp">
+
+                            <!-- Разделять устройства по сетям -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:orientation="horizontal"
+                                android:paddingStart="0dp"
+                                android:paddingEnd="0dp"
+                                android:gravity="center_vertical"
+                                >
+
+
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Разделять устройства по сетям"
+                                    android:textColor="#736E6E"
+                                    android:textSize="16sp"
+
+
+                                    />
+                                <ImageView
+                                    android:id="@+id/split_network_info"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_question_circle"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:paddingHorizontal="4dp" />
+                                <com.google.android.material.switchmaterial.SwitchMaterial
+                                    android:id="@+id/switch_split_network"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="false"
+
+                                    app:thumbTint="@color/selector_thumb_color"
+                                    app:trackTint="@color/selector_track_color"
+
+                                    />
+
+                            </LinearLayout>
+
+
+                            <!-- Управление сетями -->
+                            <LinearLayout
+                                android:id="@+id/management_network_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+
+
+
+
+                                <LinearLayout
+                                    android:id="@+id/dont_show_location_dialog_container"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical">
+
+
+                                    <!-- Разделитель -->
+
+
+                                    <!-- Не показывать диалог геолокации снова  -->
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:clickable="true"
+                                        android:orientation="horizontal"
+                                        android:paddingStart="16dp"
+                                        android:paddingBottom="16dp"
+                                        android:gravity="center_vertical"
+
+                                        >
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:text="Не показывать предупреждение о выключенной геолокации"
+                                            android:textColor="#736E6E"
+                                            android:textSize="16sp" />
+
+                                        <ImageView
+                                            android:id="@+id/dont_show_location_dialog_info"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:src="@drawable/ic_question_circle"
+                                            android:background="?attr/selectableItemBackgroundBorderless"
+                                            android:clickable="true"
+                                            android:focusable="true"
+                                            android:paddingHorizontal="4dp" />
+
+                                        <com.google.android.material.switchmaterial.SwitchMaterial
+                                            android:id="@+id/dont_show_location_dialog"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:checked="false"
+
+                                            app:thumbTint="@color/selector_thumb_color"
+                                            app:trackTint="@color/selector_track_color"
+
+                                            />
+                                    </LinearLayout>
+
+
+                                </LinearLayout>
+
+
+                                <!-- Разделитель -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="36dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:background="#55E0E0E0" />
+
+                                <!-- Разделять устройства по сетям вручную  -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:clickable="true"
+                                    android:orientation="horizontal"
+                                    android:paddingStart="0dp"
+                                    android:paddingEnd="0dp"
+                                    android:gravity="center_vertical"
+                                    >
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Не определять сеть автоматически"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp"
+
+                                        />
+
+                                    <ImageView
+                                        android:id="@+id/switch_split_network_manual_info"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?attr/selectableItemBackgroundBorderless"
+                                        android:clickable="true"
+                                        android:focusable="true"
+                                        android:paddingHorizontal="4dp"
+                                        android:src="@drawable/ic_question_circle" />
+
+                                    <com.google.android.material.switchmaterial.SwitchMaterial
+                                        android:id="@+id/switch_split_network_manual"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:checked="false"
+
+                                        app:thumbTint="@color/selector_thumb_color"
+                                        app:trackTint="@color/selector_track_color"
+
+                                        />
+
+                                </LinearLayout>
+
+
+                                <!-- Разделитель -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="36dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:background="#55E0E0E0" />
+
+                                <!-- Сохраненные сети -->
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginBottom="16dp"
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+
+                                        android:text="Сохраненные сети:"
+                                        android:textColor="#736E6E"
+                                        android:textSize="16sp" />
+
+                                    <ImageView
+                                        android:id="@+id/networks_info"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?attr/selectableItemBackgroundBorderless"
+                                        android:clickable="true"
+                                        android:focusable="true"
+                                        android:paddingHorizontal="4dp"
+                                        android:src="@drawable/ic_question_circle" />
+                            </LinearLayout>
+
+                                <!-- Список сетей -->
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/networks_recycler_view"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:nestedScrollingEnabled="false"
+                                    tools:itemCount="3"
+                                    tools:listitem="@layout/item_network" />
+
+                                <!-- Разделитель перед кнопкой "Очистить все" -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:background="#55E0E0E0" />
+
+                                <!-- Кнопка очистки всех сетей -->
+                                <TextView
+                                    android:id="@+id/clear_all_networks_button"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?android:attr/selectableItemBackground"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:padding="16dp"
+                                    android:text="Удалить все сети"
+                                    android:textColor="@android:color/holo_red_dark" />
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+                    </com.lihang.ShadowLayout>
+
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:id="@+id/about_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/headerBackground"
+        android:clickable="true"
+        android:focusable="true"
+
+        android:visibility="gone"
+        tools:visibility="gone">
+
+        <com.lihang.ShadowLayout
+            android:id="@+id/about_dialog_content"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:hl_cornerRadius="12dp"
+            app:hl_layoutBackground="@drawable/settings_item_background"
+            app:hl_shadowColor="#40000000"
+            app:hl_shadowLimit="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/settings_item_background"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Заголовок -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:text="О программе"
+                    android:textColor="#736E6E"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <!-- Логотип или иконка приложения -->
+                <ImageView
+                    android:id="@+id/icon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:src="@mipmap/ic_launcher" />
+
+                <!-- Название приложения -->
+                <TextView
+                    android:id="@+id/app_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center"
+                    android:text="Remote Settings Manager"
+                    android:textColor="#736E6E"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Версия приложения -->
+                <TextView
+                    android:id="@+id/app_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:text="Версия 1.0.0"
+                    android:textColor="#9D9797"
+                    android:textSize="14sp" />
+
+                <!-- Описание приложения -->
+                <TextView
+                    android:id="@+id/app_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="fill_horizontal"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Приложение для поиска в локальной сети и отображения веб-интерфейсов различных устройств.\n  • Роутеры, принтеры, умный дом, самодельные устройства, все что угодно с веб-интерфейсом.\n  • Добавление устройтв вручную, в том числе с адресом в сети интернет. \n "
+                    android:textColor="#736E6E"
+                    android:textSize="14sp"
+
+                    />
+
+                <!-- Информация о разработчике -->
+                <TextView
+                    android:id="@+id/developer_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center"
+                    android:text="Разработчик: Vanila"
+                    android:textColor="#9D9797"
+                    android:textSize="12sp" />
+
+
+                <TextView
+                    android:id="@+id/privacy_policy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:onClick="openGitHub"
+                    android:padding="8dp"
+                    android:text="Github"
+                    android:textColor="#086257"
+                    android:textSize="14sp" />
+
+                <!-- Кнопка закрытия -->
+                <com.lihang.ShadowLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    app:hl_cornerRadius="16dp"
+                    app:hl_shadowColor="#3B000000"
+                    app:hl_shadowLimit="16dp">
+
+                    <TextView
+                        android:id="@+id/close_about"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/buttonBackground"
+                        android:clickable="true"
+
+                        android:elevation="8dp"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:onClick="closeAbout"
+
+                        android:paddingHorizontal="24dp"
+
+                        android:paddingVertical="12dp"
+                        android:text="Закрыть"
+                        android:textColor="?attr/textButtonBackgroundTint"
+                        android:textSize="16sp" />
+
+                </com.lihang.ShadowLayout>
+
+            </LinearLayout>
+
+        </com.lihang.ShadowLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

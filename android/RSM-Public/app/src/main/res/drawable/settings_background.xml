@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Градиентный фон -->
+    <item>
+        <shape>
+            <solid
+
+                android:color="#f4f4f4"
+                />
+
+            <!-- Скругления только снизу -->
+            <corners
+                android:topLeftRadius="35dp"
+                android:topRightRadius="35dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+
+</layer-list>

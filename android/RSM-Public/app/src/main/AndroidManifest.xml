@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation" />
+
+
+<!--    android:networkSecurityConfig="@xml/network_security_config"
+
+android:usesCleartextTraffic="true"
+-->
+    <application
+        android:name=".App"
+
+
+        android:networkSecurityConfig="@xml/network_security_config"
+
+        android:allowBackup="true"
+        android:supportsRtl="false"
+        tools:replace="android:allowBackup,android:supportsRtl"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+
+
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+
+        android:theme="@style/Theme.RSM"
+
+        android:forceDarkAllowed="false"
+        tools:targetApi="31"
+
+
+        >
+
+        <!-- 1. Основная активность - ТЕПЕРЬ ОНА СКРЫТА ОТ LAUNCHER -->
+        <!-- Она служит только "целью" для алиасов. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:enabled="true"
+        android:importantForAutofill="yes"
+        >
+        <!-- УБИРАЕМ LAUNCHER ОТСЮДА -->
+        <!-- <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter> -->
+    </activity>
+
+    <!-- 2. АЛИАС ПО УМОЛЧАНИЮ (обычная иконка) -->
+    <!-- Именно он будет виден пользователю при первом запуске -->
+    <activity-alias
+        android:name=".MainActivityDefault"
+        android:targetActivity=".MainActivity"
+        android:enabled="true"
+    android:exported="true"
+    android:icon="@mipmap/ic_launcher"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:label="@string/app_name"
+    android:importantForAutofill="yes"
+    >
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity-alias>
+
+    <!-- 3. АЛИАС СНЕГОВИКА (альтернативная иконка) -->
+<activity-alias
+android:name=".MainActivitySnow"
+android:targetActivity=".MainActivity"
+android:enabled="false"
+    android:exported="true"
+    android:icon="@mipmap/ic_launcher_snow"
+    android:roundIcon="@mipmap/ic_launcher_snow_round"
+    android:label="@string/app_name"
+    android:importantForAutofill="yes"
+    >
+<intent-filter>
+<action android:name="android.intent.action.MAIN" />
+<category android:name="android.intent.category.LAUNCHER" />
+</intent-filter>
+    </activity-alias>
+
+        <!-- Другие активности -->
+        <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".DeviceScanActivity" android:exported="false" />
+
+    </application>
+</manifest>

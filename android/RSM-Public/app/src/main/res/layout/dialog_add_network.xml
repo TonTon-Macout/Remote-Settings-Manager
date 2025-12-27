@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_rounded_background"
+    android:backgroundTint="@null"
+    android:elevation="4dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:text="Добавить сеть вручную:"
+        android:textFontWeight="900"
+        android:textSize="18sp"
+
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"
+        >
+
+    </TextView>
+
+
+    <!-- Поле для ввода имени сети -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_network_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Имя сети"
+        app:errorEnabled="true"
+        android:layout_marginBottom="0dp"
+        android:paddingBottom="0dp"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_network_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Поле для ввода имени сети -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_network_ssid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="SSID"
+        app:errorEnabled="true"
+        android:layout_marginBottom="0dp"
+        android:paddingBottom="0dp"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_network_ssid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Чекбокс "Доверенная сеть" -->
+    <CheckBox
+        android:id="@+id/cb_is_trusted"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:checked="false"
+        android:text="Не проверять https сертификаты" />
+
+    <!-- Поле для ввода подсети -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_subnet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Подсеть"
+
+        app:errorEnabled="true"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_subnet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:paddingVertical="8dp"
+            android:text="192.168.1.0/24"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="end"
+        android:gravity="bottom|fill_horizontal"
+        >
+
+        <!-- кнопки "Создать" и "Отмена" -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <!-- Кнопка для автоматического определения подсети -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel"
+                android:layout_gravity="start"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="Отмена"
+
+                app:backgroundTint="@null"
+                tools:background="@drawable/scan_button_background"
+                android:background="?attr/buttonScanBackground"
+                android:textColor="?attr/textButtonScanBackgroundTint"
+                tools:textColor="@color/black"
+
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_create_network"
+                android:layout_gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Создать"
+
+                app:backgroundTint="@null"
+                tools:background="@drawable/scan_button_background"
+                android:background="?attr/buttonScanBackground"
+                android:textColor="?attr/textButtonScanBackgroundTint"
+                tools:textColor="@color/black"
+
+                />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_auto_detect_subnet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="Определить автоматически"
+            android:visibility="gone"
+
+            app:backgroundTint="@null"
+            tools:background="@drawable/scan_button_background"
+            android:background="?attr/buttonScanBackground"
+            android:textColor="?attr/textButtonScanBackgroundTint"
+            tools:textColor="@color/black"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

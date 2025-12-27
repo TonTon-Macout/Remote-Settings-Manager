@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="0dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/device_background"
+    android:clipChildren="true"
+
+    android:clipToPadding="true"
+    android:elevation="0dp"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="0dp"
+    android:paddingEnd="16dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="-0dp"
+        android:background="@drawable/divider_device_scan_background"
+        android:elevation="10dp"
+
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        android:paddingBottom="0dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="12dp">
+
+            <LinearLayout
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical">
+                <!-- Иконка -->
+                <ImageView
+                    android:id="@+id/icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:scaleType="centerCrop"
+
+                    android:src="@drawable/ic_device" />
+
+            </LinearLayout>
+            <!-- Имя и адрес -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+
+                    android:gravity="center_vertical"
+                    >
+                <TextView
+                    android:id="@+id/text_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Имя устройства"
+                    android:textColor="?attr/textScanDeviceTint"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:textColor="#598A8A" />
+
+                <ImageView
+                    android:id="@+id/active"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_active_device"
+                    android:layout_gravity="center_vertical"
+                    android:alpha="0"
+                    />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/text_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="http://192.168.1.100"
+                    android:textColor="#B1B1B1"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/device_network"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Неопознанная сеть"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Крестик справа -->
+            <ImageButton
+                android:id="@+id/button_delete"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="2dp"
+                android:background="@null"
+                android:contentDescription="Удалить"
+                android:scaleType="centerInside"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#3C0404" />
+        </LinearLayout>
+
+        <!-- Две кнопки  -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:gravity="center_vertical"
+
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@android:color/transparent"
+                android:outlineAmbientShadowColor="#1D000000"
+                android:outlineSpotShadowColor="#0C000000"
+                app:cardBackgroundColor="#00FFFFFF"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true"
+
+                >
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_open"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:backgroundTint="#EEFFFFFF"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="4dp"
+                    android:text="Открыть"
+                    android:textColor="#787878"
+                    android:textSize="10sp"
+                    app:cornerRadius="12dp"
+
+                    />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@android:color/transparent"
+                android:outlineAmbientShadowColor="#1D000000"
+                android:outlineSpotShadowColor="#0C000000"
+                app:cardBackgroundColor="#00FFFFFF"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true"
+
+                >
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:backgroundTint="#EEFFFFFF"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="4dp"
+                    android:text="Редактировать"
+                    android:textColor="#787878"
+                    android:textSize="10sp"
+                    app:cornerRadius="12dp" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+
+
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="2dp"
+                android:background="@android:color/transparent"
+                android:outlineAmbientShadowColor="#1D000000"
+                android:outlineSpotShadowColor="#0C000000"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+
+                app:cardUseCompatPadding="true">
+
+                <ImageView
+                    android:id="@+id/open_in_browser"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="open"
+                    android:src="@drawable/open_in_browser"
+
+
+                    />
+
+
+            </androidx.cardview.widget.CardView>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="-0dp"
+            android:background="@drawable/divider_device_scan_background"
+            android:elevation="4dp"
+
+            />
+
+    </LinearLayout>
+
+
+</LinearLayout>

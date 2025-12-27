@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edit_manual_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Имя устройства"
+        android:layout_marginBottom="12dp" />
+
+    <EditText
+        android:id="@+id/edit_manual_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Адрес (например, 192.168.1.100)"
+        android:inputType="textUri"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Выбор фавикона -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Фавикон:"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp"/>
+
+    <Spinner
+        android:id="@+id/spinner_favicon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+
+
+        />
+
+    <!-- Предпросмотр выбранной иконки -->
+    <ImageView
+        android:id="@+id/image_favicon_preview"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal"
+        android:background="#EEEEEE"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/ic_device" />
+
+</LinearLayout>

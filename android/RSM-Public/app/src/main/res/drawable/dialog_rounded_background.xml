@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Установите цвет фона. Используйте цвет из вашей темы или укажите явно -->
+    <!-- Например, ?attr/colorSurface для Material3 или @color/white для старых тем -->
+    <solid android:color="?attr/colorSurface" />
+    <stroke
+        android:width="2dp"
+        android:color="#F2395F29"
+        />
+    <!-- Здесь задается радиус закругления углов -->
+    <corners android:radius="16dp" />
+
+</shape>

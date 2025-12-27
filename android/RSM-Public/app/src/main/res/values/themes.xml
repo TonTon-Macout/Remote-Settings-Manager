@@ -1,0 +1,1054 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.RSM" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:forceDarkAllowed">false</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+
+    </style>
+
+    <style name="Theme.RSM" parent="Base.Theme.RSM" />
+
+    <!-- ДЕФОЛТНАЯ ТЕМА -->
+    <style name="Theme.RSM.DEFAULT" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background</item>
+        <item name="headerBackground">#D3CECE</item>
+
+        <!-- цвет кнолпки в выпадающей панели -->
+        <item name="buttonBackgroundTint">#A9D0C5C5</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#FFFFFF</item>
+        <!-- фон кнопки в выпадающей панли (только форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки в выпадающей панели -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#F3D3CECE</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#736E6E</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#F1504B4B</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#736E6E90</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#E2E0DD</item>
+
+
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах  === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#D3CECE</item>
+        <item name="SettingsBackgroundTintBottom">#D3CECE</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">#a09c9c</item>
+
+
+
+
+    </style>
+
+    <!-- БУДНИ  -->
+    <style name="Theme.RSM.MONO" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+
+
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_mono</item>
+        <item name="headerBackground">#525252</item>
+
+        <!-- цвет кнолпки в выпадающей панели -->
+        <item name="buttonBackgroundTint">#525252</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#00424242</item>
+        <!-- фон кнопки в выпадающей панли (только форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#525252</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+        <!-- цвет текста кнопки в выпадающей панели -->
+        <item name="textButtonBackgroundTint">#B6B6B6</item>
+
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#787878</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#4D4D4D</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#49404040</item>
+
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах  === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#5B5B5B</item>
+        <item name="SettingsBackgroundTintBottom">#3A3A3A</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+
+
+    </style>
+
+    <!-- ДОМАШНЯЯ -->
+    <style name="Theme.RSM.GREEN" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_green</item>
+        <item name="headerBackground">#0b4a3f</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#0b4a3f</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#C9FFFFFF</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#989494</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#365431</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#08372E</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#0b4a3f</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#0b4a3f</item>
+        <item name="SettingsBackgroundTintBottom">#08352E</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- НОЧЬ -->
+    <style name="Theme.RSM.BLACK" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок -->
+        <item name="headerBackgroundSrc">@drawable/header_background_dark_black_anim</item>
+        <item name="headerBackground">#181818</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#2F2F2F</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#D1CACACA</item>
+
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#181818</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#565656</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#000000</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#49262626</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах  === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#2C2A2A</item>
+        <item name="SettingsBackgroundTintBottom">#1D1D1D</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">#4c4a4a</item>
+    </style>
+
+    <!-- ЗЕЛЕНАЯ -->
+    <style name="Theme.RSM.ORANGE" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background</item>
+        <item name="headerBackground">#7A9064</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#6B834F</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#A5C18E</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#CEE4B2</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#6B834F</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#475630</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#6B834F</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#A3475630</item>
+
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#A3475630</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#7A9064</item>
+        <item name="SettingsBackgroundTintBottom">#475630</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+    <!-- КАВАЙ -->
+    <style name="Theme.RSM.COLORS" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_colors_anim</item>
+        <item name="headerBackground">#D3CECE</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#99ffb3bb</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#C3FFFFFF</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#A9f64f76</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#01086F</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#106610</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#ff9e9e</item>
+        <item name="SettingsBackgroundTintBottom">#ff6584</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+    <!-- ГРАВЮРА-->
+    <style name="Theme.RSM.GRAY" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_gray</item>
+        <item name="headerBackground">#434242</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#2E505050</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#7c7a78</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#91EACFB1</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#3C3C3C</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#434343</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#646464</item>
+        <item name="SettingsBackgroundTintBottom">#505050</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- СНЕГОВИК -->
+    <style name="Theme.RSM.YELLOW" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_yellow</item>
+        <item name="headerBackground">#3C0000</item>
+
+        <!-- цвет кнолпки в выпадающей панели -->
+        <item name="buttonBackgroundTint">#95730000</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#8FFFFFFF</item>
+        <!-- фон кнопки в выпадающей панли (только форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки в выпадающей панели -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#95730000</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#4D0101</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#380000</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах  === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#800101</item>
+        <item name="SettingsBackgroundTintBottom">#5B0000</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">#b43a3a</item>
+
+
+    </style>
+
+
+    <!-- БЛЕДНО КРАСНАЯ ТЕМА -->
+    <style name="Theme.RSM.PALERED" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <item name="headerBackground">#682A2A</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#7A3333</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#C3ee9f94</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#ffd2cb</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#7d3630</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">#C3ee9f94</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#5F2B2B</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#47120C</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#873C32</item>
+        <item name="SettingsBackgroundTintBottom">#682A2A</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- КРАСНАЯ ПЛАНЕТА -->
+    <style name="Theme.RSM.RED" parent="Base.Theme.RSM">
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_red</item>
+        <item name="headerBackground">#b17b63</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#C3800000</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#C3800000</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#c99178</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#500E00</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#661910</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#aa302d</item>
+        <item name="SettingsBackgroundTintBottom">#800000</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- ЭНЦЕЛАД  -->
+    <style name="Theme.RSM.BLUELIGHT" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#44596e</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_blue_lighrt</item>
+        <item name="headerBackground">#D3CECE</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#44596e</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#e5edef</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#98b4c2</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#253952</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#1A2835</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#455a6f</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#3D6F99</item>
+        <item name="SettingsBackgroundTintBottom">#224C64</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- ЗЕМЛЯ  -->
+    <style name="Theme.RSM.BLUE" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_blue</item>
+        <item name="headerBackground">#9cc4cc</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#4E969451</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#9cc4cc</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#9cc4cc</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#47543a</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#47543a</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#3A452F</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#394a32</item>
+        <item name="SettingsBackgroundTintBottom">#56714B</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- ГОРОД -->
+    <style name="Theme.RSM.PURPLE" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_purple</item>
+        <item name="headerBackground">#1c0e25</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#2E2766</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#b6ffff</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#b6ffff</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#273e66</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#26016F</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#321066</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#391E50</item>
+        <item name="SettingsBackgroundTintBottom">#1c0e25</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">#2e2766</item>
+    </style>
+
+
+    <!-- НЕГАТИВ -->
+    <style name="Theme.RSM.PURPLEGRADIENT" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/header_background_purple_gradient</item>
+        <item name="headerBackground">#000000</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#BF020202</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#C3FFFFFF</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#BF020202</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#000000</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#000000</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#497E7E7E</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#383838</item>
+        <item name="SettingsBackgroundTintBottom">#161616</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+    </style>
+
+
+    <!-- АРАКЕС -->
+    <style name="Theme.RSM.YELLOWGREEN" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#40F8EAEA</item>
+
+
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/anim_header_background_green_yelow</item>
+        <item name="headerBackground">#C0570101</item>
+
+        <!-- цвет кнолпки в выпадающей панели -->
+        <item name="buttonBackgroundTint">#5DBF7548</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#C0570101</item>
+        <!-- фон кнопки в выпадающей панли (только форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки в выпадающей панели -->
+        <item name="textButtonBackgroundTint">#13100e</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#641d1c</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">#bd5d39</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#260000</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#3E0000</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#C0570101</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах  === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#73231a</item>
+        <item name="SettingsBackgroundTintBottom">#2d1a13</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+
+    </style>
+
+    <!-- ГИКЕАН -->
+    <style name="Theme.RSM.COLORGRADIENT" parent="Base.Theme.RSM">
+        <item name="android:colorControlHighlight">#af5346</item>
+        <!-- ГЛАВНАЯ -->
+        <!-- Заголовок выпадающей панели -->
+        <item name="headerBackgroundSrc">@drawable/anim_header_background_color_gradient</item>
+        <item name="headerBackground">#af5246</item>
+        <!-- цвет кнолпки (только цвет) -->
+        <item name="buttonBackgroundTint">#CD223949</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonStrokeTint">#af5346</item>
+        <!-- фон кнопки - (форма) -->
+        <item name="buttonBackground">@drawable/scan_button_background</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonBackgroundTint">#FFFFFF</item>
+        <!-- цвет адресной строки в выпадающей панели -->
+        <item name="addressBackgroundTint">#D3223949</item>
+        <!-- цвет текста адресной строки в выпадающей панели -->
+        <item name="textAddressBackgroundTint">#61b3c5</item>
+
+        <!-- цвет текста устройства  в выпадающей панели -->
+        <item name="textDeviceTint">#092A3E</item>
+        <!-- цвет иконки  устройства  в выпадающей панели -->
+        <item name="textDeviceIconsTint">#223949</item>
+        <!-- цвет разделителя  в выпадающей панели -->
+        <item name="deviceDividerBackground">#D3223949</item>
+
+        <!-- УСТРОЙСТВА -->
+        <!-- Заголовок -->
+        <item name="headerScanBackgroundSrc">@drawable/settings_activity_baground_all_colors</item>
+        <!-- цвет кнолпки  -->
+        <item name="buttonScanBackgroundTint">?attr/buttonBackgroundTint</item>
+        <!-- фон кнопки  -->
+        <item name="buttonScanBackground">@drawable/scan_button_background</item>
+        <!-- цвет обводки кнолпки в выпадающей панели -->
+        <item name="buttonScanStrokeTint">?attr/buttonStrokeTint</item>
+        <!-- цвет текста кнопки -->
+        <item name="textButtonScanBackgroundTint">?attr/textButtonBackgroundTint</item>
+
+        <!-- фон нового устройства -->
+        <item name="newDeviceScanBackground">@drawable/device_background</item>
+        <!-- цвет нового устройства (середина) -->
+        <item name="newDeviceScanTint">#CFE0FFD4</item>
+        <!-- цвет разделителя устройства -->
+        <item name="deviderDeviceScanTint">#736E6E90</item>
+
+        <!-- цвет текста устройства -->
+        <item name="textScanDeviceTint">?attr/textDeviceTint</item>
+        <!-- цвет текста в параметрах === НЕ ИСПОЛЬЗУЕТСЯ, всегда белый -->
+        <item name="textScanTint">#165731</item>
+
+
+        <!-- НАСТРОЙКИ -->
+        <!-- Заголовок -->
+        <item name="headerSettingsBackground">@drawable/settings_activity_baground_all_colors</item>
+        <item name="SettingsBackgroundTintTop">#b05447</item>
+        <item name="SettingsBackgroundTintBottom">#22384d</item>
+        <item name="SettingsBackgroundTintAngle">270</item>
+
+        <!-- цвет знака вопроса в настройках и устройствах  -->
+        <item name="questionTint">?attr/SettingsBackgroundTintTop</item>
+
+    </style>
+
+
+
+
+
+
+</resources>

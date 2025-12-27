@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Полоса с градиентом толщиной -->
+    <item
+        android:left="0dp"
+        android:right="0dp"
+        android:bottom="0dp"
+        android:top="0dp"
+        >
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#00000000"
+                android:centerColor="#FFFFFF"
+                android:endColor="#00000000"
+                android:angle="0" />
+
+        </shape>
+    </item>
+
+</layer-list>
