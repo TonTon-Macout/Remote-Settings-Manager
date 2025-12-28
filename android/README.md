@@ -28,7 +28,6 @@
 </div>
 
 <br>
-  
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.0"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
@@ -41,7 +40,11 @@
 
 
 <img width="4824" height="2412" alt="Без имени-2" src="https://github.com/user-attachments/assets/02c23b5c-aefa-413c-9d92-d2c38720275f" />
+<br><br>
 
+[https://www.youtube.com/shorts/ch9GHMlZML4](https://www.youtube.com/shorts/ch9GHMlZML4) - видос-демонстрация первого открытия, сканирования сети и открытия небезопасного сайта
+
+<br>
 
 ## Возможности приложения:
 + Поиск в локальной сети и отображение устройств, с  **Settings**, **WLED**, **Home Assistant**, любых других доступных вебинтерфейсов
