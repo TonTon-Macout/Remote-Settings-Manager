@@ -27,7 +27,7 @@
 </div>
 
 <br>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.1"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.2"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
 
@@ -90,6 +90,10 @@
 
 <h2 id="relise"  > Версии </h2>
 
++ [1.2.2](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.2)
+  + Отключение истории отключает возвращение на предыдущее устройство, историю навигации внутри устройства сохраняется.
+  + Обновить страницу теперь можно по двойному тапу на ярлык
+  + ...
 + [1.2.0](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.1)
   + Массштабное обновление. 
   + Главное изменение это режим разделения сетей, теперь если активировать его в настройках, все устройства будут не одной большой простыней, а в каждой сети свои. 
