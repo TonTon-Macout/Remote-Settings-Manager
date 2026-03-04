@@ -1,11 +1,11 @@
-VERSION = "1.1.6"
+VERSION = "1.1.1"
 NAME = "RSM" # 
 
 TEST_SPLASH = 0.1 # пауза при заполнении прогрес бара
  
-DEBUG = False # вывод в консоль True
+DEBUG = False # вывод в консоль
 STAMP = True # префикс со временем
-REPO = "TonTon-Macout/Remote-Settings-Manager"  # Репо
+REPO = "TonTon-Macout/APP-for-AlexGyver-Settings"  # Репо
 
 
 import sys,json, requests, ipaddress, os, socket, math, re
@@ -42,8 +42,6 @@ from datetime import datetime
 #from zeroconf import ServiceBrowser, Zeroconf
 import threading
 
-from packaging.version import parse as parse_version
-    
 
 def resource_path(relative_path):
     """Получает абсолютный путь к ресурсу, работает как в разработке, так и в собранном exe."""
@@ -555,7 +553,7 @@ class WebBrowser(QMainWindow):
             QApplication.processEvents()
             time.sleep(TEST_SPLASH)
 
-        self.check_timeout = 1.2 # в секундах
+        self.check_timeout = 0.7 # в секундах
         self.update_available = False
         self.latest_version = None
         
@@ -623,7 +621,7 @@ class WebBrowser(QMainWindow):
         self.window_height = self.default_height  # Значение по умолчанию задано ранее в __init__
         self.zoom_factor = self.default_zoom_factor  # Значение по умолчанию задано ранее в __init__
         self.custom_colors_enabled = False  # Использовать пользовательские цвета всегда
-        self.check_timeout = 1.2       # Таймаут проверки доступности (в секундах)
+        self.check_timeout = 0.7       # Таймаут проверки доступности (в секундах)
         self.custom_border_color = self.default_border_color  # Изначально используем цвет по умолчанию
         self.custom_back_color = self.default_back_color      # Изначально используем цвет по умолчанию
         self.custom_bottom_color = self.default_bottom_color  # Изначально используем цвет по умолчанию
@@ -1261,7 +1259,7 @@ class WebBrowser(QMainWindow):
                 self.window_width   = settings.get("window_width", 800)  # Ширина окна
                 self.window_height  = settings.get("window_height", 600)  # Высота окна
                 self.zoom_factor    = settings.get("zoom_factor", 1.0)  # Масштаб браузера
-                self.check_timeout  = settings.get("check_timeout", 1.2)  # Таймаут проверки
+                self.check_timeout  = settings.get("check_timeout", 0.7)  # Таймаут проверки
 
                 # Устанавливаем флаг использования пользовательских цветов
                 self.custom_colors_enabled = settings.get("custom_colors_enabled", False)
@@ -2082,7 +2080,7 @@ class WebBrowser(QMainWindow):
         #max_width = self.width() - 100  
         #self.address_input.setMinimumWidth(max(min_width, min(width, max_width)))
 
-    def check_latest_versionOld(self):
+    def check_latest_version(self):
         try:
             # Запрос к GitHub API для получения последнего релиза
             url = f"https://api.github.com/repos/{REPO}/releases/latest"
@@ -2100,63 +2098,9 @@ class WebBrowser(QMainWindow):
         except Exception as e:
             Debug.info(f"Не удалось проверить версию на GitHub: {e}")
 
-
-
-
-
-
-    def check_latest_version(self):
-        try:
-            # Запрос к GitHub API для получения всех релизов 
-            url = f"https://api.github.com/repos/{REPO}/releases"
-            headers = {
-                'User-Agent': 'RSM-Updater/1.1.0',  # ✅ Обязательно!
-                'Accept': 'application/vnd.github.v3+json'
-            }
-            response = requests.get(url,headers=headers, timeout=10)
-            if response.status_code == 200:
-                releases = response.json()
-                self.latest_version = None
-
-                # Ищем релиз с .exe файлом
-                for release in releases:
-                    # Проверяем наличие .exe файла в активах
-                    exe_found = False
-                    for asset in release["assets"]:
-                        if asset["name"].endswith(".exe"):
-                            exe_found = True
-                            break
-                        
-                    if exe_found:
-                        # Используем тег релиза как версию
-                        tag_name = release["tag_name"]
-                        # Убираем префикс v если есть (v1.1.1 -> 1.1.1)
-                        self.latest_version = tag_name.lstrip('v')
-                        break
-                    
-                if self.latest_version:
-                    if self.compare_versions(self.latest_version, VERSION) > 0:
-                        self.update_available = True
-                        Debug.info(f"Доступна новая версия: {self.latest_version} (текущая: {VERSION})")
-                    else:
-                        Debug.info(f"Уже последняя версия: {VERSION}")
-                else:
-                    Debug.warning("Не найден релиз с .exe файлом")
-            else:
-                Debug.warning(f"Ошибка проверки версии: {response.status_code}")
-        except Exception as e:
-            Debug.info(f"Не удалось проверить версию на GitHub: {e}")
-
-    def compare_versions(self, version1, version2):
-        """Сравнивает две версии в формате '1.2.3'
-        Возвращает: 1 если version1 > version2, -1 если version1 < version2, 0 если равны"""
-        return 1 if parse_version(version1) > parse_version(version2) else -1 if parse_version(version1) < parse_version(version2) else 0
-
-
-
     def open_latest_release_page(self):
         if self.latest_version:
-            url = f"https://github.com/{REPO}/releases/tag/{self.latest_version}"
+            url = f"https://github.com/{REPO}/releases/tag/v{self.latest_version}"
 
             webbrowser.open(url)
 
@@ -2689,28 +2633,11 @@ class WebBrowser(QMainWindow):
 
     def handle_accent_color(self, color):
         """Универсальный обработчик акцентного цвета"""
-        
         Debug.blue(f"handle_accent_color вызван с цветом: {color}")
-        
-        if not isinstance(color, str):
-            color = "#37a93c"
-            Debug.error(f"[handle_accent_color] невалидный код цвета: {color}")
-            Debug.warning(f"[handle_accent_color] назначен цвет по умолчанию: #37a93c")
-        else:
-            color = color.strip()
 
-        
-        if not color.startswith("#") or len(color) not in (4, 7, 9):
-            color = "#37a93c"
-            Debug.error(f"[handle_accent_color] невалидный код цвета: {color}")
-            Debug.warning(f"[handle_accent_color] назначен цвет по умолчанию: #37a93c")
-        elif not all(c in "0123456789abcdefABCDEF" for c in color[1:]):
-            Debug.error(f"[handle_accent_color] невалидный код цвета: {color}")
-            Debug.warning(f"[handle_accent_color] назначен цвет по умолчанию: #37a93c")
-            color = "#37a93c"
-
-        self.accent_color = color.upper()        
-
+        if not color or not color.strip():
+            Debug.warning("handle_accent_color: цвет пустой или None")
+            return
 
         try:
             if not hasattr(self, 'browser') or not self.browser or self.browser.isHidden():
@@ -3002,87 +2929,6 @@ class WebBrowser(QMainWindow):
             indicator_size
         )
         self.set_icon()
-
-
-    def paintEventtest(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    
-        # === ТВОЙ ПАРАМЕТР: ТОЛЩИНА РАМКИ ===
-        border_width = getattr(self, 'border_width', 10)  # ← ВВОДИ СЮДА ЧИСЛО
-    
-        # === АВТОМАТИЧЕСКИЕ РАСЧЁТЫ ===
-        margin       = max(4, border_width // 2 + 2)           # Отступ от края (минимум 4)
-        corner_radius = max(15, border_width + 10)             # Скругление (не меньше 15)
-        inner_margin = margin + border_width // 2              # Внутренний отступ для фона
-    
-        # === Цвета ===
-        border_color = getattr(self, 'border_color', QColor(49, 113, 49, 150))
-        top_color    = getattr(self, 'back_color', QColor(28, 29, 34, 255))
-    
-        # (твоя логика выбора bottom_color остаётся без изменений)
-        current_url = self.browser.url().toString()
-        device_colors = self.device_custom_colors.get(current_url, {})
-        
-        if device_colors.get("use_custom_colors", False):
-            bottom_color = QColor(*device_colors.get("bottom", device_colors.get("back", [28, 29, 34, 255])))
-        elif self.custom_colors_enabled:
-            bottom_color = self.custom_bottom_color
-        else:
-            bottom_color = top_color.darker(150)
-        
-        if self.no_color == "black":
-            top_color = QColor(0, 0, 0, 255)
-            bottom_color = QColor(0, 0, 0, 255)
-        elif self.no_color == "gray":  
-            top_color = QColor(28, 29, 34, 255)
-            bottom_color = QColor(28, 29, 34, 255)
-    
-        # === Фон: шапка ===
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(QBrush(top_color))
-        painter.drawRoundedRect(
-            self.rect().adjusted(inner_margin, inner_margin, -inner_margin, -90-inner_margin),
-            corner_radius, corner_radius
-        )
-    
-        # === Фон: подвал ===
-        painter.setBrush(QBrush(bottom_color))
-        painter.drawRoundedRect(
-            self.rect().adjusted(inner_margin, 90+inner_margin, -inner_margin, -inner_margin),
-            corner_radius, corner_radius
-        )
-    
-        # === Рамка ===
-        pen = QPen(border_color, border_width)
-        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)  # Плавные стыки при толстой рамке
-        painter.setPen(pen)
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.drawRoundedRect(
-            self.rect().adjusted(margin, margin, -margin, -margin),
-            corner_radius, corner_radius
-        )
-    
-        # === Точка в углу (с учётом толщины рамки) ===
-        point_size = max(6, border_width // 2)
-        painter.setBrush(QBrush(border_color))
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawEllipse(
-            self.width() - point_size - margin,
-            self.height() - point_size - margin,
-            point_size * 2,
-            point_size * 2
-        )
-    
-        # === Индикатор (смещён от кнопки) ===
-        indicator_size = 8
-        indicator_x = self.scan_button.x() - indicator_size + 13
-        indicator_y = self.scan_button.y() + (self.scan_button.height() - indicator_size) // 2 - 1
-        painter.setBrush(QBrush(self.indicator_color))
-        painter.drawEllipse(indicator_x, indicator_y, indicator_size, indicator_size)
-    
-        self.set_icon()
-    
 
     def start_indicator_animation(self):
         if not self.indicator_visible:
@@ -3708,7 +3554,7 @@ class WebBrowser(QMainWindow):
                             bridge = channel.objects.pybridge;
                         }}); 
 
-                       if (false) setTimeout(() => {{
+                        setTimeout(() => {{
                             document.body.style.backgroundColor = '#000000';
                              const msg = document.querySelector('.message');
                             msg.style.height = '0';
@@ -3754,7 +3600,7 @@ class WebBrowser(QMainWindow):
                                     
                                 }}, 7000);
                             }}, 5000);
-                        }}, 255000);
+                        }}, 55000);
                     
                 </script>
             </body>
@@ -5140,37 +4986,6 @@ class ScanDialog(QDialog):
     
     def start_scan(self):
         Debug.teal("\nStarting scan...")
-        
-        # Проверяем размер подсети
-        subnet_mask = self.subnet_input.currentText()
-        try:
-            network = ipaddress.ip_network(subnet_mask)
-            num_addresses = network.num_addresses
-
-            # Если сеть содержит более 1000 адресов, показываем предупреждение
-            if num_addresses > 1000:
-                reply = QMessageBox.warning(
-                    self,
-                    "Предупреждение",
-                    f"Выбранная подсеть содержит {num_addresses} адресов.\n\n"
-                    "Сканирование большой сети может занять длительное время и создать "
-                    "значительную нагрузку на сеть.\n\n"
-                    "Рекомендуется:\n"
-                    "• Использовать более узкую подсеть\n"
-                    "• Добавлять устройства вручную\n"
-                    "• При необходимости остановить сканирование кнопкой 'Стоп'\n\n"
-                    "Продолжить сканирование?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No
-                )
-                if reply == QMessageBox.StandardButton.No:
-                    return
-
-        except ValueError as e:
-            QMessageBox.warning(self, "Warning", f"Неверная маска подсети: {e}")
-            Debug.error(f"Неверная маска подсети: {e}")
-            return        
-        
         self.scanning = True
         self.scan_button.setText("Стоп")
         self.stop_flag.value = 0
@@ -5288,9 +5103,6 @@ class ScanDialog(QDialog):
         self.highlight_last_device()
         self.update_buttons_state()
         self.update_list_style()
-        
-        self.device_list.scrollToBottom()
-        Debug.green(" ✔  нашли что то новое!")
 
    
    
@@ -5436,9 +5248,7 @@ class ScanDialog(QDialog):
                 item.setIcon(QIcon(type_icon_path))
 
             self.device_list.addItem(item)
-            
-            
-            
+
             # Проверяем, соответствует ли устройство текущим значениям в полях ввода
             #if device.get("name", "") == current_name and device.get('url', '') == current_url:
             #    font = QFont()
