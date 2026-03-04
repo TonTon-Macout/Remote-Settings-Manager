@@ -107,7 +107,12 @@
 
 <h2 id="relise"  > Версии </h2>
 
-ссылка на последнюю версию программы ([https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.4](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3))<br> <br> 
+ссылка на последнюю версию программы ([https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7+1.2.3](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3))<br> <br> 
+
++ v1.1.7
+  - Исправлен баг который мог приводить к крашу приложения при получении акцентных цветов в сеттингс
+  - В окне сканирования если нашлись новые устройства прокрутит список устройств вниз
+  - Мелкие исправления
 + v1.1.1
   -  добавил поиск любого веб-интерфейса в локальной сети
 + v1.0.0
