@@ -27,8 +27,8 @@
 <br>
 
 
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="APK Latest"></a>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.3"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 
 
 
@@ -107,7 +107,7 @@
 
 <h2 id="relise"  > Версии </h2>
 
-ссылка на последнюю версию программы ([https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7+1.2.3](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3))<br> <br> 
+ссылка на последнюю версию программы ([https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7))<br> <br> 
 
 + v1.1.7
   - Исправлен баг который мог приводить к крашу приложения при получении акцентных цветов в сеттингс
