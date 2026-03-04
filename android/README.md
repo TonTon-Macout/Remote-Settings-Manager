@@ -27,8 +27,8 @@
 </div>
 
 <br>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.3"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
 
 <br>
@@ -90,7 +90,7 @@
 
 <h2 id="relise"  > Версии </h2>
 
-+ [1.2.3](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.6.7%2B1.2.3)
++ [1.2.3](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.3)
   + Кнопка очистки кеша и данных в настройках
   + Отметка неактивных устройств
   + ...
