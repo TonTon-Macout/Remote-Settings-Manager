@@ -27,7 +27,7 @@
 </div>
 
 <br>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.3"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.4"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
 
@@ -86,10 +86,21 @@
       - Ну и классичесское: Автор **не несет ответственности** за любые последствия использования RSM для доступа к непредназначенному контенту (фишинг, кража сессий, утечка данных и т.д.). <br>Используйте RSM только для доступа к своим устройсвам в своей сети!
   <br>
   
-  
+  ## Обновление Android  приложения
+
+
 
 <h2 id="relise"  > Версии </h2>
 
+
++ [1.2.4](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.4)
+  - Устранил баг с невозможностью удалить устройство в некоторых сценариях использования
+  - Прозрачная шапка. 
+      - можно отключить в настройках глобально или для каждого устройства
+  - Обновление свайпом можно теперь отключить для конкретного устройства
+  - Открытие панели резким свайпом снизу вверх. 
+      - можно отключить в настройках
+  - Небольшие оптимизации и исправления 
 + [1.2.3](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.3)
   + Кнопка очистки кеша и данных в настройках
   + Отметка неактивных устройств
