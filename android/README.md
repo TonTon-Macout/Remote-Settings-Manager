@@ -27,7 +27,7 @@
 </div>
 
 <br>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.4"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.5"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
 
@@ -92,7 +92,9 @@
 
 <h2 id="relise"  > Версии </h2>
 
-
++ [1.2.5](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.5)
+  - Исправил баг, при котором при переключении на новую сеть, открытое устройство могло добавиться в нее само
+  - И чтобы инкремент версии не был из за одной убранной строчки, добавил виброотклик на открытие шторки и окончание проверки доступности устройств (можно отключить в настройках) 
 + [1.2.4](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.4)
   - Устранил баг с невозможностью удалить устройство в некоторых сценариях использования
   - Прозрачная шапка. 
