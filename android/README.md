@@ -27,7 +27,7 @@
 </div>
 
 <br>
-<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.8"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
+<a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.9"><img src="https://img.shields.io/badge/APK-latest-green?style=flat" alt="APK Latest"></a>
 <a href="https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.1.7"><img src="https://img.shields.io/badge/EXE-latest-blue?style=flat" alt="EXE Latest"></a>
 
 
@@ -101,7 +101,7 @@
 
 
 <h2 id="relise"  > Версии </h2>
-+ [1.2.8](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.8)
++ [1.2.9](https://github.com/TonTon-Macout/Remote-Settings-Manager/releases/tag/1.2.9)
   - Ярлык теперь прилипает и к левой и правой стороне
   - Добавлена поддержка поиска Settings 1.5
   - Уменьшил область свайпа сверху вниз для открытия шторки 
